@@ -1,0 +1,429 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  @include flex-center;
+  overflow: hidden;
+  padding-top: 80px;
+  
+  // Background effects
+  &::before {
+    content: '';
+    @include absolute-cover;
+    background: 
+      radial-gradient(ellipse at top, rgba(14, 165, 233, 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.1) 0%, transparent 60%),
+      radial-gradient(ellipse at bottom left, rgba(16, 185, 129, 0.1) 0%, transparent 60%);
+    z-index: -1;
+  }
+  
+  &::after {
+    content: '';
+    @include absolute-cover;
+    background: 
+      linear-gradient(0deg, rgba(10, 10, 15, 0.8) 0%, transparent 20%),
+      linear-gradient(180deg, rgba(10, 10, 15, 0.4) 0%, transparent 30%);
+    z-index: -1;
+  }
+}
+
+.container {
+  max-width: $container-2xl;
+  margin: 0 auto;
+  padding: 0 $space-6;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-16;
+  align-items: center;
+  min-height: 80vh;
+  
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-12;
+    text-align: center;
+    padding: 0 $space-4;
+  }
+  
+  @include respond-below(md) {
+    padding: 0 $space-3;
+    gap: $space-8;
+    min-height: 70vh;
+  }
+}
+
+.content {
+  @include flex-column;
+  gap: $space-8;
+  
+  @include respond-below(lg) {
+    align-items: center;
+    order: 2;
+  }
+}
+
+// Badge
+.badge {
+  position: relative;
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-3 $space-6;
+  @include glass-effect(0.1);
+  border: 1px solid rgba($color-primary-500, 0.3);
+  border-radius: $radius-full;
+  color: $color-primary-300;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  align-self: flex-start;
+  
+  @include respond-below(lg) {
+    align-self: center;
+  }
+  
+  @include respond-below(md) {
+    padding: $space-2 $space-4;
+    font-size: $font-size-xs;
+  }
+}
+
+.badgeIcon {
+  color: $color-primary-400;
+}
+
+.badgeGlow {
+  @include absolute-cover;
+  background: $gradient-primary;
+  border-radius: inherit;
+  opacity: 0.1;
+  filter: blur(10px);
+  z-index: -1;
+}
+
+// Title
+.title {
+  @include heading-1;
+  color: $text-inverse;
+  margin: 0;
+  line-height: 1.1;
+  
+  @include respond-below(lg) {
+    text-align: center;
+  }
+}
+
+.titleHighlight {
+  position: relative;
+  @include text-gradient($gradient-primary);
+  display: inline-block;
+}
+
+.titleUnderline {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: $gradient-primary;
+  border-radius: $radius-full;
+  transform-origin: left;
+  
+  @include respond-below(md) {
+    bottom: -4px;
+    height: 3px;
+  }
+}
+
+// Subtitle
+.subtitle {
+  @include body-large;
+  color: rgba($text-inverse, 0.8);
+  max-width: 600px;
+  line-height: 1.6;
+  margin: 0;
+  
+  @include respond-below(lg) {
+    text-align: center;
+    max-width: 700px;
+  }
+  
+  @include respond-below(md) {
+    font-size: $font-size-base;
+  }
+}
+
+// Actions
+.actions {
+  @include flex-center;
+  gap: $space-6;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-4;
+    width: 100%;
+  }
+}
+
+// Stats
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-6;
+  }
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.stat {
+  @include flex-column-center;
+  gap: $space-1;
+  text-align: center;
+}
+
+.statNumber {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-extrabold;
+  @include text-gradient($gradient-primary);
+  
+  @include respond-below(md) {
+    font-size: $font-size-xl;
+  }
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: rgba($text-inverse, 0.7);
+  font-weight: $font-weight-medium;
+}
+
+// Visual section
+.visual {
+  position: relative;
+  @include flex-center;
+  min-height: 600px;
+  
+  @include respond-below(lg) {
+    order: 1;
+    min-height: 400px;
+  }
+  
+  @include respond-below(md) {
+    min-height: 300px;
+  }
+}
+
+.aiVisualization {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  @include flex-center;
+  
+  @include respond-below(lg) {
+    width: 400px;
+    height: 400px;
+  }
+  
+  @include respond-below(md) {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+// AI Core
+.aiCore {
+  position: relative;
+  @include flex-center;
+  width: 120px;
+  height: 120px;
+  background: $gradient-primary;
+  border-radius: 50%;
+  z-index: 10;
+  
+  @include respond-below(md) {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+.aiCoreIcon {
+  color: $text-inverse;
+  z-index: 1;
+  
+  @include respond-below(md) {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+.aiCoreGlow {
+  @include absolute-cover;
+  background: $gradient-primary;
+  border-radius: 50%;
+  filter: blur(20px);
+  opacity: 0.6;
+  z-index: 0;
+}
+
+// Orbiting icons
+.orbitIcon {
+  position: absolute;
+  @include flex-center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  color: $text-inverse;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transform-origin: center;
+  
+  // Create circular orbit
+  left: 50%;
+  top: 50%;
+  margin-left: calc(var(--radius) * -0.5);
+  margin-top: -30px;
+  
+  @include respond-below(md) {
+    width: 50px;
+    height: 50px;
+    margin-top: -25px;
+  }
+  
+  &::before {
+    content: '';
+    @include absolute-cover;
+    border-radius: 50%;
+    opacity: 0.3;
+    filter: blur(10px);
+  }
+}
+
+.orbitPrimary {
+  background: $gradient-primary;
+  box-shadow: $shadow-glow-sm;
+  
+  &::before {
+    background: $gradient-primary;
+  }
+}
+
+.orbitNeural {
+  background: $gradient-neural;
+  box-shadow: $shadow-neural;
+  
+  &::before {
+    background: $gradient-neural;
+  }
+}
+
+.orbitCyber {
+  background: $gradient-cyber;
+  box-shadow: $shadow-cyber;
+  
+  &::before {
+    background: $gradient-cyber;
+  }
+}
+
+// Data streams
+.dataStream {
+  position: absolute;
+  width: 2px;
+  height: 80px;
+  background: $gradient-data-stream;
+  left: 50%;
+  top: 50%;
+  margin-left: -1px;
+  margin-top: -40px;
+  transform-origin: center bottom;
+  border-radius: $radius-full;
+  opacity: 0.6;
+}
+
+// Particles
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, $color-primary-400 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(0.5px);
+}
+
+// Scroll indicator
+.scrollIndicator {
+  position: absolute;
+  bottom: $space-12;
+  left: 50%;
+  transform: translateX(-50%);
+  @include flex-column-center;
+  gap: $space-2;
+  color: rgba($text-inverse, 0.6);
+  
+  @include respond-below(md) {
+    bottom: $space-8;
+  }
+}
+
+.scrollMouse {
+  width: 24px;
+  height: 40px;
+  border: 2px solid rgba($text-inverse, 0.3);
+  border-radius: $radius-xl;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 8px;
+    background: rgba($text-inverse, 0.6);
+    border-radius: $radius-full;
+  }
+}
+
+.scrollText {
+  font-size: $font-size-xs;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+  font-weight: $font-weight-medium;
+}
+
+// Responsive adjustments
+@include respond-below(sm) {
+  .hero {
+    padding-top: 70px;
+    min-height: 90vh;
+  }
+  
+  .container {
+    min-height: 60vh;
+  }
+  
+  .title {
+    font-size: $font-size-4xl;
+  }
+  
+  .actions {
+    width: 100%;
+    
+    button {
+      width: 100%;
+    }
+  }
+}

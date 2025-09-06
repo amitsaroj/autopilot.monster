@@ -1,0 +1,312 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.button {
+  @include button-reset;
+  @include flex-center;
+  @include focus-glow;
+  
+  position: relative;
+  border-radius: $radius-lg;
+  font-weight: $font-weight-semibold;
+  font-family: $font-family-primary;
+  cursor: pointer;
+  user-select: none;
+  transition: all $duration-normal $ease-out;
+  overflow: hidden;
+  isolation: isolate;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform $duration-slow $ease-out;
+  }
+  
+  &:hover::before {
+    transform: translateX(100%);
+  }
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    
+    &::before {
+      display: none;
+    }
+  }
+}
+
+// Primary variant - AI Blue
+.buttonPrimary {
+  background: $gradient-primary;
+  color: $text-inverse;
+  border: 1px solid $color-primary-600;
+  box-shadow: $shadow-glow-sm;
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, $color-primary-600 0%, $color-primary-800 100%);
+    box-shadow: $shadow-glow-md;
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: $shadow-glow-sm;
+  }
+}
+
+// Secondary variant - Accent Gold
+.buttonSecondary {
+  background: $gradient-accent;
+  color: $color-dark-900;
+  border: 1px solid $color-accent-600;
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.3);
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, $color-accent-600 0%, $color-accent-800 100%);
+    box-shadow: 0 0 25px rgba(234, 179, 8, 0.4);
+    transform: translateY(-1px);
+  }
+}
+
+// Outline variant - Glass morphism
+.buttonOutline {
+  @include glass-dark(0.1);
+  color: $color-primary-400;
+  border: 1px solid rgba($color-primary-500, 0.3);
+  
+  &:hover:not(:disabled) {
+    background: rgba($color-primary-500, 0.1);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-sm;
+  }
+}
+
+// Ghost variant - Minimal with glow
+.buttonGhost {
+  background: transparent;
+  color: $color-primary-400;
+  border: 1px solid transparent;
+  
+  &:hover:not(:disabled) {
+    background: rgba($color-primary-500, 0.1);
+    color: $color-primary-300;
+    box-shadow: inset 0 0 20px rgba($color-primary-500, 0.2);
+  }
+}
+
+// Destructive variant - Error red
+.buttonDestructive {
+  background: linear-gradient(135deg, $color-error 0%, #d13b3b 100%);
+  color: $text-inverse;
+  border: 1px solid $color-error;
+  box-shadow: 0 0 15px rgba($color-error, 0.3);
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 0 25px rgba($color-error, 0.4);
+  }
+}
+
+// Holographic variant - Multi-color shifting
+.buttonHolographic {
+  background: linear-gradient(45deg, 
+    $color-primary-500 0%,
+    $color-cyber-500 25%,
+    $color-neural-500 50%,
+    $color-accent-500 75%,
+    $color-primary-500 100%
+  );
+  background-size: 300% 300%;
+  color: $text-inverse;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: holographicShift 3s ease-in-out infinite;
+  
+  &:hover:not(:disabled) {
+    animation-duration: 1s;
+    box-shadow: 0 0 30px rgba(14, 165, 233, 0.6);
+  }
+}
+
+@keyframes holographicShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+// Neural variant - Green with particles
+.buttonNeural {
+  background: $gradient-neural;
+  color: $text-inverse;
+  border: 1px solid $color-neural-600;
+  box-shadow: $shadow-neural;
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, $color-neural-600 0%, $color-neural-800 100%);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+  }
+}
+
+// Cyber variant - Purple with glow
+.buttonCyber {
+  background: $gradient-cyber;
+  color: $text-inverse;
+  border: 1px solid $color-cyber-600;
+  box-shadow: $shadow-cyber;
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, $color-cyber-600 0%, $color-cyber-800 100%);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  }
+}
+
+// Glow effect modifier
+.buttonGlow {
+  @include pulse-glow;
+}
+
+// Size variants
+.buttonSm {
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  height: 2rem;
+  border-radius: $radius-md;
+}
+
+.buttonMd {
+  padding: $space-3 $space-6;
+  font-size: $font-size-base;
+  height: 2.75rem;
+  border-radius: $radius-lg;
+}
+
+.buttonLg {
+  padding: $space-4 $space-8;
+  font-size: $font-size-lg;
+  height: 3.5rem;
+  border-radius: $radius-xl;
+}
+
+.buttonXl {
+  padding: $space-6 $space-12;
+  font-size: $font-size-xl;
+  height: 4rem;
+  border-radius: $radius-2xl;
+}
+
+// Full width modifier
+.buttonFullWidth {
+  width: 100%;
+}
+
+// Loading state
+.loader {
+  position: absolute;
+  left: $space-4;
+  @include flex-center;
+}
+
+.loaderIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Icon spacing
+.leftIcon {
+  margin-right: $space-2;
+  @include flex-center;
+}
+
+.rightIcon {
+  margin-left: $space-2;
+  @include flex-center;
+}
+
+.content {
+  @include flex-center;
+  position: relative;
+  z-index: 1;
+}
+
+// Holographic overlay effect
+.holographicOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, 
+    rgba(255, 0, 150, 0.1) 0%,
+    rgba(0, 255, 255, 0.1) 25%,
+    rgba(255, 255, 0, 0.1) 50%,
+    rgba(255, 0, 150, 0.1) 75%,
+    rgba(0, 255, 255, 0.1) 100%
+  );
+  background-size: 400% 400%;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity $duration-normal $ease-out;
+  animation: hologramShift 4s ease-in-out infinite;
+  
+  .buttonHolographic:hover & {
+    opacity: 1;
+  }
+}
+
+@keyframes hologramShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+// Particle effect for neural variant
+.particleEffect {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.3) 1px, transparent 1px),
+    radial-gradient(circle at 75% 25%, rgba(16, 185, 129, 0.3) 1px, transparent 1px),
+    radial-gradient(circle at 25% 75%, rgba(16, 185, 129, 0.3) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.3) 1px, transparent 1px);
+  background-size: 20px 20px, 25px 25px, 18px 18px, 22px 22px;
+  opacity: 0;
+  transition: opacity $duration-normal $ease-out;
+  animation: particleFloat 3s linear infinite;
+  
+  .buttonNeural:hover & {
+    opacity: 1;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .buttonLg {
+    padding: $space-3 $space-6;
+    font-size: $font-size-base;
+    height: 3rem;
+  }
+  
+  .buttonXl {
+    padding: $space-4 $space-8;
+    font-size: $font-size-lg;
+    height: 3.5rem;
+  }
+}

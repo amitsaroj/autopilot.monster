@@ -1,0 +1,151 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.filters {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  height: fit-content;
+  position: sticky;
+  top: 120px;
+  
+  @include respond-below(lg) {
+    position: static;
+    margin-bottom: $space-6;
+  }
+}
+
+.header {
+  @include flex-center;
+  gap: $space-3;
+  margin-bottom: $space-8;
+  padding-bottom: $space-4;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin: 0;
+  }
+  
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.filterSection {
+  margin-bottom: $space-8;
+  
+  &:last-of-type {
+    margin-bottom: $space-6;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-4;
+}
+
+.filterOptions {
+  @include flex-column;
+  gap: $space-2;
+}
+
+.filterOption {
+  @include button-reset;
+  padding: $space-3 $space-4;
+  text-align: left;
+  font-size: $font-size-sm;
+  color: rgba($text-inverse, 0.7);
+  border-radius: $radius-lg;
+  transition: all $duration-normal $ease-out;
+  border: 1px solid transparent;
+  
+  &:hover {
+    color: $text-inverse;
+    background: rgba($color-primary-500, 0.1);
+    border-color: rgba($color-primary-500, 0.2);
+  }
+  
+  &.active {
+    color: $color-primary-400;
+    background: rgba($color-primary-500, 0.15);
+    border-color: rgba($color-primary-500, 0.3);
+    font-weight: $font-weight-medium;
+  }
+}
+
+.ratingFilter {
+  @include flex-column;
+  gap: $space-3;
+}
+
+.ratingOption {
+  @include button-reset;
+  @include flex-center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border-radius: $radius-lg;
+  transition: all $duration-normal $ease-out;
+  border: 1px solid transparent;
+  
+  &:hover {
+    background: rgba($color-accent-500, 0.1);
+    border-color: rgba($color-accent-500, 0.2);
+  }
+  
+  &.active {
+    background: rgba($color-accent-500, 0.15);
+    border-color: rgba($color-accent-500, 0.3);
+  }
+  
+  span {
+    font-size: $font-size-sm;
+    color: rgba($text-inverse, 0.7);
+    font-weight: $font-weight-medium;
+  }
+}
+
+.stars {
+  @include flex-center;
+  gap: 2px;
+}
+
+.starFilled {
+  color: $color-accent-400;
+  fill: currentColor;
+}
+
+.starEmpty {
+  color: rgba($color-accent-400, 0.3);
+}
+
+// Responsive adjustments
+@include respond-below(lg) {
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: $space-6;
+    padding: $space-4;
+  }
+  
+  .header {
+    grid-column: 1 / -1;
+    margin-bottom: $space-4;
+  }
+  
+  .filterSection {
+    margin-bottom: 0;
+  }
+}
+
+@include respond-below(md) {
+  .filters {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}

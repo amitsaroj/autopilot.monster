@@ -1,0 +1,305 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-index-sticky;
+  transition: all $duration-normal $ease-out;
+  
+  @include glass-dark(0.05);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  &.scrolled {
+    @include glass-dark(0.1);
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.container {
+  max-width: $container-2xl;
+  margin: 0 auto;
+  padding: 0 $space-6;
+  height: 80px;
+  @include flex-between;
+  
+  @include respond-below(md) {
+    padding: 0 $space-4;
+    height: 70px;
+  }
+}
+
+// Logo styles
+.logo {
+  @include flex-center;
+  gap: $space-3;
+  text-decoration: none;
+  color: $text-inverse;
+  
+  &:hover {
+    .logoText {
+      color: $color-primary-400;
+    }
+  }
+}
+
+.logoIcon {
+  position: relative;
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  background: $gradient-primary;
+  border-radius: $radius-lg;
+  
+  @include respond-below(md) {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.logoSvg {
+  width: 24px;
+  height: 24px;
+  color: $text-inverse;
+  z-index: 1;
+  
+  @include respond-below(md) {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.logoGlow {
+  @include absolute-cover;
+  background: $gradient-primary;
+  border-radius: inherit;
+  filter: blur(8px);
+  opacity: 0.6;
+  z-index: 0;
+}
+
+.logoText {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  transition: color $duration-normal $ease-out;
+  
+  @include respond-below(md) {
+    font-size: $font-size-lg;
+  }
+}
+
+.logoMain {
+  color: $text-inverse;
+}
+
+.logoSub {
+  color: $color-primary-400;
+}
+
+// Desktop navigation
+.desktopNav {
+  @include respond-below(lg) {
+    display: none;
+  }
+}
+
+.navList {
+  @include flex-center;
+  gap: $space-8;
+  list-style: none;
+}
+
+.navLink {
+  position: relative;
+  display: block;
+  padding: $space-2 $space-4;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: rgba($text-inverse, 0.8);
+  text-decoration: none;
+  border-radius: $radius-md;
+  transition: all $duration-normal $ease-out;
+  
+  &:hover {
+    color: $text-inverse;
+    background: rgba($color-primary-500, 0.1);
+  }
+  
+  &.active {
+    color: $color-primary-400;
+  }
+}
+
+.activeIndicator {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: $gradient-primary;
+  border-radius: $radius-full;
+  box-shadow: $shadow-glow-sm;
+}
+
+// Action buttons
+.actions {
+  @include flex-center;
+  gap: $space-4;
+}
+
+.searchBtn,
+.cartBtn {
+  @include button-reset;
+  @include flex-center;
+  width: 44px;
+  height: 44px;
+  color: rgba($text-inverse, 0.8);
+  border-radius: $radius-lg;
+  transition: all $duration-normal $ease-out;
+  
+  &:hover {
+    color: $text-inverse;
+    background: rgba($color-primary-500, 0.1);
+    box-shadow: $shadow-glow-sm;
+  }
+  
+  @include respond-below(md) {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.cartBtn {
+  position: relative;
+}
+
+.cartCount {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  @include flex-center;
+  width: 18px;
+  height: 18px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: $text-inverse;
+  background: $gradient-accent;
+  border-radius: $radius-full;
+  border: 2px solid $bg-space;
+}
+
+.authButtons {
+  @include flex-center;
+  gap: $space-3;
+  
+  @include respond-below(lg) {
+    display: none;
+  }
+}
+
+.mobileMenuBtn {
+  @include button-reset;
+  @include flex-center;
+  width: 44px;
+  height: 44px;
+  color: $text-inverse;
+  border-radius: $radius-lg;
+  transition: all $duration-normal $ease-out;
+  
+  @include respond-to(lg) {
+    display: none;
+  }
+  
+  &:hover {
+    background: rgba($color-primary-500, 0.1);
+    box-shadow: $shadow-glow-sm;
+  }
+  
+  @include respond-below(md) {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+// Mobile navigation
+.mobileNav {
+  @include respond-to(lg) {
+    display: none;
+  }
+  
+  @include glass-dark(0.15);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.mobileNavContent {
+  padding: $space-6 $space-4 $space-8;
+}
+
+.mobileNavList {
+  list-style: none;
+  margin-bottom: $space-8;
+}
+
+.mobileNavLink {
+  display: block;
+  padding: $space-4 $space-6;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: rgba($text-inverse, 0.8);
+  text-decoration: none;
+  border-radius: $radius-lg;
+  transition: all $duration-normal $ease-out;
+  margin-bottom: $space-2;
+  
+  &:hover {
+    color: $text-inverse;
+    background: rgba($color-primary-500, 0.1);
+    transform: translateX(8px);
+  }
+  
+  &.active {
+    color: $color-primary-400;
+    background: rgba($color-primary-500, 0.15);
+    box-shadow: inset 4px 0 0 $color-primary-500;
+  }
+}
+
+.mobileAuthActions {
+  @include flex-column;
+  gap: $space-3;
+}
+
+// Overlay
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: $z-index-modal-backdrop;
+  backdrop-filter: blur(2px);
+  
+  @include respond-to(lg) {
+    display: none;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(sm) {
+  .container {
+    padding: 0 $space-3;
+  }
+  
+  .actions {
+    gap: $space-2;
+  }
+  
+  .logoText {
+    font-size: $font-size-base;
+  }
+}

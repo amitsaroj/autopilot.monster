@@ -1,0 +1,298 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.productGrid {
+  width: 100%;
+}
+
+.header {
+  @include flex-between;
+  align-items: center;
+  margin-bottom: $space-8;
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.title {
+  @include heading-3;
+  color: $text-inverse;
+  margin: 0;
+}
+
+.sortOptions {
+  position: relative;
+}
+
+.sortSelect {
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-lg;
+  color: $text-inverse;
+  font-size: $font-size-sm;
+  padding: $space-3 $space-8 $space-3 $space-4;
+  min-width: 180px;
+  cursor: pointer;
+  transition: all $duration-normal $ease-out;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $color-primary-500;
+    box-shadow: $shadow-glow-sm;
+  }
+  
+  // Custom arrow
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right $space-3 center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: $space-8;
+  margin-bottom: $space-12;
+  
+  @include respond-below(md) {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: $space-6;
+  }
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.productCard {
+  position: relative;
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  overflow: hidden;
+  transition: all $duration-normal $ease-out;
+  transform-style: preserve-3d;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    
+    .cardGlow {
+      opacity: 1;
+    }
+    
+    .overlay {
+      opacity: 1;
+    }
+    
+    .productImage {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.imageContainer {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  border-radius: $radius-2xl $radius-2xl 0 0;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  transition: transform $duration-normal $ease-out;
+}
+
+.placeholderImage {
+  @include flex-column-center;
+  gap: $space-2;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    rgba(14, 165, 233, 0.1) 0%, 
+    rgba(139, 92, 246, 0.1) 100%
+  );
+  color: rgba($text-inverse, 0.8);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: $space-3;
+  left: $space-3;
+  padding: $space-1 $space-3;
+  background: rgba(0, 0, 0, 0.8);
+  color: $text-inverse;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-full;
+  backdrop-filter: blur(10px);
+  z-index: 2;
+}
+
+.overlay {
+  @include absolute-cover;
+  @include flex-center;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity $duration-normal $ease-out;
+  z-index: 1;
+}
+
+.quickActions {
+  position: absolute;
+  top: $space-3;
+  right: $space-3;
+  z-index: 2;
+}
+
+.quickAction {
+  @include button-reset;
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.8);
+  color: $text-inverse;
+  border-radius: $radius-full;
+  backdrop-filter: blur(10px);
+  transition: all $duration-normal $ease-out;
+  
+  &:hover {
+    background: rgba($color-primary-500, 0.8);
+    transform: scale(1.1);
+  }
+}
+
+.productInfo {
+  padding: $space-6;
+}
+
+.productHeader {
+  @include flex-between;
+  align-items: flex-start;
+  margin-bottom: $space-4;
+  gap: $space-3;
+}
+
+.productTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin: 0;
+  line-height: $line-height-tight;
+  flex: 1;
+}
+
+.productPrice {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  @include text-gradient($gradient-primary);
+  flex-shrink: 0;
+}
+
+.productDescription {
+  color: rgba($text-inverse, 0.8);
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+  margin-bottom: $space-4;
+  @include line-clamp(2);
+}
+
+.tags {
+  @include flex-center;
+  gap: $space-2;
+  margin-bottom: $space-4;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: $space-1 $space-3;
+  background: rgba($color-primary-500, 0.15);
+  color: $color-primary-300;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-full;
+  border: 1px solid rgba($color-primary-500, 0.3);
+}
+
+.tagMore {
+  padding: $space-1 $space-3;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba($text-inverse, 0.6);
+  font-size: $font-size-xs;
+  border-radius: $radius-full;
+}
+
+.stats {
+  @include flex-center;
+  gap: $space-6;
+  margin-bottom: $space-6;
+}
+
+.stat {
+  @include flex-center;
+  gap: $space-1;
+  color: rgba($text-inverse, 0.7);
+  font-size: $font-size-sm;
+  
+  svg {
+    color: $color-accent-400;
+  }
+}
+
+.actions {
+  width: 100%;
+}
+
+.cardGlow {
+  @include absolute-cover;
+  background: $gradient-primary;
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(20px);
+  transition: opacity $duration-normal $ease-out;
+  z-index: -1;
+}
+
+.loadMore {
+  @include flex-center;
+  margin-top: $space-8;
+}
+
+// Responsive adjustments
+@include respond-below(sm) {
+  .productCard {
+    border-radius: $radius-xl;
+  }
+  
+  .imageContainer {
+    height: 160px;
+    border-radius: $radius-xl $radius-xl 0 0;
+  }
+  
+  .productInfo {
+    padding: $space-4;
+  }
+  
+  .productTitle {
+    font-size: $font-size-lg;
+  }
+  
+  .productPrice {
+    font-size: $font-size-lg;
+  }
+}

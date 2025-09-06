@@ -1,0 +1,240 @@
+// Design Tokens - Autopilot.monster
+// Core design system variables
+
+// Colors - AI-themed palette
+$color-primary-50: #f0f9ff;
+$color-primary-100: #e0f2fe;
+$color-primary-200: #bae6fd;
+$color-primary-300: #7dd3fc;
+$color-primary-400: #38bdf8;
+$color-primary-500: #0ea5e9;  // Primary AI Blue
+$color-primary-600: #0284c7;
+$color-primary-700: #0369a1;
+$color-primary-800: #075985;
+$color-primary-900: #0c4a6e;
+
+// AI Accent Colors
+$color-accent-50: #fefce8;
+$color-accent-100: #fef9c3;
+$color-accent-200: #fef08a;
+$color-accent-300: #fde047;
+$color-accent-400: #facc15;
+$color-accent-500: #eab308;  // AI Gold
+$color-accent-600: #ca8a04;
+$color-accent-700: #a16207;
+$color-accent-800: #854d0e;
+$color-accent-900: #713f12;
+
+// Cyber Colors
+$color-cyber-50: #f5f3ff;
+$color-cyber-100: #ede9fe;
+$color-cyber-200: #ddd6fe;
+$color-cyber-300: #c4b5fd;
+$color-cyber-400: #a78bfa;
+$color-cyber-500: #8b5cf6;  // Cyber Purple
+$color-cyber-600: #7c3aed;
+$color-cyber-700: #6d28d9;
+$color-cyber-800: #5b21b6;
+$color-cyber-900: #4c1d95;
+
+// Neural Network Green
+$color-neural-50: #ecfdf5;
+$color-neural-100: #d1fae5;
+$color-neural-200: #a7f3d0;
+$color-neural-300: #6ee7b7;
+$color-neural-400: #34d399;
+$color-neural-500: #10b981;  // Neural Green
+$color-neural-600: #059669;
+$color-neural-700: #047857;
+$color-neural-800: #065f46;
+$color-neural-900: #064e3b;
+
+// Dark Theme Colors
+$color-dark-50: #f8fafc;
+$color-dark-100: #f1f5f9;
+$color-dark-200: #e2e8f0;
+$color-dark-300: #cbd5e1;
+$color-dark-400: #94a3b8;
+$color-dark-500: #64748b;
+$color-dark-600: #475569;
+$color-dark-700: #334155;
+$color-dark-800: #1e293b;
+$color-dark-900: #0f172a;  // Deep Space Dark
+
+// Semantic Colors
+$color-success: #10b981;
+$color-warning: #f59e0b;
+$color-error: #ef4444;
+$color-info: #3b82f6;
+
+// Background Colors
+$bg-primary: #ffffff;
+$bg-secondary: $color-dark-50;
+$bg-tertiary: $color-dark-100;
+$bg-dark: $color-dark-900;
+$bg-space: #0a0a0f;  // Deep space background
+$bg-overlay: rgba(15, 23, 42, 0.8);
+$bg-glass: rgba(255, 255, 255, 0.1);
+
+// Text Colors
+$text-primary: $color-dark-900;
+$text-secondary: $color-dark-600;
+$text-tertiary: $color-dark-500;
+$text-inverse: #ffffff;
+$text-glow: #00f5ff;  // AI Glow text
+$text-link: $color-primary-600;
+$text-link-hover: $color-primary-700;
+
+// Spacing Scale (8px baseline grid)
+$space-0: 0;
+$space-1: 0.25rem;   // 4px
+$space-2: 0.5rem;    // 8px
+$space-3: 0.75rem;   // 12px
+$space-4: 1rem;      // 16px
+$space-5: 1.25rem;   // 20px
+$space-6: 1.5rem;    // 24px
+$space-8: 2rem;      // 32px
+$space-10: 2.5rem;   // 40px
+$space-12: 3rem;     // 48px
+$space-16: 4rem;     // 64px
+$space-20: 5rem;     // 80px
+$space-24: 6rem;     // 96px
+$space-32: 8rem;     // 128px
+$space-40: 10rem;    // 160px
+$space-48: 12rem;    // 192px
+$space-56: 14rem;    // 224px
+$space-64: 16rem;    // 256px
+
+// Border Radius
+$radius-none: 0;
+$radius-sm: 0.125rem;   // 2px
+$radius-md: 0.375rem;   // 6px
+$radius-lg: 0.5rem;     // 8px
+$radius-xl: 0.75rem;    // 12px
+$radius-2xl: 1rem;      // 16px
+$radius-3xl: 1.5rem;    // 24px
+$radius-full: 9999px;
+
+// Z-Index Scale
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-offcanvas: 1050;
+$z-index-modal: 1060;
+$z-index-popover: 1070;
+$z-index-tooltip: 1080;
+
+// Breakpoints
+$breakpoint-xs: 0;
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// Container Max Widths
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
+$container-2xl: 1536px;
+
+// Typography Scale
+$font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+$font-family-display: 'Cal Sans', 'Inter', sans-serif;
+
+// Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+$font-weight-black: 900;
+
+// Font Sizes (Modular Scale - 1.25)
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.5rem;    // 24px
+$font-size-3xl: 1.875rem;  // 30px
+$font-size-4xl: 2.25rem;   // 36px
+$font-size-5xl: 3rem;      // 48px
+$font-size-6xl: 3.75rem;   // 60px
+$font-size-7xl: 4.5rem;    // 72px
+$font-size-8xl: 6rem;      // 96px
+$font-size-9xl: 8rem;      // 128px
+
+// Line Heights
+$line-height-tight: 1.25;
+$line-height-snug: 1.375;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+$line-height-loose: 2;
+
+// Letter Spacing
+$letter-spacing-tighter: -0.05em;
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.025em;
+$letter-spacing-wider: 0.05em;
+$letter-spacing-widest: 0.1em;
+
+// Animation Durations
+$duration-instant: 0ms;
+$duration-fast: 150ms;
+$duration-normal: 300ms;
+$duration-slow: 500ms;
+$duration-slower: 700ms;
+$duration-glacial: 1000ms;
+
+// Animation Easing
+$ease-linear: linear;
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-emphasis: cubic-bezier(0.2, 0, 0, 1);
+$ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+// Shadows
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+// AI-specific shadows
+$shadow-glow-sm: 0 0 5px rgba(14, 165, 233, 0.3);
+$shadow-glow-md: 0 0 15px rgba(14, 165, 233, 0.4);
+$shadow-glow-lg: 0 0 25px rgba(14, 165, 233, 0.5);
+$shadow-neural: 0 0 20px rgba(16, 185, 129, 0.3);
+$shadow-cyber: 0 0 20px rgba(139, 92, 246, 0.3);
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $color-primary-500 0%, $color-primary-700 100%);
+$gradient-accent: linear-gradient(135deg, $color-accent-500 0%, $color-accent-700 100%);
+$gradient-cyber: linear-gradient(135deg, $color-cyber-500 0%, $color-cyber-700 100%);
+$gradient-neural: linear-gradient(135deg, $color-neural-500 0%, $color-neural-700 100%);
+$gradient-dark: linear-gradient(135deg, $color-dark-800 0%, $color-dark-900 100%);
+$gradient-space: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+
+// AI Data Stream Gradients
+$gradient-data-stream: linear-gradient(90deg, 
+  transparent 0%,
+  rgba(14, 165, 233, 0.1) 25%,
+  rgba(14, 165, 233, 0.3) 50%,
+  rgba(14, 165, 233, 0.1) 75%,
+  transparent 100%
+);
+
+$gradient-neural-flow: linear-gradient(45deg,
+  rgba(16, 185, 129, 0.1) 0%,
+  rgba(16, 185, 129, 0.3) 50%,
+  rgba(16, 185, 129, 0.1) 100%
+);

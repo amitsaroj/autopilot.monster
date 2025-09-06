@@ -1,0 +1,276 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.hero {
+  position: relative;
+  min-height: 80vh;
+  @include flex-center;
+  overflow: hidden;
+  padding-top: 120px;
+  padding-bottom: $space-20;
+  
+  &::before {
+    content: '';
+    @include absolute-cover;
+    background: 
+      radial-gradient(ellipse at top center, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+    z-index: -1;
+  }
+}
+
+.container {
+  max-width: $container-2xl;
+  margin: 0 auto;
+  padding: 0 $space-6;
+  position: relative;
+  
+  @include respond-below(md) {
+    padding: 0 $space-4;
+  }
+}
+
+.content {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  z-index: 2;
+  position: relative;
+}
+
+.title {
+  @include heading-1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-2;
+  
+  @include respond-below(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.highlight {
+  @include text-gradient($gradient-primary);
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: $gradient-primary;
+    border-radius: $radius-full;
+    opacity: 0.6;
+  }
+}
+
+.subtitle {
+  @include body-large;
+  color: rgba($text-inverse, 0.8);
+  margin-bottom: $space-12;
+  line-height: $line-height-relaxed;
+  
+  @include respond-below(md) {
+    font-size: $font-size-base;
+    margin-bottom: $space-8;
+  }
+}
+
+.searchSection {
+  margin-bottom: $space-8;
+}
+
+.searchBar {
+  @include flex-center;
+  gap: $space-4;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: $space-3;
+  @include glass-dark(0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-2xl;
+  backdrop-filter: blur(20px);
+  transition: all $duration-normal $ease-out;
+  
+  &:focus-within {
+    border-color: $color-primary-500;
+    box-shadow: $shadow-glow-md;
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-3;
+    padding: $space-4;
+  }
+}
+
+.searchIcon {
+  color: rgba($text-inverse, 0.6);
+  flex-shrink: 0;
+  
+  @include respond-below(md) {
+    display: none;
+  }
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: $text-inverse;
+  font-size: $font-size-lg;
+  padding: $space-3 $space-4;
+  
+  &::placeholder {
+    color: rgba($text-inverse, 0.5);
+  }
+  
+  &:focus {
+    outline: none;
+  }
+  
+  @include respond-below(md) {
+    width: 100%;
+    text-align: center;
+    font-size: $font-size-base;
+  }
+}
+
+.stats {
+  @include flex-center;
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+  }
+}
+
+.stat {
+  @include flex-center;
+  gap: $space-2;
+  color: rgba($text-inverse, 0.7);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.statIcon {
+  color: $color-primary-400;
+}
+
+// Floating Cards
+.floatingCards {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  
+  @include respond-below(lg) {
+    display: none;
+  }
+}
+
+.floatingCard {
+  position: absolute;
+  width: 280px;
+  padding: $space-6;
+  @include glass-dark(0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-2xl;
+  backdrop-filter: blur(20px);
+  transform-style: preserve-3d;
+  transition: all $duration-normal $ease-out;
+  
+  &:nth-child(1) {
+    top: 20%;
+    right: 10%;
+    animation: float1 6s ease-in-out infinite;
+  }
+  
+  &:nth-child(2) {
+    top: 50%;
+    left: 5%;
+    animation: float2 7s ease-in-out infinite;
+  }
+  
+  &:nth-child(3) {
+    bottom: 20%;
+    right: 15%;
+    animation: float3 8s ease-in-out infinite;
+  }
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    
+    .cardGlow {
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translateY(0px) rotateY(5deg); }
+  50% { transform: translateY(-15px) rotateY(-2deg); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translateY(0px) rotateY(-5deg); }
+  50% { transform: translateY(-20px) rotateY(3deg); }
+}
+
+@keyframes float3 {
+  0%, 100% { transform: translateY(0px) rotateY(3deg); }
+  50% { transform: translateY(-10px) rotateY(-5deg); }
+}
+
+.cardCategory {
+  font-size: $font-size-xs;
+  color: $color-primary-400;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+  margin-bottom: $space-2;
+}
+
+.cardTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-4;
+  line-height: $line-height-tight;
+}
+
+.cardMeta {
+  @include flex-between;
+  align-items: center;
+}
+
+.cardPrice {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  @include text-gradient($gradient-primary);
+}
+
+.cardRating {
+  @include flex-center;
+  gap: $space-1;
+  color: $color-accent-400;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.cardGlow {
+  @include absolute-cover;
+  background: $gradient-primary;
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(20px);
+  transition: opacity $duration-normal $ease-out;
+  z-index: -1;
+}

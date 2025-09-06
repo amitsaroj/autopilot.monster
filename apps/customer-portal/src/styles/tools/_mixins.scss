@@ -1,0 +1,414 @@
+// Mixins - Autopilot.monster
+// Reusable SCSS mixins
+
+@use '../settings/variables' as *;
+
+// Responsive mixins
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (min-width: $breakpoint-xs) { @content; }
+  }
+  @if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  }
+  @if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  }
+  @if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  }
+  @if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  }
+  @if $breakpoint == 2xl {
+    @media (min-width: $breakpoint-2xl) { @content; }
+  }
+}
+
+@mixin respond-below($breakpoint) {
+  @if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm - 1px) { @content; }
+  }
+  @if $breakpoint == md {
+    @media (max-width: $breakpoint-md - 1px) { @content; }
+  }
+  @if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg - 1px) { @content; }
+  }
+  @if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl - 1px) { @content; }
+  }
+  @if $breakpoint == 2xl {
+    @media (max-width: $breakpoint-2xl - 1px) { @content; }
+  }
+}
+
+// Flexbox utilities
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-column-center {
+  @include flex-column;
+  align-items: center;
+  justify-content: center;
+}
+
+// Positioning
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin absolute-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// Text utilities
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@mixin text-gradient($gradient) {
+  background: $gradient;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 100%;
+}
+
+// Focus states
+@mixin focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  
+  &:focus-visible {
+    outline: 2px solid $color-primary-500;
+    outline-offset: 2px;
+    box-shadow: $shadow-glow-sm;
+  }
+}
+
+@mixin focus-glow {
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+  }
+}
+
+// Button reset
+@mixin button-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+// Glass effect (glassmorphism)
+@mixin glass-effect($opacity: 0.1) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@mixin glass-dark($opacity: 0.1) {
+  background: rgba(0, 0, 0, $opacity);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// AI-themed effects
+@mixin ai-glow($color: $color-primary-500) {
+  box-shadow: 0 0 20px rgba($color, 0.3);
+  transition: box-shadow $duration-normal $ease-out;
+  
+  &:hover {
+    box-shadow: 0 0 30px rgba($color, 0.5);
+  }
+}
+
+@mixin neural-network-bg {
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+}
+
+@mixin cyber-grid {
+  background-image: 
+    linear-gradient(rgba(14, 165, 233, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+@mixin data-stream-animation {
+  background: $gradient-data-stream;
+  background-size: 200% 100%;
+  animation: dataStream 3s linear infinite;
+}
+
+@keyframes dataStream {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Holographic effect
+@mixin holographic-effect {
+  background: linear-gradient(45deg, 
+    rgba(255, 0, 150, 0.1) 0%,
+    rgba(0, 255, 255, 0.1) 25%,
+    rgba(255, 255, 0, 0.1) 50%,
+    rgba(255, 0, 150, 0.1) 75%,
+    rgba(0, 255, 255, 0.1) 100%
+  );
+  background-size: 400% 400%;
+  animation: hologram 4s ease-in-out infinite;
+}
+
+@keyframes hologram {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+// Pulse animation
+@mixin pulse-glow($color: $color-primary-500) {
+  animation: pulseGlow 2s ease-in-out infinite;
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba($color, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba($color, 0.6);
+    }
+  }
+}
+
+// 3D tilt effect
+@mixin tilt-3d {
+  transform-style: preserve-3d;
+  transition: transform $duration-normal $ease-out;
+  
+  &:hover {
+    transform: perspective(1000px) rotateX(5deg) rotateY(5deg) translateZ(10px);
+  }
+}
+
+// Floating animation
+@mixin floating-animation($duration: 6s) {
+  animation: floating $duration ease-in-out infinite;
+  
+  @keyframes floating {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+}
+
+// Particle effect
+@mixin particle-bg {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(14, 165, 233, 0.2) 1px, transparent 1px),
+      radial-gradient(circle at 75% 25%, rgba(16, 185, 129, 0.2) 1px, transparent 1px),
+      radial-gradient(circle at 25% 75%, rgba(139, 92, 246, 0.2) 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, rgba(234, 179, 8, 0.2) 1px, transparent 1px);
+    background-size: 100px 100px, 120px 120px, 80px 80px, 90px 90px;
+    animation: particleFloat 20s linear infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px);
+  }
+  50% {
+    transform: translateY(-5px) translateX(-5px);
+  }
+  75% {
+    transform: translateY(-15px) translateX(10px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+// Shadows
+@mixin shadow-sm {
+  box-shadow: $shadow-sm;
+}
+
+@mixin shadow-md {
+  box-shadow: $shadow-md;
+}
+
+@mixin shadow-lg {
+  box-shadow: $shadow-lg;
+}
+
+@mixin shadow-xl {
+  box-shadow: $shadow-xl;
+}
+
+// Custom scrollbar
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $color-dark-200;
+    border-radius: $radius-full;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $color-primary-500;
+    border-radius: $radius-full;
+    
+    &:hover {
+      background: $color-primary-600;
+    }
+  }
+}
+
+// Loading shimmer effect
+@mixin shimmer-loading {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Typography mixins
+@mixin heading-1 {
+  font-size: $font-size-6xl;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-tight;
+  letter-spacing: $letter-spacing-tighter;
+  
+  @include respond-below(lg) {
+    font-size: $font-size-5xl;
+  }
+  
+  @include respond-below(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+@mixin heading-2 {
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  letter-spacing: $letter-spacing-tight;
+  
+  @include respond-below(lg) {
+    font-size: $font-size-4xl;
+  }
+  
+  @include respond-below(md) {
+    font-size: $font-size-3xl;
+  }
+}
+
+@mixin heading-3 {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-snug;
+  
+  @include respond-below(lg) {
+    font-size: $font-size-3xl;
+  }
+  
+  @include respond-below(md) {
+    font-size: $font-size-2xl;
+  }
+}
+
+@mixin body-large {
+  font-size: $font-size-xl;
+  line-height: $line-height-relaxed;
+  
+  @include respond-below(md) {
+    font-size: $font-size-lg;
+  }
+}
+
+@mixin body-medium {
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+}
+
+@mixin body-small {
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+}
