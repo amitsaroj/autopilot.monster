@@ -1,0 +1,266 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.workflowShowcase {
+  padding: $space-24 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 30% 30%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(14, 165, 233, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  position: relative;
+  z-index: 1;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $space-4;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: $radius-full;
+  color: $color-neural-400;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.sectionTitle {
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-tight;
+  margin-bottom: $space-6;
+  color: $text-inverse;
+}
+
+.gradientText {
+  background: $gradient-neural;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sectionDescription {
+  font-size: $font-size-xl;
+  line-height: $line-height-relaxed;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.workflowsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: $space-8;
+  margin-bottom: $space-16;
+  position: relative;
+  z-index: 1;
+}
+
+.workflowCard {
+  @include product-card;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: $space-6;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: $gradient-neural;
+  }
+}
+
+.cardHeader {
+  margin-bottom: $space-4;
+}
+
+.workflowImage {
+  position: relative;
+  margin-bottom: $space-4;
+}
+
+.imagePlaceholder {
+  @include flex-center;
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+  border-radius: $radius-lg;
+  color: $color-neural-400;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.popularBadge {
+  position: absolute;
+  top: $space-2;
+  right: $space-2;
+  @include flex-center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  background: rgba(16, 185, 129, 0.9);
+  border-radius: $radius-full;
+  color: $text-inverse;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.workflowInfo {
+  margin-bottom: $space-4;
+}
+
+.category {
+  font-size: $font-size-sm;
+  color: $color-neural-400;
+  font-weight: $font-weight-medium;
+  margin-bottom: $space-1;
+}
+
+.workflowTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-inverse;
+  margin-bottom: $space-2;
+  line-height: $line-height-tight;
+}
+
+.workflowDescription {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: $line-height-relaxed;
+}
+
+.workflowFeatures {
+  margin-bottom: $space-4;
+}
+
+.feature {
+  @include flex-center;
+  gap: $space-2;
+  margin-bottom: $space-2;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.featureDot {
+  width: 6px;
+  height: 6px;
+  background: $color-neural-400;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.moreFeatures {
+  font-size: $font-size-xs;
+  color: $color-neural-400;
+  font-weight: $font-weight-medium;
+}
+
+.workflowStats {
+  display: flex;
+  gap: $space-4;
+  margin-bottom: $space-6;
+  padding: $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+}
+
+.stat {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.workflowFooter {
+  @include flex-between;
+  align-items: center;
+}
+
+.pricing {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.price {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-neural-400;
+}
+
+.priceSubtext {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sectionFooter {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+@include respond-below(lg) {
+  .workflowsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: $space-6;
+  }
+
+  .sectionTitle {
+    font-size: $font-size-4xl;
+  }
+
+  .sectionDescription {
+    font-size: $font-size-lg;
+  }
+}
+
+@include respond-below(md) {
+  .workflowShowcase {
+    padding: $space-20 0;
+  }
+
+  .workflowsGrid {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+
+  .sectionTitle {
+    font-size: $font-size-3xl;
+  }
+
+  .workflowCard {
+    padding: $space-4;
+  }
+
+  .workflowFooter {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: stretch;
+  }
+}

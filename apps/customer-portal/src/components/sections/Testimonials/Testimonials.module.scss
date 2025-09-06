@@ -1,0 +1,260 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.testimonials {
+  padding: $space-24 0;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(14, 165, 233, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  position: relative;
+  z-index: 1;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $space-4;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: $radius-full;
+  color: $color-cyber-400;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.sectionTitle {
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-extrabold;
+  line-height: $line-height-tight;
+  margin-bottom: $space-6;
+  color: $text-inverse;
+}
+
+.gradientText {
+  background: $gradient-cyber;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sectionDescription {
+  font-size: $font-size-xl;
+  line-height: $line-height-relaxed;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.testimonialsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: $space-8;
+  margin-bottom: $space-16;
+  position: relative;
+  z-index: 1;
+}
+
+.testimonialCard {
+  @include product-card;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: $space-6;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: $gradient-cyber;
+  }
+}
+
+.quoteIcon {
+  position: absolute;
+  top: $space-4;
+  right: $space-4;
+  color: rgba(139, 92, 246, 0.3);
+  opacity: 0.5;
+}
+
+.testimonialContent {
+  margin-bottom: $space-6;
+}
+
+.rating {
+  display: flex;
+  gap: $space-1;
+  margin-bottom: $space-4;
+}
+
+.star {
+  color: $color-accent-400;
+  fill: currentColor;
+}
+
+.testimonialText {
+  font-size: $font-size-base;
+  line-height: $line-height-relaxed;
+  color: rgba(255, 255, 255, 0.9);
+  font-style: italic;
+}
+
+.testimonialAuthor {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+}
+
+.authorAvatar {
+  flex-shrink: 0;
+}
+
+.avatarPlaceholder {
+  @include flex-center;
+  width: 60px;
+  height: 60px;
+  background: $gradient-cyber;
+  border-radius: $radius-full;
+  color: $text-inverse;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-lg;
+}
+
+.authorInfo {
+  flex: 1;
+}
+
+.authorName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-1;
+}
+
+.authorTitle {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-1;
+}
+
+.authorIndustry {
+  font-size: $font-size-xs;
+  color: $color-cyber-400;
+  font-weight: $font-weight-medium;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $space-8;
+  position: relative;
+  z-index: 1;
+}
+
+.statItem {
+  text-align: center;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-xl;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-4px);
+  }
+}
+
+.statNumber {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-extrabold;
+  background: $gradient-cyber;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: $space-2;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: $font-weight-medium;
+}
+
+@include respond-below(lg) {
+  .testimonialsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: $space-6;
+  }
+
+  .sectionTitle {
+    font-size: $font-size-4xl;
+  }
+
+  .sectionDescription {
+    font-size: $font-size-lg;
+  }
+
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-6;
+  }
+}
+
+@include respond-below(md) {
+  .testimonials {
+    padding: $space-20 0;
+  }
+
+  .testimonialsGrid {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+
+  .sectionTitle {
+    font-size: $font-size-3xl;
+  }
+
+  .testimonialCard {
+    padding: $space-4;
+  }
+
+  .statsRow {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+
+  .statNumber {
+    font-size: $font-size-3xl;
+  }
+}

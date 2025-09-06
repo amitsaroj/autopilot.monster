@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import '@/styles/main.scss'
 import { Providers } from './providers'
 import { AIBackground } from '@/components/animations/AIBackground'
+import { ConditionalBackground } from '@/components/layout/ConditionalBackground/ConditionalBackground'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -41,6 +42,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <AIBackground />
+          <ConditionalBackground />
           <div className="relative z-10">
             {children}
           </div>

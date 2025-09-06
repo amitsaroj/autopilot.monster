@@ -1,0 +1,1020 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.productDetailPage {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+// Breadcrumb
+.breadcrumb {
+  padding: 20px 0;
+  background: $bg-dark;
+  border-bottom: 1px solid rgba($text-tertiary, 0.1);
+}
+
+.breadcrumbContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  @include flex-center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.breadcrumbLink {
+  @include flex-center;
+  gap: 8px;
+  color: $text-secondary;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: $color-primary-400;
+  }
+}
+
+.breadcrumbSeparator {
+  color: $text-tertiary;
+}
+
+.breadcrumbCurrent {
+  color: $text-primary;
+  font-weight: 600;
+}
+
+// Product Header
+.productHeader {
+  padding: 60px 0;
+  background: $bg-dark;
+}
+
+.productHeaderContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 80px;
+  align-items: start;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.productInfo {
+  .category {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba($color-primary-500, 0.1);
+    color: $color-primary-500;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .title {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: $text-primary;
+    margin-bottom: 16px;
+
+    @include respond-below(md) {
+      font-size: 2.5rem;
+    }
+  }
+
+  .subtitle {
+    font-size: 1.25rem;
+    color: $text-secondary;
+    line-height: 1.6;
+    margin-bottom: 32px;
+
+    @include respond-below(md) {
+      font-size: 1.1rem;
+    }
+  }
+
+  .rating {
+    @include flex-center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stars {
+    @include flex-center;
+    gap: 4px;
+  }
+
+  .star {
+    color: $text-tertiary;
+    transition: color 0.3s ease;
+
+  &.filled {
+    color: $color-warning;
+  }
+  }
+
+  .ratingText {
+    font-size: 14px;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  .stats {
+    @include flex-center;
+    gap: 32px;
+    flex-wrap: wrap;
+
+    @include respond-below(md) {
+      gap: 24px;
+    }
+  }
+
+  .stat {
+    @include flex-center;
+    gap: 8px;
+    font-size: 14px;
+    color: $text-secondary;
+
+    svg {
+      color: $text-tertiary;
+    }
+  }
+}
+
+.productActions {
+  background: $bg-primary;
+  border: 1px solid rgba($text-tertiary, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  position: sticky;
+  top: 100px;
+
+  @include respond-below(lg) {
+    position: static;
+  }
+}
+
+.priceSection {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.price {
+  font-size: 3rem;
+  font-weight: 800;
+  color: $text-primary;
+  margin-bottom: 8px;
+  @include flex-center;
+  gap: 16px;
+  justify-content: center;
+
+  @include respond-below(md) {
+    font-size: 2.5rem;
+  }
+}
+
+.originalPrice {
+  font-size: 1.5rem;
+  color: $text-tertiary;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.priceNote {
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.purchaseButton,
+.cartButton {
+  width: 100%;
+  justify-content: center;
+}
+
+.quickActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.quickAction {
+  @include flex-center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba($text-tertiary, 0.1);
+  border: 1px solid rgba($text-tertiary, 0.2);
+  border-radius: 12px;
+  color: $text-secondary;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($color-primary-500, 0.1);
+    border-color: $color-primary-500;
+    color: $color-primary-500;
+  }
+
+  &.favorited {
+    background: rgba($color-error, 0.1);
+    border-color: $color-error;
+    color: $color-error;
+  }
+}
+
+.security {
+  @include flex-center;
+  gap: 8px;
+  font-size: 12px;
+  color: $text-tertiary;
+  text-align: center;
+  padding: 16px;
+  background: rgba($color-success, 0.05);
+  border: 1px solid rgba($color-success, 0.2);
+  border-radius: 12px;
+
+  svg {
+    color: $color-success;
+  }
+}
+
+// Product Gallery
+.productGallery {
+  padding: 60px 0;
+  background: $bg-space;
+}
+
+.galleryContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.mainImage {
+  margin-bottom: 24px;
+}
+
+.imagePlaceholder {
+  @include flex-center;
+  flex-direction: column;
+  width: 100%;
+  height: 400px;
+  background: linear-gradient(135deg, rgba($color-primary-500, 0.1) 0%, rgba($color-neural-500, 0.1) 100%);
+  border-radius: 16px;
+  color: $color-primary-500;
+  gap: 16px;
+
+  @include respond-below(md) {
+    height: 250px;
+  }
+}
+
+.thumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.thumbnail {
+  @include flex-center;
+  height: 80px;
+  background: rgba($text-tertiary, 0.1);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba($color-primary-500, 0.3);
+  }
+
+  &.active {
+    border-color: $color-primary-500;
+    background: rgba($color-primary-500, 0.1);
+  }
+}
+
+.thumbnailPlaceholder {
+  @include flex-center;
+  color: $text-tertiary;
+}
+
+// Product Details
+.productDetails {
+  padding: 80px 0;
+  background: $bg-space;
+}
+
+.detailsContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 80px;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+}
+
+.mainContent {
+  min-width: 0;
+}
+
+// Tabs
+.tabs {
+  display: flex;
+  border-bottom: 1px solid rgba($text-tertiary, 0.1);
+  margin-bottom: 40px;
+  overflow-x: auto;
+
+  @include respond-below(md) {
+    margin-bottom: 32px;
+  }
+}
+
+.tab {
+  padding: 16px 24px;
+  background: none;
+  border: none;
+  color: $text-secondary;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+  }
+
+  &.active {
+    color: $color-primary-500;
+    border-bottom-color: $color-primary-500;
+  }
+
+  @include respond-below(md) {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+.tabContent {
+  min-height: 400px;
+}
+
+// Overview Tab
+.overview {
+  .description {
+    margin-bottom: 40px;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: $text-secondary;
+      margin-bottom: 16px;
+    }
+
+    .shortDescription {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .fullDescription {
+      display: block;
+    }
+  }
+
+  .readMore,
+  .readLess {
+    @include flex-center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: $color-primary-500;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: $color-primary-400;
+    }
+  }
+}
+
+.tags {
+  margin-bottom: 40px;
+
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 16px;
+  }
+}
+
+.tagList {
+  @include flex-center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  @include flex-center;
+  padding: 8px 16px;
+  background: rgba($text-tertiary, 0.1);
+  border-radius: 20px;
+  font-size: 12px;
+  color: $text-secondary;
+  font-weight: 500;
+}
+
+.productInfo {
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 16px;
+  }
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.infoItem {
+  @include flex-center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba($text-tertiary, 0.05);
+  border-radius: 12px;
+}
+
+.infoLabel {
+  font-size: 14px;
+  color: $text-secondary;
+  font-weight: 500;
+}
+
+.infoValue {
+  font-size: 14px;
+  color: $text-primary;
+  font-weight: 600;
+}
+
+// Features Tab
+.features {
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 24px;
+  }
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.feature {
+  @include flex-center;
+  gap: 12px;
+  align-items: flex-start;
+
+  svg {
+    color: $color-success;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  span {
+    color: $text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.compatibility,
+.requirements {
+  margin-bottom: 32px;
+
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 16px;
+  }
+}
+
+.compatibilityList {
+  @include flex-center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.compatibilityItem {
+  @include flex-center;
+  padding: 8px 16px;
+  background: rgba($color-primary-500, 0.1);
+  color: $color-primary-500;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.requirementsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.requirement {
+  @include flex-center;
+  gap: 12px;
+  align-items: flex-start;
+
+  svg {
+    color: $text-tertiary;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  span {
+    color: $text-secondary;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 14px;
+  }
+}
+
+// Reviews Tab
+.reviews {
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 24px;
+  }
+}
+
+.reviewsHeader {
+  margin-bottom: 40px;
+}
+
+.reviewsSummary {
+  @include flex-center;
+  justify-content: center;
+}
+
+.averageRating {
+  @include flex-center;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.ratingNumber {
+  font-size: 3rem;
+  font-weight: 800;
+  color: $text-primary;
+}
+
+.ratingStars {
+  @include flex-center;
+  gap: 4px;
+}
+
+.ratingCount {
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.review {
+  background: $bg-primary;
+  border: 1px solid rgba($text-tertiary, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.reviewHeader {
+  @include flex-center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  @include respond-below(md) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.reviewer {
+  @include flex-center;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.reviewerAvatar {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba($color-primary-500, 0.1);
+  color: $color-primary-500;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.reviewerInfo {
+  .reviewerName {
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 4px;
+  }
+
+  .reviewDate {
+    font-size: 12px;
+    color: $text-tertiary;
+  }
+}
+
+.reviewRating {
+  @include flex-center;
+  gap: 4px;
+}
+
+.reviewComment {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: $text-secondary;
+  margin-bottom: 16px;
+}
+
+.reviewActions {
+  @include flex-center;
+  gap: 16px;
+}
+
+.reviewAction {
+  @include flex-center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: $text-tertiary;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: $text-secondary;
+  }
+}
+
+// Support Tab
+.support {
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 24px;
+  }
+}
+
+.supportOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.supportOption {
+  @include flex-center;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 24px;
+  background: $bg-primary;
+  border: 1px solid rgba($text-tertiary, 0.1);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba($color-primary-500, 0.3);
+    box-shadow: 0 8px 32px rgba($color-primary-500, 0.1);
+  }
+}
+
+.supportIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: rgba($color-primary-500, 0.1);
+  border-radius: 12px;
+  color: $color-primary-500;
+  flex-shrink: 0;
+}
+
+.supportContent {
+  flex: 1;
+
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 14px;
+    color: $text-secondary;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+}
+
+.supportLink {
+  @include flex-center;
+  gap: 8px;
+  color: $color-primary-500;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: $color-primary-400;
+  }
+}
+
+// Sidebar
+.sidebar {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+
+  @include respond-below(lg) {
+    position: static;
+  }
+}
+
+.vendorCard {
+  background: $bg-primary;
+  border: 1px solid rgba($text-tertiary, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.vendorHeader {
+  @include flex-center;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.vendorAvatar {
+  @include flex-center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba($color-primary-500, 0.1);
+  color: $color-primary-500;
+  font-size: 16px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.vendorInfo {
+  flex: 1;
+}
+
+.vendorName {
+  @include flex-center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 6px;
+}
+
+.verified {
+  color: $color-success;
+}
+
+.vendorRating {
+  @include flex-center;
+  gap: 8px;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.vendorStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.vendorStat {
+  text-align: center;
+  padding: 12px;
+  background: rgba($text-tertiary, 0.05);
+  border-radius: 12px;
+}
+
+.statLabel {
+  display: block;
+  font-size: 12px;
+  color: $text-tertiary;
+  margin-bottom: 4px;
+}
+
+.statValue {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.vendorButton {
+  width: 100%;
+  justify-content: center;
+}
+
+.relatedProducts {
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 16px;
+  }
+}
+
+.relatedList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.relatedItem {
+  @include flex-center;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  background: $bg-primary;
+  border: 1px solid rgba($text-tertiary, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba($color-primary-500, 0.3);
+    box-shadow: 0 4px 16px rgba($color-primary-500, 0.1);
+  }
+}
+
+.relatedImage {
+  flex-shrink: 0;
+}
+
+.relatedImagePlaceholder {
+  @include flex-center;
+  width: 60px;
+  height: 40px;
+  background: rgba($text-tertiary, 0.1);
+  border-radius: 8px;
+  color: $text-tertiary;
+}
+
+.relatedInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.relatedTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.relatedRating {
+  @include flex-center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.relatedPrice {
+  font-size: 14px;
+  font-weight: 700;
+  color: $color-primary-500;
+}
+
+// Responsive Design
+@include respond-below(lg) {
+  .productHeader,
+  .productGallery,
+  .productDetails {
+    padding: 40px 0;
+  }
+}
+
+@include respond-below(md) {
+  .productHeader,
+  .productGallery,
+  .productDetails {
+    padding: 30px 0;
+  }
+
+  .productHeaderContent {
+    padding: 0 16px;
+  }
+
+  .galleryContent,
+  .detailsContent {
+    padding: 0 16px;
+  }
+
+  .productActions {
+    padding: 24px;
+  }
+
+  .vendorCard {
+    padding: 20px;
+  }
+
+  .supportOption {
+    padding: 20px;
+  }
+
+  .review {
+    padding: 20px;
+  }
+}
+
+@include respond-below(sm) {
+  .productHeader,
+  .productGallery,
+  .productDetails {
+    padding: 20px 0;
+  }
+
+  .productActions {
+    padding: 20px;
+  }
+
+  .vendorCard {
+    padding: 16px;
+  }
+
+  .supportOption {
+    padding: 16px;
+  }
+
+  .review {
+    padding: 16px;
+  }
+}

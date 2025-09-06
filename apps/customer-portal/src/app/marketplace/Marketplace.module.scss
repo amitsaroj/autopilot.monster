@@ -1,0 +1,651 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.marketplacePage {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  background: linear-gradient(135deg, $bg-space 0%, $bg-dark 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 20%, rgba($color-primary-500, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba($color-neural-500, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.badge {
+  @include flex-center;
+  gap: 8px;
+  display: inline-flex;
+  padding: 8px 16px;
+  background: rgba($color-primary-500, 0.1);
+  border: 1px solid rgba($color-primary-500, 0.3);
+  border-radius: 50px;
+  color: $color-primary-400;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+}
+
+.heroTitle {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: $text-primary;
+
+  @include respond-below(lg) {
+    font-size: 2.5rem;
+  }
+
+  @include respond-below(md) {
+    font-size: 2rem;
+  }
+}
+
+.gradientText {
+  @include gradient-text;
+}
+
+.heroDescription {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: $text-secondary;
+  margin-bottom: 48px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include respond-below(md) {
+    font-size: 1.1rem;
+  }
+}
+
+.searchContainer {
+  margin-bottom: 48px;
+}
+
+.searchBar {
+  @include flex-center;
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgba($text-primary, 0.05);
+  border: 1px solid rgba($text-tertiary, 0.2);
+  border-radius: 50px;
+  padding: 4px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+
+  &:focus-within {
+    border-color: $color-primary-500;
+    box-shadow: 0 0 0 3px rgba($color-primary-500, 0.1);
+  }
+}
+
+.searchIcon {
+  color: $text-tertiary;
+  margin-left: 16px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  color: $text-primary;
+  font-size: 16px;
+  outline: none;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.heroStats {
+  @include flex-center;
+  gap: 48px;
+  flex-wrap: wrap;
+
+  @include respond-below(md) {
+    gap: 24px;
+  }
+}
+
+.stat {
+  text-align: center;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $color-primary-400;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: $text-tertiary;
+  font-weight: 500;
+}
+
+// Filters Section
+.filtersSection {
+  padding: 60px 0 40px;
+  background: $bg-dark;
+  border-bottom: 1px solid rgba($text-tertiary, 0.1);
+}
+
+.filtersHeader {
+  @include flex-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 24px;
+
+  @include respond-below(md) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.filtersLeft {
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 4px;
+  }
+
+  p {
+    color: $text-secondary;
+    font-size: 14px;
+  }
+}
+
+.filtersRight {
+  @include flex-center;
+  gap: 16px;
+}
+
+.filterToggle {
+  @include flex-center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba($text-tertiary, 0.1);
+  border: 1px solid rgba($text-tertiary, 0.2);
+  border-radius: 50px;
+  color: $text-secondary;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($color-primary-500, 0.1);
+    border-color: $color-primary-500;
+    color: $color-primary-400;
+  }
+}
+
+.viewControls {
+  @include flex-center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba($text-tertiary, 0.1);
+  border-radius: 12px;
+}
+
+.viewButton {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: $text-tertiary;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($color-primary-500, 0.1);
+    color: $color-primary-400;
+  }
+
+  &.active {
+    background: $color-primary-500;
+    color: white;
+  }
+}
+
+.categories {
+  @include flex-center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+
+  @include respond-below(md) {
+    justify-content: flex-start;
+  }
+}
+
+.categoryButton {
+  @include flex-center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba($text-tertiary, 0.05);
+  border: 1px solid rgba($text-tertiary, 0.2);
+  border-radius: 50px;
+  color: $text-secondary;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba($color-primary-500, 0.1);
+    border-color: $color-primary-500;
+    color: $color-primary-400;
+  }
+
+  &.active {
+    background: $color-primary-500;
+    border-color: $color-primary-500;
+    color: white;
+  }
+}
+
+.categoryCount {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.sortSection {
+  @include flex-center;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  @include respond-below(md) {
+    justify-content: flex-start;
+  }
+}
+
+.sortLabel {
+  font-size: 14px;
+  color: $text-secondary;
+  font-weight: 500;
+}
+
+.sortOptions {
+  @include flex-center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sortOption {
+  @include flex-center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba($text-tertiary, 0.05);
+  border: 1px solid rgba($text-tertiary, 0.2);
+  border-radius: 25px;
+  color: $text-secondary;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($color-primary-500, 0.1);
+    border-color: $color-primary-500;
+    color: $color-primary-400;
+  }
+
+  &.active {
+    background: $color-primary-500;
+    border-color: $color-primary-500;
+    color: white;
+  }
+}
+
+// Products Section
+.productsSection {
+  padding: 60px 0 100px;
+  background: $bg-space;
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 32px;
+
+  &.listView {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.productCard {
+  background: $bg-primary;
+  border: 1px solid rgba($text-tertiary, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba($color-primary-500, 0.3);
+    box-shadow: 0 20px 40px rgba($color-primary-500, 0.1);
+  }
+}
+
+.productImage {
+  position: relative;
+  height: 200px;
+  background: linear-gradient(135deg, rgba($color-primary-500, 0.1) 0%, rgba($color-neural-500, 0.1) 100%);
+  @include flex-center;
+}
+
+.imagePlaceholder {
+  @include flex-center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba($color-primary-500, 0.2);
+  color: $color-primary-400;
+}
+
+.productBadges {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  @include flex-center;
+  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.popularBadge {
+  @include flex-center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: $color-accent-500;
+  color: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.trendingBadge {
+  @include flex-center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: $color-neural-500;
+  color: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.freeBadge {
+  padding: 6px 12px;
+  background: $color-success;
+  color: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.productActions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  @include flex-center;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.actionButton {
+  @include flex-center;
+  width: 36px;
+  height: 36px;
+  background: rgba($text-primary, 0.1);
+  border: 1px solid rgba($text-tertiary, 0.2);
+  border-radius: 50%;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: rgba($color-primary-500, 0.2);
+    border-color: $color-primary-500;
+    color: $color-primary-400;
+  }
+}
+
+.productContent {
+  padding: 24px;
+}
+
+.productCategory {
+  font-size: 12px;
+  color: $color-primary-400;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.productName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.productDescription {
+  font-size: 14px;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.productTags {
+  @include flex-center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.tag {
+  padding: 4px 8px;
+  background: rgba($text-tertiary, 0.1);
+  border-radius: 12px;
+  font-size: 11px;
+  color: $text-tertiary;
+  font-weight: 500;
+}
+
+.productStats {
+  @include flex-center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  @include flex-center;
+  gap: 4px;
+  font-size: 13px;
+  color: $text-tertiary;
+
+  svg {
+    color: $color-accent-500;
+  }
+
+  .statLabel {
+    font-size: 11px;
+    opacity: 0.7;
+  }
+}
+
+.productFooter {
+  @include flex-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.vendorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vendorName {
+  font-size: 12px;
+  color: $text-secondary;
+  font-weight: 500;
+}
+
+.lastUpdated {
+  font-size: 11px;
+  color: $text-tertiary;
+}
+
+.productPricing {
+  .freePrice {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $color-success;
+  }
+
+  .paidPrice {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $text-primary;
+  }
+}
+
+.downloadButton {
+  width: 100%;
+}
+
+// No Results
+.noResults {
+  text-align: center;
+  padding: 80px 20px;
+  color: $text-secondary;
+}
+
+.noResultsIcon {
+  @include flex-center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: rgba($text-tertiary, 0.1);
+  color: $text-tertiary;
+}
+
+.noResults h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 12px;
+}
+
+.noResults p {
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+
+// Responsive Design
+@include respond-below(lg) {
+  .hero {
+    padding: 100px 0 60px;
+  }
+
+  .filtersSection,
+  .productsSection {
+    padding: 50px 0;
+  }
+}
+
+@include respond-below(md) {
+  .hero {
+    padding: 80px 0 40px;
+  }
+
+  .filtersSection,
+  .productsSection {
+    padding: 40px 0;
+  }
+
+  .heroStats {
+    justify-content: center;
+  }
+
+  .searchBar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 16px;
+
+    .searchInput {
+      padding: 12px 16px;
+    }
+  }
+}
+
+@include respond-below(sm) {
+  .hero {
+    padding: 60px 0 30px;
+  }
+
+  .filtersSection,
+  .productsSection {
+    padding: 30px 0;
+  }
+
+  .productContent {
+    padding: 20px;
+  }
+
+  .categories {
+    gap: 8px;
+  }
+
+  .categoryButton {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}

@@ -5,6 +5,8 @@ import { PopularAgents } from '@/components/sections/PopularAgents/PopularAgents
 import { WorkflowShowcase } from '@/components/sections/WorkflowShowcase/WorkflowShowcase'
 import { Testimonials } from '@/components/sections/Testimonials/Testimonials'
 import { PricingTeaser } from '@/components/sections/PricingTeaser/PricingTeaser'
+import { StatsSection } from '@/components/sections/StatsSection/StatsSection'
+import { CTASection } from '@/components/sections/CTASection/CTASection'
 import { Footer } from '@/components/layout/Footer/Footer'
 
 export default function HomePage() {
@@ -13,11 +15,13 @@ export default function HomePage() {
       <Navigation />
       <main>
         <Hero />
+        <StatsSection />
         <Features />
         <PopularAgents />
         <WorkflowShowcase />
         <Testimonials />
         <PricingTeaser />
+        <CTASection />
       </main>
       <Footer />
     </>

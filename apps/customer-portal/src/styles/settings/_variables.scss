@@ -238,3 +238,32 @@ $gradient-neural-flow: linear-gradient(45deg,
   rgba(16, 185, 129, 0.3) 50%,
   rgba(16, 185, 129, 0.1) 100%
 );
+
+// Ecommerce specific colors
+$color-discount: #ef4444;
+$color-free: #10b981;
+$color-premium: #f59e0b;
+
+// Product categories
+$color-no-code: #8b5cf6;
+$color-low-code: #06b6d4;
+$color-developer: #f59e0b;
+
+// Holographic effects
+$gradient-holographic: linear-gradient(45deg, #00d4ff, #ff00ff, #00ff88, #ffaa00);
+$gradient-holographic-vertical: linear-gradient(180deg, #00d4ff, #ff00ff, #00ff88, #ffaa00);
+
+// Enhanced shadows for ecommerce
+$shadow-product: 0 4px 20px rgba(0, 0, 0, 0.1);
+$shadow-product-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+$shadow-card: 0 2px 10px rgba(0, 0, 0, 0.08);
+$shadow-card-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+$shadow-button: 0 2px 8px rgba(0, 0, 0, 0.1);
+$shadow-button-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+// Motion & Animation
+$transition-fast: 0.15s ease-out;
+$transition-base: 0.3s ease-out;
+$transition-slow: 0.5s ease-out;
+$ease-in-out-cubic: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);

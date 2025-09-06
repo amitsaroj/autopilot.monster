@@ -1,0 +1,559 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.footer {
+  position: relative;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.backgroundAnimation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: $color-primary-400;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: particleFloat 8s infinite ease-in-out;
+
+  &:nth-child(1) {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 6s;
+  }
+
+  &:nth-child(2) {
+    top: 60%;
+    left: 80%;
+    animation-delay: 2s;
+    animation-duration: 8s;
+  }
+
+  &:nth-child(3) {
+    top: 40%;
+    left: 30%;
+    animation-delay: 4s;
+    animation-duration: 7s;
+  }
+
+  &:nth-child(4) {
+    top: 80%;
+    left: 60%;
+    animation-delay: 1s;
+    animation-duration: 9s;
+  }
+
+  &:nth-child(5) {
+    top: 10%;
+    left: 70%;
+    animation-delay: 3s;
+    animation-duration: 5s;
+  }
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px) scale(1.2);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-10px) translateX(-5px) scale(0.8);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-30px) translateX(15px) scale(1.1);
+    opacity: 0.7;
+  }
+}
+
+.footerContent {
+  padding: $space-20 0 $space-16;
+}
+
+.footerTop {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: $space-16;
+  margin-bottom: $space-16;
+}
+
+.brandSection {
+  max-width: 500px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+.logoIcon {
+  @include flex-center;
+  width: 60px;
+  height: 60px;
+  background: $gradient-primary;
+  border-radius: $radius-xl;
+  color: $text-inverse;
+  box-shadow: $shadow-glow-md;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.logoName {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-inverse;
+  line-height: 1;
+}
+
+.logoTagline {
+  font-size: $font-size-sm;
+  color: $color-primary-400;
+  font-weight: $font-weight-medium;
+}
+
+.description {
+  font-size: $font-size-base;
+  line-height: $line-height-relaxed;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+}
+
+.newsletter {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  padding: $space-6;
+}
+
+.newsletterTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-2;
+}
+
+.newsletterDescription {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: $space-4;
+}
+
+.newsletterForm {
+  display: flex;
+  gap: $space-2;
+}
+
+.newsletterInput {
+  flex: 1;
+  padding: $space-3 $space-4;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-lg;
+  color: $text-inverse;
+  font-size: $font-size-sm;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary-400;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  }
+}
+
+.newsletterButton {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background: $gradient-primary;
+  border: none;
+  border-radius: $radius-lg;
+  color: $text-inverse;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-glow-md;
+  }
+}
+
+
+.linksGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-8;
+}
+
+.linkSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.linkSectionTitle {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-4;
+}
+
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.link {
+  display: block;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all $transition-base $ease-out-expo;
+  padding: $space-1 0;
+
+  &:hover {
+    color: $color-primary-400;
+    transform: translateX(4px);
+  }
+}
+
+.contactSection {
+  margin-bottom: $space-12;
+  padding: $space-8;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-xl;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contactTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  text-align: center;
+}
+
+.contactInfo {
+  display: flex;
+  justify-content: center;
+  gap: $space-8;
+  flex-wrap: wrap;
+}
+
+.contactItem {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: $font-size-sm;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: $color-primary-400;
+    color: $text-inverse;
+  }
+}
+
+.socialSection {
+  margin-bottom: $space-12;
+  text-align: center;
+}
+
+.socialTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+}
+
+.socialLinks {
+  display: flex;
+  justify-content: center;
+  gap: $space-4;
+  flex-wrap: wrap;
+}
+
+.socialLink {
+  @include flex-center;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-full;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: $color-primary-400;
+    color: $color-primary-400;
+    box-shadow: $shadow-glow-sm;
+  }
+}
+
+// Footer Social Section (below footer menus)
+.footerSocialSection {
+  text-align: center;
+  padding: $space-8 0 $space-6;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: $space-6;
+}
+
+.footerSocialTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  background: $gradient-neural;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footerSocialLinks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $space-4;
+  max-width: 800px;
+  margin: 0 auto;
+
+  @include respond-below(md) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-3;
+  }
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.footerSocialLink {
+  @include flex-center;
+  gap: $space-3;
+  padding: $space-4 $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base $ease-out-expo;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+    color: $color-primary-400;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.2);
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  svg {
+    transition: transform $transition-base $ease-out-expo;
+  }
+
+  &:hover svg {
+    transform: scale(1.2) rotate(5deg);
+  }
+}
+
+.footerSocialName {
+  font-weight: $font-weight-medium;
+  letter-spacing: 0.5px;
+}
+
+.footerBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $space-8;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copyright {
+  p {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+  }
+}
+
+.heart {
+  color: #ef4444;
+  animation: heartbeat 2s infinite ease-in-out;
+}
+
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.bottomLinks {
+  display: flex;
+  gap: $space-6;
+}
+
+.bottomLink {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color $transition-base $ease-out-expo;
+
+  &:hover {
+    color: $color-primary-400;
+  }
+}
+
+@include respond-below(lg) {
+  .footerTop {
+    grid-template-columns: 1fr;
+    gap: $space-12;
+  }
+
+  .linksGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-6;
+  }
+
+  .contactInfo {
+    gap: $space-4;
+  }
+
+  .contactItem {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+@include respond-below(md) {
+  .footerContent {
+    padding: $space-16 0 $space-12;
+  }
+
+  .linksGrid {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+
+  .contactInfo {
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  .contactItem {
+    min-width: auto;
+  }
+
+  .footerBottom {
+    flex-direction: column;
+    gap: $space-4;
+    text-align: center;
+  }
+
+  .bottomLinks {
+    gap: $space-4;
+  }
+
+  .newsletterForm {
+    flex-direction: column;
+  }
+
+  .newsletterButton {
+    justify-content: center;
+  }
+
+  .footerSocialSection {
+    padding: $space-6 0 $space-4;
+  }
+
+  .footerSocialTitle {
+    font-size: $font-size-lg;
+    margin-bottom: $space-4;
+  }
+
+  .footerSocialLinks {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+  }
+
+  .footerSocialLink {
+    padding: $space-3 $space-4;
+    font-size: $font-size-sm;
+  }
+}
+
+@include respond-below(sm) {
+  .logo {
+    flex-direction: column;
+    text-align: center;
+    gap: $space-3;
+  }
+
+  .socialLinks {
+    gap: $space-3;
+  }
+
+  .socialLink {
+    width: 45px;
+    height: 45px;
+  }
+}

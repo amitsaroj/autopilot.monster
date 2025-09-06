@@ -2,8 +2,8 @@ import { Navigation } from '@/components/layout/Navigation/Navigation'
 import { Footer } from '@/components/layout/Footer/Footer'
 
 export const metadata = {
-  title: 'FAQ - Autopilot.monster',
-  description: 'Frequently asked questions about the marketplace.',
+  title: 'FAQ - Help Center - Autopilot.monster',
+  description: 'Find answers to common questions about AI agents, workflows, and automation tools.',
 }
 
 export default function FAQPage() {
@@ -13,9 +13,9 @@ export default function FAQPage() {
       <main>
         <section className="section">
           <div className="container">
-            <h1 className="text-4xl font-extrabold">FAQ</h1>
+            <h1 className="text-4xl font-extrabold">Help Center & FAQ</h1>
             <p className="text-lg" style={{ opacity: 0.8, marginTop: '12px' }}>
-              Common questions and answers.
+              Comprehensive help center with frequently asked questions coming soon.
             </p>
           </div>
         </section>

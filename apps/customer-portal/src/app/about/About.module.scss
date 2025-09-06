@@ -1,0 +1,610 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.aboutPage {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  background: linear-gradient(135deg, $bg-space 0%, $bg-dark 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 20%, rgba($color-primary-500, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba($color-neural-500, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.badge {
+  @include flex-center;
+  gap: 8px;
+  display: inline-flex;
+  padding: 8px 16px;
+  background: rgba($color-primary-500, 0.1);
+  border: 1px solid rgba($color-primary-500, 0.3);
+  border-radius: 50px;
+  color: $color-primary-400;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+}
+
+.heroTitle {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: $text-primary;
+
+  @include respond-below(lg) {
+    font-size: 2.5rem;
+  }
+
+  @include respond-below(md) {
+    font-size: 2rem;
+  }
+}
+
+.gradientText {
+  @include gradient-text;
+}
+
+.heroDescription {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: $text-secondary;
+  margin-bottom: 48px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include respond-below(md) {
+    font-size: 1.1rem;
+  }
+}
+
+.heroStats {
+  @include flex-center;
+  gap: 48px;
+  flex-wrap: wrap;
+
+  @include respond-below(md) {
+    gap: 24px;
+  }
+}
+
+.stat {
+  text-align: center;
+  position: relative;
+}
+
+.statIcon {
+  @include flex-center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: rgba($color-primary-500, 0.1);
+  color: $color-primary-400;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $color-primary-400;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: $text-tertiary;
+  font-weight: 500;
+}
+
+// Mission Section
+.mission {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.missionContent {
+  @include flex-center;
+  gap: 80px;
+  align-items: center;
+
+  @include respond-below(lg) {
+    flex-direction: column;
+    gap: 60px;
+  }
+}
+
+.missionText {
+  flex: 1;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 24px;
+
+  @include respond-below(md) {
+    font-size: 2rem;
+  }
+}
+
+.missionDescription {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: $text-secondary;
+  margin-bottom: 32px;
+}
+
+.missionPoints {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.missionPoint {
+  @include flex-center;
+  gap: 12px;
+  align-items: flex-start;
+  color: $text-secondary;
+
+  svg {
+    color: $color-primary-400;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+.missionVisual {
+  flex: 1;
+  @include flex-center;
+}
+
+.visualPlaceholder {
+  @include flex-center;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba($color-primary-500, 0.1) 0%, rgba($color-neural-500, 0.1) 100%);
+  color: $color-primary-400;
+}
+
+// Values Section
+.values {
+  padding: 100px 0;
+  background: $bg-space;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.sectionDescription {
+  font-size: 1.1rem;
+  color: $text-secondary;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.valueCard {
+  padding: 40px 32px;
+  border-radius: 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba($color-primary-500, 0.1) 0%, rgba($color-neural-500, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &.primary {
+    border: 1px solid rgba($color-primary-500, 0.3);
+    background: rgba($color-primary-500, 0.05);
+  }
+
+  &.neural {
+    border: 1px solid rgba($color-neural-500, 0.3);
+    background: rgba($color-neural-500, 0.05);
+  }
+
+  &.cyber {
+    border: 1px solid rgba($color-cyber-500, 0.3);
+    background: rgba($color-cyber-500, 0.05);
+  }
+
+  &.accent {
+    border: 1px solid rgba($color-accent-500, 0.3);
+    background: rgba($color-accent-500, 0.05);
+  }
+}
+
+.valueIcon {
+  @include flex-center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: rgba($color-primary-500, 0.1);
+  color: $color-primary-400;
+  position: relative;
+  z-index: 2;
+}
+
+.valueTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.valueDescription {
+  font-size: 1rem;
+  color: $text-secondary;
+  line-height: 1.6;
+  position: relative;
+  z-index: 2;
+}
+
+// Timeline Section
+.timeline {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.timelineContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, $color-primary-500, $color-neural-500);
+    transform: translateX(-50%);
+
+    @include respond-below(md) {
+      left: 20px;
+    }
+  }
+}
+
+.timelineItem {
+  position: relative;
+  margin-bottom: 60px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+
+  &:nth-child(odd) {
+    flex-direction: row;
+
+    @include respond-below(md) {
+      flex-direction: row;
+    }
+  }
+
+  &:nth-child(even) {
+    flex-direction: row-reverse;
+
+    @include respond-below(md) {
+      flex-direction: row;
+    }
+  }
+
+  @include respond-below(md) {
+    gap: 20px;
+  }
+}
+
+.timelineYear {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $color-primary-400;
+  min-width: 80px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+
+  @include respond-below(md) {
+    min-width: 60px;
+    font-size: 1.25rem;
+  }
+}
+
+.timelineContent {
+  flex: 1;
+  background: $bg-primary;
+  border: 1px solid rgba($text-tertiary, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  position: relative;
+  z-index: 2;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border: 12px solid transparent;
+    transform: translateY(-50%);
+
+    @include respond-below(md) {
+      display: none;
+    }
+  }
+
+  .timelineItem:nth-child(odd) &::before {
+    right: -24px;
+    border-left-color: $bg-primary;
+  }
+
+  .timelineItem:nth-child(even) &::before {
+    left: -24px;
+    border-right-color: $bg-primary;
+  }
+}
+
+.timelineIcon {
+  @include flex-center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: rgba($color-primary-500, 0.1);
+  color: $color-primary-400;
+}
+
+.timelineTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 12px;
+}
+
+.timelineDescription {
+  font-size: 1rem;
+  color: $text-secondary;
+  line-height: 1.6;
+}
+
+// Team Section
+.team {
+  padding: 100px 0;
+  background: $bg-space;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.teamCard {
+  background: $bg-primary;
+  border: 1px solid rgba($text-tertiary, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba($color-primary-500, 0.3);
+    box-shadow: 0 20px 40px rgba($color-primary-500, 0.1);
+  }
+}
+
+.memberImage {
+  margin-bottom: 24px;
+}
+
+.imagePlaceholder {
+  @include flex-center;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba($color-primary-500, 0.1) 0%, rgba($color-neural-500, 0.1) 100%);
+  color: $color-primary-400;
+}
+
+.memberInfo {
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 8px;
+  }
+}
+
+.memberRole {
+  font-size: 14px;
+  color: $color-primary-400;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.memberBio {
+  font-size: 14px;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.memberSocial {
+  @include flex-center;
+  gap: 12px;
+
+  a {
+    @include flex-center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba($text-tertiary, 0.1);
+    color: $text-secondary;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba($color-primary-500, 0.2);
+      color: $color-primary-400;
+    }
+  }
+}
+
+// CTA Section
+.cta {
+  padding: 100px 0;
+  background: linear-gradient(135deg, $bg-dark 0%, $bg-space 100%);
+  text-align: center;
+}
+
+.ctaContent {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.ctaTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 24px;
+
+  @include respond-below(md) {
+    font-size: 2rem;
+  }
+}
+
+.ctaDescription {
+  font-size: 1.1rem;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.ctaButtons {
+  @include flex-center;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  @include respond-below(md) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+// Responsive Design
+@include respond-below(lg) {
+  .hero,
+  .mission,
+  .values,
+  .timeline,
+  .team,
+  .cta {
+    padding: 80px 0;
+  }
+}
+
+@include respond-below(md) {
+  .hero,
+  .mission,
+  .values,
+  .timeline,
+  .team,
+  .cta {
+    padding: 60px 0;
+  }
+
+  .heroStats {
+    justify-content: center;
+  }
+
+  .missionContent {
+    text-align: center;
+  }
+
+  .valuesGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .teamGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@include respond-below(sm) {
+  .hero,
+  .mission,
+  .values,
+  .timeline,
+  .team,
+  .cta {
+    padding: 40px 0;
+  }
+
+  .timelineContent {
+    padding: 24px;
+  }
+
+  .teamCard {
+    padding: 24px;
+  }
+}

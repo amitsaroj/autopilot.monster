@@ -2,8 +2,8 @@ import { Navigation } from '@/components/layout/Navigation/Navigation'
 import { Footer } from '@/components/layout/Footer/Footer'
 
 export const metadata = {
-  title: 'Vendor - Autopilot.monster',
-  description: 'Manage your products and sales.',
+  title: 'Vendor Dashboard - Autopilot.monster',
+  description: 'Vendor dashboard for managing your AI agents and workflows listings.',
 }
 
 export default function VendorPage() {
@@ -15,7 +15,7 @@ export default function VendorPage() {
           <div className="container">
             <h1 className="text-4xl font-extrabold">Vendor Dashboard</h1>
             <p className="text-lg" style={{ opacity: 0.8, marginTop: '12px' }}>
-              Upload products, view analytics, and manage orders.
+              Vendor dashboard with sales analytics and product management coming soon.
             </p>
           </div>
         </section>
