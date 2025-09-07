@@ -1,0 +1,127 @@
+# ========================================
+# OS / System
+# ========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ========================================
+# Node.js / General
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional if you want to commit lock files, remove above lines
+
+# Logs
+logs
+*.log
+*.log.*
+logs/
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage / Test
+coverage/
+.nyc_output
+lcov-report/
+
+# Environment
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build / Dist
+dist/
+build/
+.out/
+.next/
+.cache/
+temp/
+tmp/
+*.tsbuildinfo
+
+# ========================================
+# NestJS Specific
+# ========================================
+/dist
+/.env
+/.env.*.local
+
+# ========================================
+# Next.js Specific
+# ========================================
+.next/
+out/
+.vercel/
+.vercel_build_output/
+
+# ========================================
+# React Specific
+# ========================================
+build/
+.cache/
+*.cache
+
+# ========================================
+# TypeScript
+# ========================================
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ========================================
+# IDE / Editors
+# ========================================
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.iml
+
+# ========================================
+# MacOS Metadata
+# ========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+__MACOSX/
+
+# ========================================
+# Docker
+# ========================================
+docker-compose.override.yml
+.docker/
+*.dockerfile
+*.tar
+
+# ========================================
+# Misc
+# ========================================
+*.tgz
+*.zip
+*.bak
+*.tmp
+*.swp
+*.swo
+
+# Ignore lockfiles if using monorepo tools
+/.turbo
+/.nx
