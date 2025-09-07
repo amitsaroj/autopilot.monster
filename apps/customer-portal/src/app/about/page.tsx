@@ -4,8 +4,6 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { Navigation } from '@/components/layout/Navigation/Navigation'
-import { Footer } from '@/components/layout/Footer/Footer'
 import { Button } from '@/components/ui/Button/Button'
 import { 
   Zap,
@@ -169,8 +167,6 @@ export default function AboutPage() {
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
   return (
-    <>
-      <Navigation />
       <main className={styles.aboutPage}>
         {/* Hero Section */}
         <section className={styles.hero}>
@@ -430,7 +426,5 @@ export default function AboutPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
   )
 }

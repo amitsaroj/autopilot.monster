@@ -206,6 +206,13 @@
 }
 
 
+// Concerns wrapper (contains linksGrid and social section)
+.concerns {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
 .linksGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -224,6 +231,7 @@
   font-weight: $font-weight-semibold;
   color: $text-inverse;
   margin-bottom: $space-4;
+  justify-content: unset;
 }
 
 .linkList {
@@ -349,29 +357,28 @@
 }
 
 .footerSocialLinks {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  justify-content: center;
   gap: $space-4;
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 400px;
+  margin: 0 0;
 
   @include respond-below(md) {
-    grid-template-columns: repeat(2, 1fr);
     gap: $space-3;
   }
 
   @include respond-below(sm) {
-    grid-template-columns: 1fr;
+    gap: $space-2;
   }
 }
 
 .footerSocialLink {
   @include flex-center;
-  gap: $space-3;
-  padding: $space-4 $space-6;
+  width: 60px;
+  height: 60px;
   background: rgba(255, 255, 255, 0.03);
   border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: $radius-2xl;
+  border-radius: 50%;
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   font-size: $font-size-base;
@@ -531,12 +538,12 @@
   }
 
   .footerSocialLinks {
-    grid-template-columns: 1fr;
     gap: $space-3;
   }
 
   .footerSocialLink {
-    padding: $space-3 $space-4;
+    width: 50px;
+    height: 50px;
     font-size: $font-size-sm;
   }
 }

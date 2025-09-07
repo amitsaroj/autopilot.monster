@@ -1,0 +1,620 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.searchPage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+}
+
+.searchHeader {
+  margin-bottom: $space-8;
+  text-align: center;
+}
+
+.searchBox {
+  @include flex-center;
+  gap: $space-3;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+
+  svg {
+    color: $color-primary-400;
+    flex-shrink: 0;
+  }
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: $text-primary;
+  font-size: $font-size-lg;
+  padding: $space-2 0;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-6;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: stretch;
+  }
+}
+
+.resultsInfo {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.controlsGroup {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+
+  @include respond-below(md) {
+    justify-content: space-between;
+  }
+
+  @include respond-below(sm) {
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+}
+
+.filterToggle {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover,
+  &.active {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: $color-primary-400;
+    color: $color-primary-400;
+  }
+
+  svg:last-child {
+    transition: transform $transition-base;
+  }
+
+  &.active svg:last-child {
+    transform: rotate(180deg);
+  }
+}
+
+.sortSelect {
+  padding: $space-2 $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+  color: $text-primary;
+  font-size: $font-size-sm;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary-400;
+  }
+}
+
+.viewToggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.viewButton {
+  @include flex-center;
+  padding: $space-2 $space-3;
+  background: transparent;
+  border: none;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover,
+  &.active {
+    background: $color-primary-500;
+    color: white;
+  }
+}
+
+.searchContent {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: $space-6;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filtersSidebar {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  padding: $space-6;
+  height: fit-content;
+  position: sticky;
+  top: $space-6;
+
+  @include respond-below(lg) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: $bg-dark;
+    border: none;
+    border-radius: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity $transition-base;
+
+    &.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+.filtersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-6;
+  padding-bottom: $space-3;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.clearFilters {
+  @include flex-center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  font-size: $font-size-xs;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: $color-error;
+    color: $color-error;
+  }
+}
+
+.filterGroup {
+  margin-bottom: $space-6;
+
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+    margin-bottom: $space-3;
+  }
+}
+
+.filterOptions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.filterOption {
+  @include flex-center;
+  gap: $space-2;
+  cursor: pointer;
+  justify-content: flex-start;
+
+  input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    accent-color: $color-primary-500;
+  }
+
+  span {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    transition: color $transition-base;
+  }
+
+  &:hover span {
+    color: $text-primary;
+  }
+}
+
+.ratingFilter {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.ratingButton {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all $transition-base;
+  justify-content: flex-start;
+
+  &:hover,
+  &.active {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: $color-primary-400;
+    color: $color-primary-400;
+  }
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.resultsContainer {
+  min-height: 400px;
+}
+
+.loadingState {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-6;
+  padding: $space-20;
+  text-align: center;
+  color: $text-secondary;
+
+  p {
+    font-size: $font-size-lg;
+    margin: 0;
+  }
+}
+
+.loadingSpinner {
+  color: $color-primary-400;
+}
+
+.emptyState {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-6;
+  padding: $space-20;
+  text-align: center;
+
+  svg {
+    color: $text-tertiary;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  p {
+    font-size: $font-size-lg;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: $space-6;
+
+  &.listView {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.resultCard {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  overflow: hidden;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-lg;
+  }
+
+  .listView & {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: $space-4;
+
+    @include respond-below(sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.featuredBadge {
+  @include flex-center;
+  gap: $space-1;
+  position: absolute;
+  top: $space-3;
+  left: $space-3;
+  z-index: 2;
+  padding: $space-1 $space-2;
+  background: linear-gradient(135deg, $color-primary-500, $color-primary-600);
+  color: white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-sm;
+  text-transform: uppercase;
+}
+
+.resultImage {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+
+  .listView & {
+    height: 120px;
+
+    @include respond-below(sm) {
+      height: 160px;
+    }
+  }
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform $transition-base;
+
+  .resultCard:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.typeBadge {
+  position: absolute;
+  bottom: $space-2;
+  right: $space-2;
+  padding: $space-1 $space-2;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-sm;
+  text-transform: uppercase;
+}
+
+.resultContent {
+  padding: $space-6;
+
+  .listView & {
+    padding: $space-4;
+  }
+}
+
+.resultHeader {
+  margin-bottom: $space-3;
+}
+
+.resultTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $space-2;
+
+  a {
+    color: $text-primary;
+    text-decoration: none;
+    transition: color $transition-base;
+
+    &:hover {
+      color: $color-primary-400;
+    }
+  }
+
+  .listView & {
+    font-size: $font-size-lg;
+  }
+}
+
+.resultMeta {
+  display: flex;
+  gap: $space-3;
+  font-size: $font-size-sm;
+  color: $text-tertiary;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-1;
+  }
+}
+
+.vendor {
+  font-weight: $font-weight-medium;
+  color: $color-primary-400;
+}
+
+.category {
+  &::before {
+    content: '•';
+    margin-right: $space-2;
+
+    @include respond-below(sm) {
+      display: none;
+    }
+  }
+
+  @include respond-below(sm) {
+    &::before {
+      display: none;
+    }
+  }
+}
+
+.resultDescription {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin-bottom: $space-4;
+  @include line-clamp(3);
+
+  .listView & {
+    @include line-clamp(2);
+  }
+}
+
+.resultTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-bottom: $space-4;
+}
+
+.tag {
+  @include flex-center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  background: rgba(14, 165, 233, 0.1);
+  color: $color-primary-400;
+  font-size: $font-size-xs;
+  border-radius: $radius-sm;
+
+  svg {
+    opacity: 0.7;
+  }
+}
+
+.resultFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resultStats {
+  display: flex;
+  gap: $space-4;
+}
+
+.rating,
+.downloads {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  color: $text-tertiary;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.resultPrice {
+  font-weight: $font-weight-bold;
+}
+
+.freePrice {
+  color: $color-success;
+  font-size: $font-size-lg;
+}
+
+.paidPrice {
+  @include flex-center;
+  gap: $space-1;
+  color: $color-primary-400;
+  font-size: $font-size-lg;
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .searchPage {
+    padding: $space-16 0;
+  }
+
+  .searchBox {
+    margin: 0 $space-4;
+  }
+
+  .resultsHeader {
+    margin: 0 $space-4 $space-6;
+  }
+
+  .searchContent {
+    padding: 0 $space-4;
+  }
+}
+
+@include respond-below(sm) {
+  .resultCard {
+    .listView & {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .resultContent {
+    padding: $space-4;
+  }
+
+  .resultStats {
+    flex-direction: column;
+    gap: $space-2;
+    align-items: flex-start;
+  }
+
+  .resultFooter {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: flex-start;
+  }
+}

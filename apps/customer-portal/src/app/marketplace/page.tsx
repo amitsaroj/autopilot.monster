@@ -4,8 +4,6 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
-import { Navigation } from '@/components/layout/Navigation/Navigation'
-import { Footer } from '@/components/layout/Footer/Footer'
 import { Button } from '@/components/ui/Button/Button'
 import { 
   Search,
@@ -226,9 +224,7 @@ export default function MarketplacePage() {
   })
 
   return (
-    <>
-      <Navigation />
-      <main className={styles.marketplacePage}>
+    <div className={styles.marketplacePage}>
         {/* Hero Section */}
         <section className={styles.hero}>
           <div className="container">
@@ -512,8 +508,6 @@ export default function MarketplacePage() {
             )}
           </div>
         </section>
-      </main>
-      <Footer />
-    </>
+    </div>
   )
 }

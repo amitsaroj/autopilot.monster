@@ -1,0 +1,649 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.checkoutPage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 40%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 20% 90%, rgba(34, 197, 94, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.checkoutHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-4;
+  margin-bottom: $space-12;
+}
+
+.backLink {
+  @include flex-center;
+  gap: $space-2;
+  color: $text-secondary;
+  text-decoration: none;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base $ease-out-expo;
+  align-self: flex-start;
+
+  &:hover {
+    color: $color-primary-400;
+    transform: translateX(-4px);
+  }
+}
+
+.checkoutTitle {
+  @include flex-center;
+  gap: $space-3;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  background: $gradient-primary;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+
+// Progress Steps
+.progressSteps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $space-4;
+  margin-bottom: $space-12;
+  position: relative;
+
+  @include respond-below(md) {
+    gap: $space-2;
+    margin-bottom: $space-8;
+  }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-3;
+  position: relative;
+  z-index: 2;
+
+  @include respond-below(md) {
+    gap: $space-2;
+  }
+}
+
+.stepIcon {
+  @include flex-center;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: $text-tertiary;
+  transition: all $transition-base $ease-out-expo;
+
+  @include respond-below(md) {
+    width: 50px;
+    height: 50px;
+  }
+
+  .step.active & {
+    background: rgba(14, 165, 233, 0.2);
+    border-color: $color-primary-400;
+    color: $color-primary-400;
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+  }
+
+  .step.completed & {
+    background: $color-success;
+    border-color: $color-success;
+    color: white;
+  }
+}
+
+.stepInfo {
+  text-align: center;
+  min-width: 120px;
+
+  @include respond-below(md) {
+    min-width: 80px;
+  }
+}
+
+.stepNumber {
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  .step.active & {
+    color: $color-primary-400;
+  }
+
+  .step.completed & {
+    color: $color-success;
+  }
+}
+
+.stepTitle {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  font-weight: $font-weight-medium;
+  margin-top: $space-1;
+
+  @include respond-below(md) {
+    font-size: $font-size-xs;
+  }
+
+  .step.active & {
+    color: $text-primary;
+  }
+
+  .step.completed & {
+    color: $text-primary;
+  }
+}
+
+.stepConnector {
+  position: absolute;
+  top: 30px;
+  left: 60px;
+  width: calc(100% + #{$space-4});
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 1;
+
+  @include respond-below(md) {
+    top: 25px;
+    left: 50px;
+    width: calc(100% + #{$space-2});
+  }
+
+  .step.completed + .step & {
+    background: $color-success;
+  }
+}
+
+// Main Content
+.checkoutContent {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: $space-8;
+  align-items: start;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.checkoutForm {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  padding: $space-8;
+  backdrop-filter: blur(10px);
+
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.formSection {
+  margin-bottom: $space-8;
+}
+
+.sectionTitle {
+  @include flex-center;
+  gap: $space-3;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-bottom: $space-6;
+  justify-content: flex-start;
+}
+
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $space-4;
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.label {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.input {
+  padding: $space-3 $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  transition: all $transition-base $ease-out-expo;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary-400;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  }
+
+  &.error {
+    border-color: $color-error;
+    background: rgba(239, 68, 68, 0.05);
+  }
+}
+
+.errorText {
+  font-size: $font-size-xs;
+  color: $color-error;
+  margin-top: $space-1;
+}
+
+// Payment Methods
+.paymentMethods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+  margin-bottom: $space-6;
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.paymentMethod {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+  }
+
+  &.selected {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: $color-primary-400;
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
+  }
+}
+
+.methodInfo {
+  @include flex-center;
+  gap: $space-3;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.methodLogos {
+  @include flex-center;
+  gap: $space-2;
+}
+
+.cardLogo {
+  font-size: $font-size-lg;
+}
+
+.securityNotice {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-3;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: $radius-lg;
+  color: $color-success;
+  font-size: $font-size-sm;
+  margin-top: $space-4;
+  justify-content: center;
+
+  svg {
+    color: $color-success;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $space-6;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-3;
+  }
+}
+
+// Order Summary
+.orderSummary {
+  position: sticky;
+  top: $space-8;
+
+  @include respond-below(lg) {
+    position: static;
+    order: -1;
+  }
+}
+
+.summaryCard {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.summaryTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin: 0 0 $space-6 0;
+  text-align: center;
+}
+
+.orderItems {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+.orderItem {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: $space-3;
+  align-items: center;
+}
+
+.itemImage {
+  width: 60px;
+  height: 40px;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemDetails {
+  min-width: 0;
+}
+
+.itemName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  margin: 0;
+  @include truncate;
+}
+
+.itemVendor {
+  font-size: $font-size-xs;
+  color: $color-primary-400;
+  margin: 0;
+}
+
+.itemLicense {
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  margin: 0;
+}
+
+.itemPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $space-1;
+}
+
+.quantity {
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+}
+
+.price {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-primary-400;
+}
+
+.summaryBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  margin-bottom: $space-6;
+}
+
+.summaryLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+
+  &.discount {
+    color: $color-success;
+  }
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $space-3;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+.securityBadges {
+  display: flex;
+  gap: $space-4;
+  justify-content: center;
+  margin-top: $space-6;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-2;
+    align-items: center;
+  }
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+// Success Page
+.successContainer {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-8;
+  text-align: center;
+  padding: $space-20 $space-4;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.successIcon {
+  @include flex-center;
+  width: 120px;
+  height: 120px;
+  background: rgba(34, 197, 94, 0.2);
+  border: 3px solid $color-success;
+  border-radius: 50%;
+  color: $color-success;
+  margin-bottom: $space-4;
+
+  svg {
+    animation: checkmark 0.6s ease-out;
+  }
+}
+
+@keyframes checkmark {
+  0% {
+    scale: 0;
+    rotate: 45deg;
+  }
+  50% {
+    scale: 1.2;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+
+.successTitle {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.successMessage {
+  font-size: $font-size-lg;
+  color: $text-secondary;
+  margin: 0;
+  max-width: 500px;
+}
+
+.orderDetails {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-primary-400;
+    margin: 0 0 $space-3 0;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: $space-2 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.successActions {
+  display: flex;
+  gap: $space-4;
+  justify-content: center;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .checkoutPage {
+    padding: $space-16 0;
+  }
+
+  .checkoutTitle {
+    font-size: $font-size-2xl;
+  }
+
+  .checkoutForm {
+    padding: $space-4;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include respond-below(sm) {
+  .checkoutContent {
+    gap: $space-4;
+  }
+
+  .progressSteps {
+    gap: $space-1;
+  }
+
+  .stepInfo {
+    min-width: 60px;
+  }
+
+  .stepTitle {
+    display: none;
+  }
+}

@@ -1,0 +1,465 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.successPage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 20%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.successContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+
+  @include respond-below(md) {
+    gap: $space-6;
+  }
+}
+
+.successHeader {
+  text-align: center;
+  padding: $space-8 $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.successIcon {
+  @include flex-center;
+  margin-bottom: $space-6;
+  color: $color-success;
+
+  svg {
+    filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.5));
+  }
+}
+
+.successTitle {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-bottom: $space-3;
+
+  @include respond-below(md) {
+    font-size: $font-size-2xl;
+  }
+}
+
+.successSubtitle {
+  font-size: $font-size-lg;
+  color: $text-secondary;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+
+  @include respond-below(md) {
+    font-size: $font-size-sm;
+  }
+}
+
+.orderSummary {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-6;
+  padding-bottom: $space-4;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: flex-start;
+  }
+}
+
+.orderTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.orderMeta {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  align-items: flex-end;
+
+  @include respond-below(md) {
+    align-items: flex-start;
+  }
+}
+
+.orderNumber {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-primary-400;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.orderDate {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.orderDetails {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: $space-6;
+  align-items: center;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.billingInfo {
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+    margin-bottom: $space-2;
+  }
+
+  p {
+    @include flex-center;
+    gap: $space-2;
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: 0;
+    justify-content: flex-start;
+
+    svg {
+      color: $color-primary-400;
+    }
+  }
+}
+
+.orderTotal {
+  text-align: right;
+
+  @include respond-below(md) {
+    text-align: left;
+  }
+}
+
+.totalAmount {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+
+  span {
+    color: $color-success;
+  }
+}
+
+.downloadSection {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.sectionTitle {
+  @include flex-center;
+  gap: $space-3;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin-bottom: $space-3;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.sectionDescription {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  margin-bottom: $space-6;
+  line-height: 1.6;
+}
+
+.productsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.productCard {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-md;
+  }
+}
+
+.productInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-4;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-2;
+    align-items: flex-start;
+  }
+}
+
+.productHeader {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-1;
+    align-items: flex-start;
+  }
+}
+
+.productName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  margin: 0;
+}
+
+.productType {
+  padding: $space-1 $space-2;
+  background: $color-primary-500;
+  color: white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-sm;
+  text-transform: uppercase;
+}
+
+.productPrice {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-success;
+}
+
+.licenseSection {
+  margin-bottom: $space-4;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+}
+
+.licenseHeader {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  margin-bottom: $space-2;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.licenseKey {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: $radius-md;
+
+  code {
+    flex: 1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: $font-size-sm;
+    color: $color-primary-400;
+    background: none;
+    padding: 0;
+  }
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-2;
+    align-items: stretch;
+  }
+}
+
+.copyButton {
+  white-space: nowrap;
+
+  @include respond-below(sm) {
+    width: 100%;
+  }
+}
+
+.productActions {
+  display: flex;
+  gap: $space-3;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+  }
+}
+
+.nextSteps {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.step {
+  display: flex;
+  gap: $space-4;
+  align-items: flex-start;
+}
+
+.stepIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: rgba(14, 165, 233, 0.2);
+  border-radius: $radius-lg;
+  color: $color-primary-400;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+    margin-bottom: $space-2;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.actionButtons {
+  display: flex;
+  gap: $space-4;
+  justify-content: center;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+  }
+}
+
+.supportInfo {
+  text-align: center;
+  padding: $space-4;
+  font-size: $font-size-sm;
+  color: $text-tertiary;
+
+  a {
+    color: $color-primary-400;
+    text-decoration: none;
+    font-weight: $font-weight-medium;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .successPage {
+    padding: $space-16 0;
+  }
+
+  .successContainer {
+    padding: 0 $space-4;
+  }
+
+  .successHeader {
+    padding: $space-6 $space-4;
+  }
+
+  .orderSummary,
+  .downloadSection,
+  .nextSteps {
+    padding: $space-4;
+  }
+
+  .productCard {
+    padding: $space-4;
+  }
+}
+
+@include respond-below(sm) {
+  .successTitle {
+    font-size: $font-size-xl;
+  }
+
+  .successSubtitle {
+    font-size: $font-size-sm;
+  }
+
+  .step {
+    gap: $space-3;
+  }
+
+  .stepIcon {
+    width: 40px;
+    height: 40px;
+  }
+}

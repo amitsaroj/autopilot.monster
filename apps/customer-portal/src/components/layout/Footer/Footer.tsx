@@ -270,9 +270,9 @@ export const Footer: React.FC = () => {
                         transition={{ duration: 0.4, delay: 1.0 + index * 0.1 }}
                         whileHover={{ scale: 1.15, y: -3 }}
                         whileTap={{ scale: 0.95 }}
+                        title={social.name}
                       >
                         <social.icon size={24} />
-                        <span className={styles.footerSocialName}>{social.name}</span>
                       </motion.a>
                     ))}
                   </div>

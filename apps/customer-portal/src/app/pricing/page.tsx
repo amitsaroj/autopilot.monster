@@ -4,8 +4,6 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
-import { Navigation } from '@/components/layout/Navigation/Navigation'
-import { Footer } from '@/components/layout/Footer/Footer'
 import { Button } from '@/components/ui/Button/Button'
 import { 
   Check,
@@ -214,8 +212,6 @@ export default function PricingPage() {
   }
 
   return (
-    <>
-      <Navigation />
       <main className={styles.pricingPage}>
         {/* Hero Section */}
         <section className={styles.hero}>
@@ -456,7 +452,5 @@ export default function PricingPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
   )
 }

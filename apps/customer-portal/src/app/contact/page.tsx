@@ -4,8 +4,6 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
-import { Navigation } from '@/components/layout/Navigation/Navigation'
-import { Footer } from '@/components/layout/Footer/Footer'
 import { Button } from '@/components/ui/Button/Button'
 import { 
   Mail,
@@ -122,8 +120,6 @@ export default function ContactPage() {
   }
 
   return (
-    <>
-      <Navigation />
       <main className={styles.contactPage}>
         {/* Hero Section */}
         <section className={styles.hero}>
@@ -403,7 +399,5 @@ export default function ContactPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
   )
 }

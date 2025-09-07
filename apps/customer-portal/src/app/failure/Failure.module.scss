@@ -1,0 +1,418 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.failurePage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 20%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.failureContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+
+  @include respond-below(md) {
+    gap: $space-6;
+    padding: 0 $space-4;
+  }
+}
+
+.failureHeader {
+  text-align: center;
+  padding: $space-8 $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.failureIcon {
+  @include flex-center;
+  margin-bottom: $space-6;
+  color: $color-error;
+
+  svg {
+    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.5));
+  }
+}
+
+.failureTitle {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-bottom: $space-3;
+
+  @include respond-below(md) {
+    font-size: $font-size-2xl;
+  }
+}
+
+.failureSubtitle {
+  font-size: $font-size-lg;
+  color: $text-secondary;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+
+  @include respond-below(md) {
+    font-size: $font-size-sm;
+  }
+}
+
+.errorDetails {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.errorCard {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: $radius-lg;
+  padding: $space-6;
+}
+
+.errorHeader {
+  @include flex-center;
+  gap: $space-3;
+  margin-bottom: $space-4;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-error;
+  }
+
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.errorContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.errorCode {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  font-family: 'JetBrains Mono', monospace;
+
+  span {
+    color: $color-error;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.errorMessage {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.errorSuggestion {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.6;
+
+  strong {
+    color: $text-primary;
+  }
+}
+
+.orderSummary {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.summaryTitle {
+  @include flex-center;
+  gap: $space-3;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin-bottom: $space-6;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.orderItems {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  margin-bottom: $space-4;
+}
+
+.orderItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-md;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-1;
+    align-items: flex-start;
+  }
+}
+
+.itemName {
+  font-size: $font-size-sm;
+  color: $text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.itemPrice {
+  font-size: $font-size-sm;
+  color: $color-primary-400;
+  font-weight: $font-weight-medium;
+}
+
+.orderTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+  border-top: 2px solid $color-primary-400;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+
+  span:last-child {
+    color: $color-primary-400;
+  }
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-1;
+  }
+}
+
+.orderNote {
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  text-align: center;
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.actionButtons {
+  display: flex;
+  gap: $space-4;
+  justify-content: center;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+  }
+}
+
+.retryButton {
+  position: relative;
+  overflow: hidden;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+.alternativeActions {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+  text-align: center;
+
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin-bottom: $space-6;
+  }
+}
+
+.helpOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-4;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.helpOption {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  text-decoration: none;
+  color: $text-primary;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: $color-primary-400;
+    transform: translateY(-2px);
+    box-shadow: $shadow-glow-sm;
+  }
+
+  svg {
+    color: $color-primary-400;
+    flex-shrink: 0;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    text-align: left;
+
+    span {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $text-primary;
+    }
+
+    small {
+      font-size: $font-size-xs;
+      color: $text-tertiary;
+    }
+  }
+
+  @include respond-below(md) {
+    justify-content: center;
+    text-align: center;
+
+    div {
+      text-align: center;
+    }
+  }
+}
+
+.commonIssues {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin-bottom: $space-6;
+    text-align: center;
+  }
+}
+
+.issuesList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-4;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.issue {
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+    margin-bottom: $space-2;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.backToShopping {
+  text-align: center;
+  padding: $space-4;
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .failurePage {
+    padding: $space-16 0;
+  }
+
+  .failureHeader {
+    padding: $space-6 $space-4;
+  }
+
+  .errorDetails,
+  .orderSummary,
+  .alternativeActions,
+  .commonIssues {
+    padding: $space-4;
+  }
+
+  .errorCard {
+    padding: $space-4;
+  }
+}
+
+@include respond-below(sm) {
+  .failureTitle {
+    font-size: $font-size-xl;
+  }
+
+  .failureSubtitle {
+    font-size: $font-size-sm;
+  }
+
+  .helpOptions {
+    gap: $space-3;
+  }
+
+  .helpOption {
+    padding: $space-3;
+  }
+}

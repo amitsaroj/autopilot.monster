@@ -1,0 +1,795 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.dashboardPage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 25% 25%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.dashboardHeader {
+  margin-bottom: $space-12;
+}
+
+.welcomeSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-8;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-6;
+    align-items: flex-start;
+  }
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+}
+
+.avatar {
+  position: relative;
+}
+
+.avatarImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid $color-primary-400;
+}
+
+.statusBadge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  @include flex-center;
+  width: 28px;
+  height: 28px;
+  background: $gradient-primary;
+  border-radius: 50%;
+  color: white;
+  border: 2px solid $bg-dark;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.welcomeTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.welcomeSubtitle {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.quickActions {
+  display: flex;
+  gap: $space-3;
+
+  @include respond-below(md) {
+    align-self: stretch;
+  }
+
+  @include respond-below(sm) {
+    flex-direction: column;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-6;
+
+  @include respond-below(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+  transition: all $transition-base $ease-out-expo;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-md;
+  }
+
+  @include respond-below(sm) {
+    padding: $space-4;
+  }
+}
+
+.statIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: rgba(14, 165, 233, 0.2);
+  border-radius: $radius-lg;
+  color: $color-primary-400;
+
+  @include respond-below(sm) {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.statValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1;
+}
+
+.statTrend {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $color-success;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-success;
+  }
+}
+
+.dashboardContent {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.tabNavigation {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  @include respond-below(md) {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.tabButton {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-4 $space-6;
+  background: transparent;
+  border: none;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base $ease-out-expo;
+  position: relative;
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.active {
+    color: $color-primary-400;
+    background: rgba(14, 165, 233, 0.1);
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: $color-primary-400;
+    }
+  }
+
+  @include respond-below(sm) {
+    padding: $space-3 $space-4;
+    font-size: $font-size-xs;
+  }
+}
+
+.tabContent {
+  padding: $space-8;
+
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+
+  @include respond-below(sm) {
+    padding: $space-4;
+  }
+}
+
+.sectionTitle {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-bottom: $space-6;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+// Overview Content
+.overviewContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $space-8;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.recentActivity {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-6;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: $radius-lg;
+  transition: background $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.activityIcon {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  background: rgba(14, 165, 233, 0.2);
+  border-radius: $radius-lg;
+  color: $color-primary-400;
+  flex-shrink: 0;
+}
+
+.activityDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.activityTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  @include truncate;
+}
+
+.activityDate {
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+}
+
+.quickStats {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-6;
+}
+
+.summaryCards {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.summaryCard {
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  text-align: center;
+}
+
+.summaryValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary-400;
+  margin-bottom: $space-1;
+}
+
+.summaryLabel {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+// Purchases Content
+.purchasesContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.purchasesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-4;
+
+  @include respond-below(md) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.searchBox {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  min-width: 250px;
+
+  @include respond-below(md) {
+    min-width: 200px;
+  }
+
+  svg {
+    color: $text-tertiary;
+  }
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  width: 100%;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.purchasesList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.purchaseCard {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: $space-4;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-md;
+  }
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+    padding: $space-4;
+  }
+}
+
+.purchaseImage {
+  position: relative;
+  width: 120px;
+  height: 80px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  @include respond-below(md) {
+    width: 100%;
+    height: 160px;
+  }
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.purchaseType {
+  position: absolute;
+  top: $space-2;
+  right: $space-2;
+  padding: $space-1 $space-2;
+  background: $color-primary-500;
+  color: white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-sm;
+  text-transform: uppercase;
+}
+
+.purchaseDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  min-width: 0;
+}
+
+.purchaseName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin: 0;
+  @include truncate;
+}
+
+.purchaseVendor {
+  font-size: $font-size-sm;
+  color: $color-primary-400;
+  margin: 0;
+}
+
+.purchaseMeta {
+  display: flex;
+  gap: $space-4;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.purchaseDate {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  justify-content: flex-start;
+}
+
+.purchasePrice {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-primary-400;
+}
+
+.licenseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.licenseKey {
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  font-family: monospace;
+}
+
+.downloadCount {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+.purchaseActions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  align-items: flex-end;
+
+  @include respond-below(md) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+// Subscriptions Content
+.subscriptionsContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.subscriptionCard {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+}
+
+.subscriptionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-4;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: flex-start;
+  }
+}
+
+.planInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.planName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.planPrice {
+  font-size: $font-size-sm;
+  color: $color-primary-400;
+  font-weight: $font-weight-medium;
+}
+
+.planStatus {
+  display: flex;
+  align-items: center;
+}
+
+.statusBadge {
+  padding: $space-1 $space-3;
+  background: $color-success;
+  color: white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-full;
+  text-transform: uppercase;
+}
+
+.subscriptionDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+.billingInfo {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.feature {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.subscriptionActions {
+  display: flex;
+  gap: $space-3;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+  }
+}
+
+// Profile Content
+.profileContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-4;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+  }
+}
+
+.input {
+  padding: $space-3 $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  transition: all $transition-base $ease-out-expo;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary-400;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  }
+}
+
+.profileActions {
+  display: flex;
+  gap: $space-4;
+  padding-top: $space-6;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  @include respond-below(sm) {
+    flex-direction: column;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .dashboardPage {
+    padding: $space-16 0;
+  }
+
+  .welcomeSection {
+    padding: $space-4;
+  }
+
+  .statsGrid {
+    gap: $space-4;
+  }
+
+  .statCard {
+    padding: $space-4;
+  }
+}
+
+@include respond-below(sm) {
+  .dashboardHeader {
+    margin-bottom: $space-8;
+  }
+
+  .userInfo {
+    gap: $space-3;
+  }
+
+  .avatarImage {
+    width: 60px;
+    height: 60px;
+  }
+
+  .welcomeTitle {
+    font-size: $font-size-lg;
+  }
+
+  .overviewGrid {
+    gap: $space-4;
+  }
+
+  .purchaseCard {
+    gap: $space-2;
+  }
+}

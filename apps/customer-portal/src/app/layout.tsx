@@ -4,6 +4,8 @@ import '@/styles/main.scss'
 import { Providers } from './providers'
 import { AIBackground } from '@/components/animations/AIBackground'
 import { ConditionalBackground } from '@/components/layout/ConditionalBackground/ConditionalBackground'
+import { Navigation } from '@/components/layout/Navigation/Navigation'
+import { Footer } from '@/components/layout/Footer/Footer'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -44,7 +46,11 @@ export default function RootLayout({
           <AIBackground />
           <ConditionalBackground />
           <div className="relative z-10">
-            {children}
+            <Navigation />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
           </div>
         </Providers>
       </body>

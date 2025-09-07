@@ -1,0 +1,516 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.ordersPage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+}
+
+.ordersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+
+  @include respond-below(md) {
+    gap: $space-6;
+  }
+}
+
+.pageHeader {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.headerTitle {
+  @include flex-center;
+  gap: $space-4;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+
+  h1 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.filtersSection {
+  display: flex;
+  gap: $space-4;
+  align-items: center;
+
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: stretch;
+  }
+}
+
+.searchBox {
+  @include flex-center;
+  gap: $space-3;
+  flex: 1;
+  max-width: 400px;
+  padding: $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+
+  svg {
+    color: $color-primary-400;
+    flex-shrink: 0;
+  }
+
+  @include respond-below(md) {
+    max-width: 100%;
+  }
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: $text-primary;
+  font-size: $font-size-sm;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.filterControls {
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+}
+
+.statusFilter {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.filterSelect {
+  background: transparent;
+  border: none;
+  color: $text-primary;
+  font-size: $font-size-sm;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.emptyState {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-6;
+  padding: $space-20;
+  text-align: center;
+
+  svg {
+    color: $text-tertiary;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  p {
+    font-size: $font-size-lg;
+    color: $text-secondary;
+    margin: 0;
+    max-width: 400px;
+  }
+}
+
+.orderCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  overflow: hidden;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-md;
+  }
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-6;
+  cursor: pointer;
+  transition: background $transition-base;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.orderInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.orderNumber {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.orderMeta {
+  display: flex;
+  gap: $space-4;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.orderDate {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.paymentMethod {
+  font-size: $font-size-sm;
+  color: $text-tertiary;
+  font-style: italic;
+}
+
+.orderSummary {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+
+  @include respond-below(md) {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+}
+
+.orderStatus {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-transform: capitalize;
+  justify-content: flex-start;
+}
+
+.orderTotal {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary-400;
+}
+
+.itemCount {
+  font-size: $font-size-sm;
+  color: $text-tertiary;
+}
+
+.expandIcon {
+  color: $text-secondary;
+  transition: transform $transition-base;
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+.orderDetails {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.orderItems {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+.orderItem {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: $space-4;
+  align-items: center;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+    text-align: center;
+  }
+}
+
+.itemImage {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  @include respond-below(md) {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+  }
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemType {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: $space-1;
+  background: $color-primary-500;
+  color: white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-sm 0 0 0;
+  text-transform: uppercase;
+}
+
+.itemDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  margin: 0;
+  @include truncate;
+}
+
+.itemPrice {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary-400;
+}
+
+.licenseKey {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+
+  code {
+    background: rgba(0, 0, 0, 0.3);
+    padding: $space-1 $space-2;
+    border-radius: $radius-sm;
+    font-family: 'JetBrains Mono', monospace;
+    color: $color-primary-400;
+  }
+}
+
+.itemActions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  @include respond-below(md) {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+.pendingActions {
+  font-size: $font-size-sm;
+  color: $text-tertiary;
+  font-style: italic;
+}
+
+.downloadInfo {
+  margin-bottom: $space-4;
+  padding: $space-4;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: $radius-lg;
+}
+
+.downloadStats {
+  display: flex;
+  justify-content: space-between;
+  font-size: $font-size-sm;
+  color: $color-success;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-1;
+  }
+}
+
+.orderActions {
+  display: flex;
+  gap: $space-3;
+  padding-top: $space-4;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  @include respond-below(sm) {
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+}
+
+.summaryStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-4;
+
+  @include respond-below(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-2;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  text-align: center;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+    transform: translateY(-2px);
+  }
+}
+
+.statValue {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary-400;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .ordersPage {
+    padding: $space-16 0;
+  }
+
+  .ordersContainer {
+    padding: 0 $space-4;
+  }
+
+  .pageHeader {
+    padding: $space-4;
+  }
+
+  .orderDetails {
+    padding: $space-4;
+  }
+
+  .orderItems {
+    margin-bottom: $space-4;
+  }
+
+  .statCard {
+    padding: $space-4;
+  }
+}
+
+@include respond-below(sm) {
+  .orderHeader {
+    padding: $space-4;
+  }
+
+  .orderSummary {
+    flex-direction: column;
+    gap: $space-2;
+    align-items: flex-start;
+  }
+
+  .itemActions {
+    align-items: center;
+  }
+}

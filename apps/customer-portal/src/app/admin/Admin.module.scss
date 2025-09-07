@@ -1,0 +1,597 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.adminPage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+}
+
+.adminContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+
+  @include respond-below(md) {
+    gap: $space-6;
+  }
+}
+
+.adminHeader {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.adminTitle {
+  @include flex-center;
+  gap: $space-4;
+  justify-content: flex-start;
+
+  svg {
+    color: #8b5cf6;
+  }
+
+  h1 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.headerActions {
+  display: flex;
+  gap: $space-3;
+
+  @include respond-below(md) {
+    align-self: stretch;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-6;
+
+  @include respond-below(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-md;
+    transform: translateY(-2px);
+  }
+}
+
+.statIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: $radius-lg;
+  color: #8b5cf6;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.statValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1;
+}
+
+.statTrend {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $color-success;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-success;
+  }
+}
+
+.tabNavigation {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  overflow: hidden;
+
+  @include respond-below(md) {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.tabButton {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-4 $space-6;
+  background: transparent;
+  border: none;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base $ease-out-expo;
+  white-space: nowrap;
+  flex: 1;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.active {
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.1);
+  }
+
+  @include respond-below(sm) {
+    padding: $space-3 $space-4;
+    font-size: $font-size-xs;
+  }
+}
+
+.tabContent {
+  padding: $space-8;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin-bottom: $space-6;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.overviewContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-8;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.recentUsers,
+.pendingApprovals {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-6;
+}
+
+.usersList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.userItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.userName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.userEmail {
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  align-items: flex-end;
+}
+
+.userRole,
+.userStatus {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  text-transform: capitalize;
+}
+
+.approvalsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.approvalItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: flex-start;
+  }
+}
+
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.productName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.productMeta {
+  display: flex;
+  gap: $space-3;
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-1;
+  }
+}
+
+.productType {
+  color: $color-primary-400;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+}
+
+.approvalActions {
+  display: flex;
+  gap: $space-2;
+
+  @include respond-below(sm) {
+    align-self: stretch;
+  }
+}
+
+.quickActions {
+  margin-top: $space-4;
+}
+
+.actionCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-4;
+
+  @include respond-below(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.actionCard {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-3;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  text-decoration: none;
+  color: $text-primary;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+    transform: translateY(-2px);
+    box-shadow: $shadow-glow-sm;
+  }
+
+  svg {
+    color: $color-primary-400;
+  }
+
+  span {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    text-align: center;
+  }
+}
+
+.analyticsContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-6;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chartCard {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0 0 $space-4 0;
+  }
+}
+
+.chartPlaceholder {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-3;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  color: $text-tertiary;
+
+  svg {
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    margin: 0;
+  }
+}
+
+.settingsContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.settingsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-6;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settingCard {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0 0 $space-4 0;
+  }
+}
+
+.settingOptions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.settingOption {
+  @include flex-center;
+  gap: $space-3;
+  cursor: pointer;
+  justify-content: flex-start;
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: $color-primary-500;
+  }
+
+  span {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    transition: color $transition-base;
+  }
+
+  &:hover span {
+    color: $text-primary;
+  }
+}
+
+.settingFields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+  }
+}
+
+.input {
+  padding: $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+  color: $text-primary;
+  font-size: $font-size-sm;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary-400;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .adminPage {
+    padding: $space-16 0;
+  }
+
+  .adminContainer {
+    padding: 0 $space-4;
+  }
+
+  .adminHeader {
+    padding: $space-4;
+  }
+
+  .tabContent {
+    padding: $space-4;
+  }
+
+  .statsGrid {
+    gap: $space-4;
+  }
+
+  .statCard {
+    padding: $space-4;
+  }
+}
+
+@include respond-below(sm) {
+  .adminTitle h1 {
+    font-size: $font-size-xl;
+  }
+
+  .userItem {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: flex-start;
+  }
+
+  .userMeta {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: $space-3;
+  }
+}

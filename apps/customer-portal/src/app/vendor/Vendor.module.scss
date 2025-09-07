@@ -1,0 +1,772 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.vendorPage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 25% 25%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.vendorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-8;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+
+  @include respond-below(lg) {
+    flex-direction: column;
+    gap: $space-6;
+    align-items: flex-start;
+  }
+}
+
+.vendorInfo {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+}
+
+.vendorAvatar {
+  position: relative;
+}
+
+.avatarImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid $color-primary-400;
+}
+
+.verifiedBadge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  @include flex-center;
+  width: 28px;
+  height: 28px;
+  background: $color-success;
+  border-radius: 50%;
+  color: white;
+  border: 2px solid $bg-dark;
+}
+
+.vendorDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.vendorName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.vendorDescription {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  margin: 0;
+  max-width: 500px;
+}
+
+.vendorMeta {
+  display: flex;
+  gap: $space-4;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.joinDate,
+.totalProducts {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.vendorActions {
+  display: flex;
+  gap: $space-3;
+
+  @include respond-below(lg) {
+    align-self: stretch;
+  }
+
+  @include respond-below(sm) {
+    flex-direction: column;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-6;
+  margin-bottom: $space-12;
+
+  @include respond-below(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+  transition: all $transition-base $ease-out-expo;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-md;
+  }
+
+  @include respond-below(sm) {
+    padding: $space-4;
+  }
+}
+
+.statIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: rgba(14, 165, 233, 0.2);
+  border-radius: $radius-lg;
+  color: $color-primary-400;
+
+  @include respond-below(sm) {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.statValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1;
+}
+
+.statTrend {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $color-success;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-success;
+  }
+}
+
+.vendorContent {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.tabNavigation {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  @include respond-below(md) {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.tabButton {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-4 $space-6;
+  background: transparent;
+  border: none;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base $ease-out-expo;
+  position: relative;
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.active {
+    color: $color-primary-400;
+    background: rgba(14, 165, 233, 0.1);
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: $color-primary-400;
+    }
+  }
+
+  @include respond-below(sm) {
+    padding: $space-3 $space-4;
+    font-size: $font-size-xs;
+  }
+}
+
+.tabContent {
+  padding: $space-8;
+
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+
+  @include respond-below(sm) {
+    padding: $space-4;
+  }
+}
+
+.sectionTitle {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-bottom: $space-6;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+// Overview Content
+.overviewContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $space-8;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.recentActivity,
+.topProducts {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-6;
+}
+
+.performanceMetrics {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+}
+
+.metricLabel {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.metricValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+.metricChange {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
+.productList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.productItem {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+}
+
+.productRank {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  background: $color-primary-500;
+  color: white;
+  border-radius: 50%;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  @include truncate;
+}
+
+.productStats {
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+}
+
+.productRating {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  color: $color-primary-400;
+  font-weight: $font-weight-medium;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+// Products Content
+.productsContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.productsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-4;
+
+  @include respond-below(lg) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.productsControls {
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+
+  @include respond-below(md) {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+.searchBox {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  min-width: 250px;
+
+  svg {
+    color: $text-tertiary;
+  }
+
+  @include respond-below(md) {
+    min-width: 200px;
+  }
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  width: 100%;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.filterSelect {
+  padding: $space-2 $space-3;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  color: $text-primary;
+  font-size: $font-size-sm;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary-400;
+  }
+}
+
+.productsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.productCard {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: $space-4;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: $color-primary-400;
+    box-shadow: $shadow-glow-md;
+  }
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+    padding: $space-4;
+  }
+}
+
+.productImage {
+  position: relative;
+  width: 120px;
+  height: 80px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  @include respond-below(md) {
+    width: 100%;
+    height: 160px;
+  }
+}
+
+.productImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.productType {
+  position: absolute;
+  top: $space-2;
+  right: $space-2;
+  padding: $space-1 $space-2;
+  background: $color-primary-500;
+  color: white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-sm;
+  text-transform: uppercase;
+}
+
+.productDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  min-width: 0;
+}
+
+.productHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-3;
+}
+
+.productName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin: 0;
+  @include truncate;
+}
+
+.productStatus {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  justify-content: flex-start;
+}
+
+.productDescription {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  margin: 0;
+  @include line-clamp(2);
+}
+
+.productMeta {
+  display: flex;
+  gap: $space-4;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.productPrice {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary-400;
+}
+
+.productDownloads,
+.productRating {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.productActions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  align-items: flex-end;
+
+  @include respond-below(md) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+// Analytics Content
+.analyticsContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-6;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chartCard {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0 0 $space-4 0;
+  }
+}
+
+.chartPlaceholder {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-3;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  color: $text-tertiary;
+
+  svg {
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    margin: 0;
+  }
+}
+
+// Earnings Content
+.earningsContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.earningsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.earningsCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-6;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.earningCard {
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  text-align: center;
+}
+
+.earningLabel {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  margin-bottom: $space-2;
+}
+
+.earningValue {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary-400;
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .vendorPage {
+    padding: $space-16 0;
+  }
+
+  .vendorHeader {
+    padding: $space-4;
+  }
+
+  .statsGrid {
+    gap: $space-4;
+    margin-bottom: $space-8;
+  }
+
+  .statCard {
+    padding: $space-4;
+  }
+}
+
+@include respond-below(sm) {
+  .vendorHeader {
+    margin-bottom: $space-6;
+  }
+
+  .vendorInfo {
+    gap: $space-3;
+  }
+
+  .avatarImage {
+    width: 60px;
+    height: 60px;
+  }
+
+  .vendorName {
+    font-size: $font-size-lg;
+  }
+
+  .overviewGrid {
+    gap: $space-4;
+  }
+
+  .productCard {
+    gap: $space-2;
+  }
+}

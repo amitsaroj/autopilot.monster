@@ -4,8 +4,6 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
-import { Navigation } from '@/components/layout/Navigation/Navigation'
-import { Footer } from '@/components/layout/Footer/Footer'
 import { Button } from '@/components/ui/Button/Button'
 import Link from 'next/link'
 import { 
@@ -157,8 +155,6 @@ export default function BlogPage() {
   })
 
   return (
-    <>
-      <Navigation />
       <main className={styles.blogPage}>
         {/* Hero Section */}
         <section className={styles.hero}>
@@ -407,7 +403,5 @@ export default function BlogPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
   )
 }

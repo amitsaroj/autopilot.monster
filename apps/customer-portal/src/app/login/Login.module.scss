@@ -1,0 +1,475 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.loginPage {
+  min-height: 100vh;
+  padding: $space-20 0;
+  background: $bg-dark;
+  position: relative;
+  @include flex-center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 25% 25%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.loginContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-12;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-8;
+    max-width: 500px;
+  }
+}
+
+.loginCard {
+  padding: $space-8;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  backdrop-filter: blur(10px);
+  box-shadow: $shadow-glow-lg;
+
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.loginHeader {
+  text-align: center;
+  margin-bottom: $space-8;
+}
+
+.logoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-4;
+}
+
+.logo {
+  @include flex-center;
+  width: 80px;
+  height: 80px;
+  background: $gradient-primary;
+  border-radius: 50%;
+  color: white;
+  margin-bottom: $space-2;
+  box-shadow: $shadow-glow-md;
+}
+
+.title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.label {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  justify-content: flex-start;
+
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  padding: $space-3 $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  transition: all $transition-base $ease-out-expo;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary-400;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.error {
+    border-color: $color-error;
+    background: rgba(239, 68, 68, 0.05);
+  }
+}
+
+.passwordInput {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: $space-3;
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: $text-tertiary;
+  cursor: pointer;
+  border-radius: $radius-md;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $color-primary-400;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.errorMessage {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $color-error;
+  margin-top: $space-1;
+  justify-content: flex-start;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.formOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: $space-2 0;
+
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: flex-start;
+  }
+}
+
+.checkbox {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  cursor: pointer;
+  user-select: none;
+  justify-content: flex-start;
+
+  input {
+    display: none;
+  }
+}
+
+.checkmark {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-sm;
+  transition: all $transition-base $ease-out-expo;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity $transition-base $ease-out-expo;
+  }
+
+  input:checked + & {
+    background: $color-primary-500;
+    border-color: $color-primary-500;
+
+    &::after {
+      opacity: 1;
+    }
+  }
+
+  input:disabled + & {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.forgotLink {
+  font-size: $font-size-sm;
+  color: $color-primary-400;
+  text-decoration: none;
+  font-weight: $font-weight-medium;
+  transition: color $transition-base $ease-out-expo;
+
+  &:hover {
+    color: $color-primary-300;
+    text-decoration: underline;
+  }
+}
+
+.divider {
+  position: relative;
+  text-align: center;
+  margin: $space-6 0;
+  color: $text-tertiary;
+  font-size: $font-size-sm;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 1;
+  }
+
+  span {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0 $space-4;
+    backdrop-filter: blur(10px);
+  }
+}
+
+.socialLogin {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-3;
+  margin-bottom: $space-6;
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.socialButton {
+  @include flex-center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base $ease-out-expo;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: $color-primary-400;
+    transform: translateY(-2px);
+    box-shadow: $shadow-glow-md;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  svg {
+    color: $text-secondary;
+  }
+}
+
+.signupPrompt {
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+
+  span {
+    margin-right: $space-2;
+  }
+}
+
+.signupLink {
+  color: $color-primary-400;
+  text-decoration: none;
+  font-weight: $font-weight-medium;
+  transition: color $transition-base $ease-out-expo;
+
+  &:hover {
+    color: $color-primary-300;
+    text-decoration: underline;
+  }
+}
+
+// Features List (Right Side)
+.featuresList {
+  padding: $space-8;
+
+  @include respond-below(lg) {
+    padding: $space-6;
+    text-align: center;
+  }
+}
+
+.featuresTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-bottom: $space-6;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.feature {
+  display: flex;
+  gap: $space-4;
+  align-items: flex-start;
+
+  @include respond-below(lg) {
+    justify-content: center;
+    text-align: left;
+  }
+
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0 0 $space-1 0;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.featureIcon {
+  font-size: $font-size-xl;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: $space-1;
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .loginPage {
+    padding: $space-16 0;
+  }
+
+  .loginCard {
+    margin: 0 $space-4;
+  }
+
+  .title {
+    font-size: $font-size-xl;
+  }
+
+  .formOptions {
+    align-items: flex-start;
+  }
+}
+
+@include respond-below(sm) {
+  .loginContainer {
+    gap: $space-6;
+  }
+
+  .loginCard {
+    padding: $space-4;
+    margin: 0 $space-2;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .title {
+    font-size: $font-size-lg;
+  }
+
+  .socialLogin {
+    gap: $space-2;
+  }
+
+  .featuresList {
+    padding: $space-4;
+  }
+
+  .feature {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: $space-2;
+  }
+
+  .featureIcon {
+    margin-top: 0;
+  }
+}
