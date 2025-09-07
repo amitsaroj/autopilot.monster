@@ -1,0 +1,242 @@
+syntax = "proto3";
+
+package autopilot.common;
+
+option go_package = "github.com/autopilot-monster/shared/proto/common";
+
+// Common data types used across services
+
+// Generic response wrapper
+message BaseResponse {
+  bool success = 1;
+  string message = 2;
+  int32 code = 3;
+  repeated string errors = 4;
+  map<string, string> metadata = 5;
+}
+
+// Pagination
+message PaginationRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string sort_by = 3;
+  string sort_order = 4;
+}
+
+message PaginationResponse {
+  int32 page = 1;
+  int32 limit = 2;
+  int32 total = 3;
+  int32 total_pages = 4;
+  bool has_next = 5;
+  bool has_prev = 6;
+}
+
+// File upload
+message FileUpload {
+  string filename = 1;
+  string content_type = 2;
+  int64 size = 3;
+  bytes data = 4;
+  string checksum = 5;
+}
+
+message FileInfo {
+  string id = 1;
+  string filename = 2;
+  string content_type = 3;
+  int64 size = 4;
+  string url = 5;
+  string checksum = 6;
+  int64 created_at = 7;
+}
+
+// Search filters
+message SearchFilter {
+  string field = 1;
+  SearchOperator operator = 2;
+  repeated string values = 3;
+}
+
+message DateRange {
+  int64 start_date = 1;
+  int64 end_date = 2;
+}
+
+// Address
+message Address {
+  string street_address = 1;
+  string city = 2;
+  string state = 3;
+  string postal_code = 4;
+  string country = 5;
+  string country_code = 6;
+  float latitude = 7;
+  float longitude = 8;
+}
+
+// Contact information
+message ContactInfo {
+  string email = 1;
+  string phone = 2;
+  string website = 3;
+  repeated SocialLink social_links = 4;
+}
+
+message SocialLink {
+  string platform = 1;
+  string url = 2;
+  string username = 3;
+}
+
+// Media
+message MediaItem {
+  string id = 1;
+  string type = 2;
+  string url = 3;
+  string thumbnail_url = 4;
+  string alt_text = 5;
+  string caption = 6;
+  map<string, string> metadata = 7;
+}
+
+// Audit log
+message AuditLog {
+  string id = 1;
+  string entity_type = 2;
+  string entity_id = 3;
+  string action = 4;
+  string user_id = 5;
+  string user_email = 6;
+  map<string, string> old_values = 7;
+  map<string, string> new_values = 8;
+  string ip_address = 9;
+  string user_agent = 10;
+  int64 timestamp = 11;
+}
+
+// Notification
+message Notification {
+  string id = 1;
+  string recipient_id = 2;
+  NotificationType type = 3;
+  string title = 4;
+  string message = 5;
+  string action_url = 6;
+  bool is_read = 7;
+  map<string, string> data = 8;
+  int64 created_at = 9;
+  int64 read_at = 10;
+}
+
+// Analytics
+message AnalyticsEvent {
+  string event_name = 1;
+  string user_id = 2;
+  string session_id = 3;
+  map<string, string> properties = 4;
+  string page_url = 5;
+  string referrer = 6;
+  string user_agent = 7;
+  string ip_address = 8;
+  string country = 9;
+  string city = 10;
+  int64 timestamp = 11;
+}
+
+// Health check
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  HealthStatus status = 1;
+  string message = 2;
+  map<string, string> details = 3;
+  int64 timestamp = 4;
+}
+
+// Configuration
+message ConfigValue {
+  string key = 1;
+  string value = 2;
+  ConfigType type = 3;
+  bool is_secret = 4;
+  string description = 5;
+  string category = 6;
+}
+
+// Rate limiting
+message RateLimit {
+  int32 requests_per_minute = 1;
+  int32 requests_per_hour = 2;
+  int32 requests_per_day = 3;
+  int32 burst_limit = 4;
+}
+
+message RateLimitStatus {
+  int32 remaining = 1;
+  int32 limit = 2;
+  int64 reset_time = 3;
+  int64 retry_after = 4;
+}
+
+// Cache
+message CacheEntry {
+  string key = 1;
+  bytes value = 2;
+  int64 ttl = 3;
+  map<string, string> tags = 4;
+}
+
+// Enums
+enum SearchOperator {
+  SEARCH_OPERATOR_UNSPECIFIED = 0;
+  SEARCH_OPERATOR_EQUALS = 1;
+  SEARCH_OPERATOR_NOT_EQUALS = 2;
+  SEARCH_OPERATOR_CONTAINS = 3;
+  SEARCH_OPERATOR_NOT_CONTAINS = 4;
+  SEARCH_OPERATOR_STARTS_WITH = 5;
+  SEARCH_OPERATOR_ENDS_WITH = 6;
+  SEARCH_OPERATOR_GREATER_THAN = 7;
+  SEARCH_OPERATOR_LESS_THAN = 8;
+  SEARCH_OPERATOR_GREATER_THAN_OR_EQUAL = 9;
+  SEARCH_OPERATOR_LESS_THAN_OR_EQUAL = 10;
+  SEARCH_OPERATOR_IN = 11;
+  SEARCH_OPERATOR_NOT_IN = 12;
+  SEARCH_OPERATOR_BETWEEN = 13;
+  SEARCH_OPERATOR_IS_NULL = 14;
+  SEARCH_OPERATOR_IS_NOT_NULL = 15;
+}
+
+enum NotificationType {
+  NOTIFICATION_TYPE_UNSPECIFIED = 0;
+  NOTIFICATION_TYPE_INFO = 1;
+  NOTIFICATION_TYPE_SUCCESS = 2;
+  NOTIFICATION_TYPE_WARNING = 3;
+  NOTIFICATION_TYPE_ERROR = 4;
+  NOTIFICATION_TYPE_SYSTEM = 5;
+  NOTIFICATION_TYPE_PROMOTION = 6;
+  NOTIFICATION_TYPE_ORDER = 7;
+  NOTIFICATION_TYPE_PAYMENT = 8;
+  NOTIFICATION_TYPE_PRODUCT = 9;
+}
+
+enum HealthStatus {
+  HEALTH_STATUS_UNSPECIFIED = 0;
+  HEALTH_STATUS_HEALTHY = 1;
+  HEALTH_STATUS_DEGRADED = 2;
+  HEALTH_STATUS_UNHEALTHY = 3;
+  HEALTH_STATUS_UNKNOWN = 4;
+}
+
+enum ConfigType {
+  CONFIG_TYPE_UNSPECIFIED = 0;
+  CONFIG_TYPE_STRING = 1;
+  CONFIG_TYPE_INTEGER = 2;
+  CONFIG_TYPE_FLOAT = 3;
+  CONFIG_TYPE_BOOLEAN = 4;
+  CONFIG_TYPE_JSON = 5;
+  CONFIG_TYPE_URL = 6;
+  CONFIG_TYPE_EMAIL = 7;
+}

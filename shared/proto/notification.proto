@@ -1,0 +1,438 @@
+syntax = "proto3";
+
+package autopilot.notification;
+
+option go_package = "github.com/autopilot-monster/shared/proto/notification";
+
+// Notification Service
+service NotificationService {
+  // Email Notifications
+  rpc SendEmail(SendEmailRequest) returns (SendEmailResponse);
+  rpc SendEmailTemplate(SendEmailTemplateRequest) returns (SendEmailTemplateResponse);
+  rpc SendBulkEmail(SendBulkEmailRequest) returns (SendBulkEmailResponse);
+  
+  // SMS Notifications
+  rpc SendSMS(SendSMSRequest) returns (SendSMSResponse);
+  rpc SendBulkSMS(SendBulkSMSRequest) returns (SendBulkSMSResponse);
+  
+  // Push Notifications
+  rpc SendPushNotification(SendPushNotificationRequest) returns (SendPushNotificationResponse);
+  rpc SendBulkPushNotification(SendBulkPushNotificationRequest) returns (SendBulkPushNotificationResponse);
+  
+  // In-App Notifications
+  rpc CreateNotification(CreateNotificationRequest) returns (CreateNotificationResponse);
+  rpc GetUserNotifications(GetUserNotificationsRequest) returns (GetUserNotificationsResponse);
+  rpc MarkNotificationRead(MarkNotificationReadRequest) returns (MarkNotificationReadResponse);
+  rpc DeleteNotification(DeleteNotificationRequest) returns (DeleteNotificationResponse);
+  
+  // Templates Management
+  rpc CreateTemplate(CreateTemplateRequest) returns (CreateTemplateResponse);
+  rpc GetTemplate(GetTemplateRequest) returns (GetTemplateResponse);
+  rpc UpdateTemplate(UpdateTemplateRequest) returns (UpdateTemplateResponse);
+  rpc DeleteTemplate(DeleteTemplateRequest) returns (DeleteTemplateResponse);
+  rpc GetTemplates(GetTemplatesRequest) returns (GetTemplatesResponse);
+  
+  // Preferences
+  rpc GetUserPreferences(GetUserPreferencesRequest) returns (GetUserPreferencesResponse);
+  rpc UpdateUserPreferences(UpdateUserPreferencesRequest) returns (UpdateUserPreferencesResponse);
+  
+  // Analytics
+  rpc GetNotificationAnalytics(GetNotificationAnalyticsRequest) returns (GetNotificationAnalyticsResponse);
+}
+
+// Email Notifications
+message SendEmailRequest {
+  string to = 1;
+  string from = 2;
+  string subject = 3;
+  string html_body = 4;
+  string text_body = 5;
+  repeated EmailAttachment attachments = 6;
+  map<string, string> headers = 7;
+  string reply_to = 8;
+  repeated string cc = 9;
+  repeated string bcc = 10;
+}
+
+message SendEmailResponse {
+  bool success = 1;
+  string message = 2;
+  string email_id = 3;
+  string provider_id = 4;
+}
+
+message SendEmailTemplateRequest {
+  string to = 1;
+  string template_id = 2;
+  map<string, string> variables = 3;
+  string from = 4;
+  string reply_to = 5;
+  repeated string cc = 6;
+  repeated string bcc = 7;
+  repeated EmailAttachment attachments = 8;
+}
+
+message SendEmailTemplateResponse {
+  bool success = 1;
+  string message = 2;
+  string email_id = 3;
+}
+
+message SendBulkEmailRequest {
+  repeated string recipients = 1;
+  string from = 2;
+  string subject = 3;
+  string html_body = 4;
+  string text_body = 5;
+  string template_id = 6;
+  map<string, string> default_variables = 7;
+  repeated PersonalizedEmail personalized_emails = 8;
+}
+
+message SendBulkEmailResponse {
+  bool success = 1;
+  string message = 2;
+  string bulk_id = 3;
+  int32 sent_count = 4;
+  int32 failed_count = 5;
+  repeated string failed_recipients = 6;
+}
+
+// SMS Notifications
+message SendSMSRequest {
+  string to = 1;
+  string message = 2;
+  string from = 3;
+  SMSType type = 4;
+}
+
+message SendSMSResponse {
+  bool success = 1;
+  string message = 2;
+  string sms_id = 3;
+  string provider_id = 4;
+}
+
+message SendBulkSMSRequest {
+  repeated string recipients = 1;
+  string message = 2;
+  string from = 3;
+  SMSType type = 4;
+}
+
+message SendBulkSMSResponse {
+  bool success = 1;
+  string message = 2;
+  string bulk_id = 3;
+  int32 sent_count = 4;
+  int32 failed_count = 5;
+  repeated string failed_recipients = 6;
+}
+
+// Push Notifications
+message SendPushNotificationRequest {
+  string user_id = 1;
+  string title = 2;
+  string body = 3;
+  string icon = 4;
+  string click_action = 5;
+  map<string, string> data = 6;
+  repeated string device_tokens = 7;
+}
+
+message SendPushNotificationResponse {
+  bool success = 1;
+  string message = 2;
+  string notification_id = 3;
+  int32 sent_count = 4;
+  int32 failed_count = 5;
+}
+
+message SendBulkPushNotificationRequest {
+  repeated string user_ids = 1;
+  string title = 2;
+  string body = 3;
+  string icon = 4;
+  string click_action = 5;
+  map<string, string> data = 6;
+}
+
+message SendBulkPushNotificationResponse {
+  bool success = 1;
+  string message = 2;
+  string bulk_id = 3;
+  int32 sent_count = 4;
+  int32 failed_count = 5;
+}
+
+// In-App Notifications
+message CreateNotificationRequest {
+  string user_id = 1;
+  NotificationType type = 2;
+  string title = 3;
+  string message = 4;
+  string action_url = 5;
+  map<string, string> data = 6;
+  int64 expires_at = 7;
+}
+
+message CreateNotificationResponse {
+  bool success = 1;
+  string message = 2;
+  string notification_id = 3;
+}
+
+message GetUserNotificationsRequest {
+  string user_id = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  bool unread_only = 4;
+  NotificationType type = 5;
+}
+
+message GetUserNotificationsResponse {
+  bool success = 1;
+  repeated Notification notifications = 2;
+  int32 total = 3;
+  int32 unread_count = 4;
+  int32 page = 5;
+  int32 limit = 6;
+}
+
+message MarkNotificationReadRequest {
+  string notification_id = 1;
+  string user_id = 2;
+}
+
+message MarkNotificationReadResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message DeleteNotificationRequest {
+  string notification_id = 1;
+  string user_id = 2;
+}
+
+message DeleteNotificationResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Templates Management
+message CreateTemplateRequest {
+  string name = 1;
+  string description = 2;
+  TemplateType type = 3;
+  string subject = 4;
+  string html_body = 5;
+  string text_body = 6;
+  repeated string variables = 7;
+  string category = 8;
+}
+
+message CreateTemplateResponse {
+  bool success = 1;
+  string message = 2;
+  string template_id = 3;
+}
+
+message GetTemplateRequest {
+  string template_id = 1;
+}
+
+message GetTemplateResponse {
+  bool success = 1;
+  NotificationTemplate template = 2;
+}
+
+message UpdateTemplateRequest {
+  string template_id = 1;
+  string name = 2;
+  string description = 3;
+  string subject = 4;
+  string html_body = 5;
+  string text_body = 6;
+  repeated string variables = 7;
+  string category = 8;
+}
+
+message UpdateTemplateResponse {
+  bool success = 1;
+  string message = 2;
+  NotificationTemplate template = 3;
+}
+
+message DeleteTemplateRequest {
+  string template_id = 1;
+}
+
+message DeleteTemplateResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetTemplatesRequest {
+  TemplateType type = 1;
+  string category = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message GetTemplatesResponse {
+  bool success = 1;
+  repeated NotificationTemplate templates = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+// Preferences
+message GetUserPreferencesRequest {
+  string user_id = 1;
+}
+
+message GetUserPreferencesResponse {
+  bool success = 1;
+  NotificationPreferences preferences = 2;
+}
+
+message UpdateUserPreferencesRequest {
+  string user_id = 1;
+  NotificationPreferences preferences = 2;
+}
+
+message UpdateUserPreferencesResponse {
+  bool success = 1;
+  string message = 2;
+  NotificationPreferences preferences = 3;
+}
+
+// Analytics
+message GetNotificationAnalyticsRequest {
+  int64 start_date = 1;
+  int64 end_date = 2;
+  NotificationType type = 3;
+}
+
+message GetNotificationAnalyticsResponse {
+  bool success = 1;
+  NotificationAnalytics analytics = 2;
+}
+
+// Data Models
+message Notification {
+  string id = 1;
+  string user_id = 2;
+  NotificationType type = 3;
+  string title = 4;
+  string message = 5;
+  string action_url = 6;
+  bool is_read = 7;
+  map<string, string> data = 8;
+  int64 created_at = 9;
+  int64 read_at = 10;
+  int64 expires_at = 11;
+}
+
+message NotificationTemplate {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  TemplateType type = 4;
+  string subject = 5;
+  string html_body = 6;
+  string text_body = 7;
+  repeated string variables = 8;
+  string category = 9;
+  bool is_active = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message NotificationPreferences {
+  string user_id = 1;
+  bool email_enabled = 2;
+  bool sms_enabled = 3;
+  bool push_enabled = 4;
+  bool marketing_emails = 5;
+  bool order_updates = 6;
+  bool security_alerts = 7;
+  bool product_updates = 8;
+  bool newsletter = 9;
+  map<string, bool> custom_preferences = 10;
+  int64 updated_at = 11;
+}
+
+message EmailAttachment {
+  string filename = 1;
+  string content_type = 2;
+  bytes content = 3;
+  string content_id = 4;
+}
+
+message PersonalizedEmail {
+  string recipient = 1;
+  string subject = 2;
+  map<string, string> variables = 3;
+}
+
+message NotificationAnalytics {
+  int32 total_sent = 1;
+  int32 total_delivered = 2;
+  int32 total_opened = 3;
+  int32 total_clicked = 4;
+  int32 total_bounced = 5;
+  float delivery_rate = 6;
+  float open_rate = 7;
+  float click_rate = 8;
+  float bounce_rate = 9;
+  repeated DailyNotificationStats daily_stats = 10;
+  repeated TypeStats type_stats = 11;
+}
+
+message DailyNotificationStats {
+  string date = 1;
+  int32 sent = 2;
+  int32 delivered = 3;
+  int32 opened = 4;
+  int32 clicked = 5;
+  int32 bounced = 6;
+}
+
+message TypeStats {
+  NotificationType type = 1;
+  int32 sent = 2;
+  int32 delivered = 3;
+  float delivery_rate = 4;
+  float engagement_rate = 5;
+}
+
+enum NotificationType {
+  NOTIFICATION_TYPE_UNSPECIFIED = 0;
+  NOTIFICATION_TYPE_INFO = 1;
+  NOTIFICATION_TYPE_SUCCESS = 2;
+  NOTIFICATION_TYPE_WARNING = 3;
+  NOTIFICATION_TYPE_ERROR = 4;
+  NOTIFICATION_TYPE_ORDER = 5;
+  NOTIFICATION_TYPE_PAYMENT = 6;
+  NOTIFICATION_TYPE_SECURITY = 7;
+  NOTIFICATION_TYPE_MARKETING = 8;
+  NOTIFICATION_TYPE_PRODUCT = 9;
+  NOTIFICATION_TYPE_SYSTEM = 10;
+}
+
+enum TemplateType {
+  TEMPLATE_TYPE_UNSPECIFIED = 0;
+  TEMPLATE_TYPE_EMAIL = 1;
+  TEMPLATE_TYPE_SMS = 2;
+  TEMPLATE_TYPE_PUSH = 3;
+}
+
+enum SMSType {
+  SMS_TYPE_UNSPECIFIED = 0;
+  SMS_TYPE_TRANSACTIONAL = 1;
+  SMS_TYPE_PROMOTIONAL = 2;
+  SMS_TYPE_OTP = 3;
+  SMS_TYPE_ALERT = 4;
+}

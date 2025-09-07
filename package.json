@@ -1,0 +1,47 @@
+{
+  "name": "autopilot-monster",
+  "version": "1.0.0",
+  "description": "AI Agents & Automation Marketplace - Backend Microservices",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:catalog\" \"npm run dev:payments\" \"npm run dev:frontend\"",
+    "dev:gateway": "cd services/api-gateway && npm run start:dev",
+    "dev:auth": "cd services/auth-service && npm run start:dev",
+    "dev:catalog": "cd services/catalog-service && npm run start:dev",
+    "dev:payments": "cd services/payment-service && npm run start:dev",
+    "dev:frontend": "cd apps/customer-portal && npm run dev",
+    "build": "npm run build:shared && npm run build:services && npm run build:apps",
+    "build:shared": "cd shared/common && npm run build",
+    "build:services": "concurrently \"npm run build:gateway\" \"npm run build:auth\" \"npm run build:catalog\" \"npm run build:payments\"",
+    "build:gateway": "cd services/api-gateway && npm run build",
+    "build:auth": "cd services/auth-service && npm run build",
+    "build:catalog": "cd services/catalog-service && npm run build",
+    "build:payments": "cd services/payment-service && npm run build",
+    "build:apps": "cd apps/customer-portal && npm run build",
+    "test": "npm run test:services && npm run test:apps",
+    "test:services": "concurrently \"npm run test:auth\" \"npm run test:catalog\" \"npm run test:payments\"",
+    "test:auth": "cd services/auth-service && npm run test",
+    "test:catalog": "cd services/catalog-service && npm run test",
+    "test:payments": "cd services/payment-service && npm run test",
+    "test:apps": "cd apps/customer-portal && npm run test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "k8s:deploy": "kubectl apply -f infrastructure/k8s/",
+    "k8s:delete": "kubectl delete -f infrastructure/k8s/"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "@types/node": "^20.11.17",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

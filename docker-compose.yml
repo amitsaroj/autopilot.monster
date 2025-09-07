@@ -1,0 +1,298 @@
+version: '3.8'
+
+services:
+  # Databases
+  mongodb:
+    image: mongo:7.0
+    container_name: autopilot-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: autopilot
+    volumes:
+      - mongodb_data:/data/db
+      - ./infrastructure/mongodb/init:/docker-entrypoint-initdb.d
+    networks:
+      - autopilot-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: autopilot-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis123
+    volumes:
+      - redis_data:/data
+    networks:
+      - autopilot-network
+
+  # Message Brokers
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: autopilot-zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_logs:/var/lib/zookeeper/log
+    networks:
+      - autopilot-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: autopilot-kafka
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - autopilot-network
+
+  # NATS for gRPC communication
+  nats:
+    image: nats:2.10-alpine
+    container_name: autopilot-nats
+    restart: unless-stopped
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["-js", "-m", "8222"]
+    networks:
+      - autopilot-network
+
+  # Elasticsearch for search
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: autopilot-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - autopilot-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: autopilot-api-gateway
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/autopilot?authSource=admin
+      - REDIS_URL=redis://:redis123@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - NATS_URL=nats://nats:4222
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - AUTH_SERVICE_URL=auth-service:3002
+      - CATALOG_SERVICE_URL=catalog-service:3003
+      - PAYMENT_SERVICE_URL=payment-service:3004
+    depends_on:
+      - mongodb
+      - redis
+      - kafka
+      - nats
+      - auth-service
+      - catalog-service
+      - payment-service
+    networks:
+      - autopilot-network
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: autopilot-auth-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/autopilot_auth?authSource=admin
+      - REDIS_URL=redis://:redis123@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - NATS_URL=nats://nats:4222
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_EXPIRATION=24h
+      - BCRYPT_ROUNDS=12
+      - GOOGLE_CLIENT_ID=your-google-client-id
+      - GOOGLE_CLIENT_SECRET=your-google-client-secret
+      - GITHUB_CLIENT_ID=your-github-client-id
+      - GITHUB_CLIENT_SECRET=your-github-client-secret
+    depends_on:
+      - mongodb
+      - redis
+      - kafka
+      - nats
+    networks:
+      - autopilot-network
+
+  # Catalog Service
+  catalog-service:
+    build:
+      context: ./services/catalog-service
+      dockerfile: Dockerfile
+    container_name: autopilot-catalog-service
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/autopilot_catalog?authSource=admin
+      - REDIS_URL=redis://:redis123@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - NATS_URL=nats://nats:4222
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - AWS_ACCESS_KEY_ID=your-aws-access-key
+      - AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+      - AWS_REGION=us-east-1
+      - AWS_S3_BUCKET=autopilot-assets
+    depends_on:
+      - mongodb
+      - redis
+      - kafka
+      - nats
+      - elasticsearch
+    networks:
+      - autopilot-network
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile
+    container_name: autopilot-payment-service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/autopilot_payments?authSource=admin
+      - REDIS_URL=redis://:redis123@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - NATS_URL=nats://nats:4222
+      - STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+      - STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_secret
+      - RAZORPAY_KEY_ID=rzp_test_your_razorpay_key_id
+      - RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+    depends_on:
+      - mongodb
+      - redis
+      - kafka
+      - nats
+    networks:
+      - autopilot-network
+
+  # License Service
+  license-service:
+    build:
+      context: ./services/license-service
+      dockerfile: Dockerfile
+    container_name: autopilot-license-service
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=development
+      - PORT=3005
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/autopilot_licenses?authSource=admin
+      - REDIS_URL=redis://:redis123@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - mongodb
+      - redis
+      - kafka
+      - nats
+    networks:
+      - autopilot-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: autopilot-notification-service
+    restart: unless-stopped
+    ports:
+      - "3006:3006"
+    environment:
+      - NODE_ENV=development
+      - PORT=3006
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/autopilot_notifications?authSource=admin
+      - REDIS_URL=redis://:redis123@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - NATS_URL=nats://nats:4222
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@gmail.com
+      - SMTP_PASS=your-app-password
+    depends_on:
+      - mongodb
+      - redis
+      - kafka
+      - nats
+    networks:
+      - autopilot-network
+
+  # Frontend Application
+  customer-portal:
+    build:
+      context: ./apps/customer-portal
+      dockerfile: Dockerfile
+    container_name: autopilot-customer-portal
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+      - NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_your_razorpay_key_id
+    depends_on:
+      - api-gateway
+    networks:
+      - autopilot-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+  kafka_data:
+  zookeeper_data:
+  zookeeper_logs:
+  elasticsearch_data:
+
+networks:
+  autopilot-network:
+    driver: bridge

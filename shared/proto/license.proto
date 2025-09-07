@@ -1,0 +1,285 @@
+syntax = "proto3";
+
+package autopilot.license;
+
+option go_package = "github.com/autopilot-monster/shared/proto/license";
+
+// License Service
+service LicenseService {
+  // License Management
+  rpc GenerateLicense(GenerateLicenseRequest) returns (GenerateLicenseResponse);
+  rpc ValidateLicense(ValidateLicenseRequest) returns (ValidateLicenseResponse);
+  rpc ActivateLicense(ActivateLicenseRequest) returns (ActivateLicenseResponse);
+  rpc DeactivateLicense(DeactivateLicenseRequest) returns (DeactivateLicenseResponse);
+  rpc GetLicense(GetLicenseRequest) returns (GetLicenseResponse);
+  rpc GetUserLicenses(GetUserLicensesRequest) returns (GetUserLicensesResponse);
+  
+  // License Keys
+  rpc GenerateLicenseKey(GenerateLicenseKeyRequest) returns (GenerateLicenseKeyResponse);
+  rpc RevokeLicense(RevokeLicenseRequest) returns (RevokeLicenseResponse);
+  rpc TransferLicense(TransferLicenseRequest) returns (TransferLicenseResponse);
+  
+  // Admin Operations
+  rpc GetAllLicenses(GetAllLicensesRequest) returns (GetAllLicensesResponse);
+  rpc UpdateLicenseStatus(UpdateLicenseStatusRequest) returns (UpdateLicenseStatusResponse);
+  rpc GetLicenseAnalytics(GetLicenseAnalyticsRequest) returns (GetLicenseAnalyticsResponse);
+}
+
+// License Management
+message GenerateLicenseRequest {
+  string product_id = 1;
+  string user_id = 2;
+  string order_id = 3;
+  LicenseType type = 4;
+  int32 max_activations = 5;
+  int64 expires_at = 6;
+  map<string, string> metadata = 7;
+}
+
+message GenerateLicenseResponse {
+  bool success = 1;
+  string message = 2;
+  string license_id = 3;
+  string license_key = 4;
+  License license = 5;
+}
+
+message ValidateLicenseRequest {
+  string license_key = 1;
+  string product_id = 2;
+  string machine_id = 3;
+}
+
+message ValidateLicenseResponse {
+  bool is_valid = 1;
+  string message = 2;
+  License license = 3;
+  LicenseValidation validation = 4;
+}
+
+message ActivateLicenseRequest {
+  string license_key = 1;
+  string machine_id = 2;
+  string machine_fingerprint = 3;
+  string user_agent = 4;
+  string ip_address = 5;
+}
+
+message ActivateLicenseResponse {
+  bool success = 1;
+  string message = 2;
+  string activation_id = 3;
+  LicenseActivation activation = 4;
+}
+
+message DeactivateLicenseRequest {
+  string license_key = 1;
+  string machine_id = 2;
+  string reason = 3;
+}
+
+message DeactivateLicenseResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetLicenseRequest {
+  string license_id = 1;
+  string user_id = 2;
+}
+
+message GetLicenseResponse {
+  bool success = 1;
+  License license = 2;
+  repeated LicenseActivation activations = 3;
+}
+
+message GetUserLicensesRequest {
+  string user_id = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  LicenseStatus status = 4;
+}
+
+message GetUserLicensesResponse {
+  bool success = 1;
+  repeated License licenses = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+// License Keys
+message GenerateLicenseKeyRequest {
+  string product_id = 1;
+  LicenseType type = 2;
+  int32 quantity = 3;
+  int32 max_activations = 4;
+  int64 expires_at = 5;
+}
+
+message GenerateLicenseKeyResponse {
+  bool success = 1;
+  string message = 2;
+  repeated string license_keys = 3;
+}
+
+message RevokeLicenseRequest {
+  string license_id = 1;
+  string reason = 2;
+  string admin_id = 3;
+}
+
+message RevokeLicenseResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message TransferLicenseRequest {
+  string license_id = 1;
+  string from_user_id = 2;
+  string to_user_id = 3;
+  string reason = 4;
+}
+
+message TransferLicenseResponse {
+  bool success = 1;
+  string message = 2;
+  License license = 3;
+}
+
+// Admin Operations
+message GetAllLicensesRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string product_id = 3;
+  LicenseStatus status = 4;
+  LicenseType type = 5;
+  string search = 6;
+}
+
+message GetAllLicensesResponse {
+  bool success = 1;
+  repeated License licenses = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+message UpdateLicenseStatusRequest {
+  string license_id = 1;
+  LicenseStatus status = 2;
+  string reason = 3;
+  string admin_id = 4;
+}
+
+message UpdateLicenseStatusResponse {
+  bool success = 1;
+  string message = 2;
+  License license = 3;
+}
+
+message GetLicenseAnalyticsRequest {
+  string product_id = 1;
+  int64 start_date = 2;
+  int64 end_date = 3;
+}
+
+message GetLicenseAnalyticsResponse {
+  bool success = 1;
+  LicenseAnalytics analytics = 2;
+}
+
+// Data Models
+message License {
+  string id = 1;
+  string license_key = 2;
+  string product_id = 3;
+  string product_name = 4;
+  string user_id = 5;
+  string order_id = 6;
+  LicenseType type = 7;
+  LicenseStatus status = 8;
+  int32 max_activations = 9;
+  int32 current_activations = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+  int64 expires_at = 13;
+  int64 last_validated = 14;
+  map<string, string> metadata = 15;
+}
+
+message LicenseActivation {
+  string id = 1;
+  string license_id = 2;
+  string machine_id = 3;
+  string machine_fingerprint = 4;
+  string user_agent = 5;
+  string ip_address = 6;
+  ActivationStatus status = 7;
+  int64 activated_at = 8;
+  int64 last_seen = 9;
+  int64 deactivated_at = 10;
+}
+
+message LicenseValidation {
+  bool is_valid = 1;
+  bool is_expired = 2;
+  bool is_revoked = 3;
+  bool is_max_activations_reached = 4;
+  int64 expires_at = 5;
+  int32 remaining_activations = 6;
+  repeated string validation_errors = 7;
+}
+
+message LicenseAnalytics {
+  int32 total_licenses = 1;
+  int32 active_licenses = 2;
+  int32 expired_licenses = 3;
+  int32 revoked_licenses = 4;
+  int32 total_activations = 5;
+  float activation_rate = 6;
+  repeated DailyLicenseStats daily_stats = 7;
+  repeated ProductLicenseStats product_stats = 8;
+}
+
+message DailyLicenseStats {
+  string date = 1;
+  int32 new_licenses = 2;
+  int32 activations = 3;
+  int32 validations = 4;
+}
+
+message ProductLicenseStats {
+  string product_id = 1;
+  string product_name = 2;
+  int32 total_licenses = 3;
+  int32 active_licenses = 4;
+  float activation_rate = 5;
+}
+
+enum LicenseType {
+  LICENSE_TYPE_UNSPECIFIED = 0;
+  LICENSE_TYPE_TRIAL = 1;
+  LICENSE_TYPE_PERSONAL = 2;
+  LICENSE_TYPE_COMMERCIAL = 3;
+  LICENSE_TYPE_ENTERPRISE = 4;
+  LICENSE_TYPE_LIFETIME = 5;
+  LICENSE_TYPE_SUBSCRIPTION = 6;
+}
+
+enum LicenseStatus {
+  LICENSE_STATUS_UNSPECIFIED = 0;
+  LICENSE_STATUS_ACTIVE = 1;
+  LICENSE_STATUS_EXPIRED = 2;
+  LICENSE_STATUS_REVOKED = 3;
+  LICENSE_STATUS_SUSPENDED = 4;
+  LICENSE_STATUS_PENDING = 5;
+}
+
+enum ActivationStatus {
+  ACTIVATION_STATUS_UNSPECIFIED = 0;
+  ACTIVATION_STATUS_ACTIVE = 1;
+  ACTIVATION_STATUS_DEACTIVATED = 2;
+  ACTIVATION_STATUS_SUSPENDED = 3;
+}

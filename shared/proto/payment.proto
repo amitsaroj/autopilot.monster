@@ -1,0 +1,612 @@
+syntax = "proto3";
+
+package autopilot.payment;
+
+option go_package = "github.com/autopilot-monster/shared/proto/payment";
+
+// Payment Service
+service PaymentService {
+  // Cart Management
+  rpc AddToCart(AddToCartRequest) returns (AddToCartResponse);
+  rpc GetCart(GetCartRequest) returns (GetCartResponse);
+  rpc UpdateCartItem(UpdateCartItemRequest) returns (UpdateCartItemResponse);
+  rpc RemoveFromCart(RemoveFromCartRequest) returns (RemoveFromCartResponse);
+  rpc ClearCart(ClearCartRequest) returns (ClearCartResponse);
+  rpc ApplyCoupon(ApplyCouponRequest) returns (ApplyCouponResponse);
+  
+  // Checkout & Orders
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  rpc GetOrders(GetOrdersRequest) returns (GetOrdersResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+  
+  // Payment Processing
+  rpc CreatePaymentIntent(CreatePaymentIntentRequest) returns (CreatePaymentIntentResponse);
+  rpc ConfirmPayment(ConfirmPaymentRequest) returns (ConfirmPaymentResponse);
+  rpc ProcessWebhook(ProcessWebhookRequest) returns (ProcessWebhookResponse);
+  
+  // Refunds
+  rpc CreateRefund(CreateRefundRequest) returns (CreateRefundResponse);
+  rpc GetRefunds(GetRefundsRequest) returns (GetRefundsResponse);
+  rpc UpdateRefundStatus(UpdateRefundStatusRequest) returns (UpdateRefundStatusResponse);
+  
+  // Subscriptions
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
+  rpc GetSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse);
+  rpc UpdateSubscription(UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse);
+  rpc CancelSubscription(CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+  
+  // Analytics
+  rpc GetPaymentAnalytics(GetPaymentAnalyticsRequest) returns (GetPaymentAnalyticsResponse);
+  rpc GetVendorPayouts(GetVendorPayoutsRequest) returns (GetVendorPayoutsResponse);
+  
+  // Admin Operations
+  rpc GetAllOrders(GetAllOrdersRequest) returns (GetAllOrdersResponse);
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
+}
+
+// Cart Operations
+message AddToCartRequest {
+  string user_id = 1;
+  string product_id = 2;
+  int32 quantity = 3;
+  string pricing_tier = 4;
+}
+
+message AddToCartResponse {
+  bool success = 1;
+  string message = 2;
+  Cart cart = 3;
+}
+
+message GetCartRequest {
+  string user_id = 1;
+}
+
+message GetCartResponse {
+  bool success = 1;
+  Cart cart = 2;
+}
+
+message UpdateCartItemRequest {
+  string user_id = 1;
+  string item_id = 2;
+  int32 quantity = 3;
+  string pricing_tier = 4;
+}
+
+message UpdateCartItemResponse {
+  bool success = 1;
+  string message = 2;
+  Cart cart = 3;
+}
+
+message RemoveFromCartRequest {
+  string user_id = 1;
+  string item_id = 2;
+}
+
+message RemoveFromCartResponse {
+  bool success = 1;
+  string message = 2;
+  Cart cart = 3;
+}
+
+message ClearCartRequest {
+  string user_id = 1;
+}
+
+message ClearCartResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ApplyCouponRequest {
+  string user_id = 1;
+  string coupon_code = 2;
+}
+
+message ApplyCouponResponse {
+  bool success = 1;
+  string message = 2;
+  Cart cart = 3;
+  CouponDetails coupon = 4;
+}
+
+// Orders
+message CreateOrderRequest {
+  string user_id = 1;
+  BillingAddress billing_address = 2;
+  PaymentMethod payment_method = 3;
+  string coupon_code = 4;
+  map<string, string> metadata = 5;
+}
+
+message CreateOrderResponse {
+  bool success = 1;
+  string message = 2;
+  string order_id = 3;
+  Order order = 4;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+  string user_id = 2;
+}
+
+message GetOrderResponse {
+  bool success = 1;
+  Order order = 2;
+}
+
+message GetOrdersRequest {
+  string user_id = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  OrderStatus status = 4;
+  int64 start_date = 5;
+  int64 end_date = 6;
+}
+
+message GetOrdersResponse {
+  bool success = 1;
+  repeated Order orders = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+message CancelOrderRequest {
+  string order_id = 1;
+  string user_id = 2;
+  string reason = 3;
+}
+
+message CancelOrderResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Payment Processing
+message CreatePaymentIntentRequest {
+  string order_id = 1;
+  PaymentProvider provider = 2;
+  string currency = 3;
+  map<string, string> metadata = 4;
+}
+
+message CreatePaymentIntentResponse {
+  bool success = 1;
+  string message = 2;
+  string payment_intent_id = 3;
+  string client_secret = 4;
+  map<string, string> provider_data = 5;
+}
+
+message ConfirmPaymentRequest {
+  string payment_intent_id = 1;
+  string payment_method_id = 2;
+  PaymentProvider provider = 3;
+  map<string, string> provider_data = 4;
+}
+
+message ConfirmPaymentResponse {
+  bool success = 1;
+  string message = 2;
+  PaymentStatus status = 3;
+  Payment payment = 4;
+}
+
+message ProcessWebhookRequest {
+  PaymentProvider provider = 1;
+  string signature = 2;
+  bytes payload = 3;
+  map<string, string> headers = 4;
+}
+
+message ProcessWebhookResponse {
+  bool success = 1;
+  string message = 2;
+  string event_type = 3;
+}
+
+// Refunds
+message CreateRefundRequest {
+  string order_id = 1;
+  string payment_id = 2;
+  float amount = 3;
+  string reason = 4;
+  string admin_id = 5;
+}
+
+message CreateRefundResponse {
+  bool success = 1;
+  string message = 2;
+  string refund_id = 3;
+  Refund refund = 4;
+}
+
+message GetRefundsRequest {
+  string user_id = 1;
+  string order_id = 2;
+  int32 page = 3;
+  int32 limit = 4;
+  RefundStatus status = 5;
+}
+
+message GetRefundsResponse {
+  bool success = 1;
+  repeated Refund refunds = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+message UpdateRefundStatusRequest {
+  string refund_id = 1;
+  RefundStatus status = 2;
+  string admin_id = 3;
+  string notes = 4;
+}
+
+message UpdateRefundStatusResponse {
+  bool success = 1;
+  string message = 2;
+  Refund refund = 3;
+}
+
+// Subscriptions
+message CreateSubscriptionRequest {
+  string user_id = 1;
+  string plan_id = 2;
+  PaymentMethod payment_method = 3;
+  string coupon_code = 4;
+}
+
+message CreateSubscriptionResponse {
+  bool success = 1;
+  string message = 2;
+  string subscription_id = 3;
+  Subscription subscription = 4;
+}
+
+message GetSubscriptionRequest {
+  string subscription_id = 1;
+  string user_id = 2;
+}
+
+message GetSubscriptionResponse {
+  bool success = 1;
+  Subscription subscription = 2;
+}
+
+message UpdateSubscriptionRequest {
+  string subscription_id = 1;
+  string user_id = 2;
+  string new_plan_id = 3;
+  bool prorate = 4;
+}
+
+message UpdateSubscriptionResponse {
+  bool success = 1;
+  string message = 2;
+  Subscription subscription = 3;
+}
+
+message CancelSubscriptionRequest {
+  string subscription_id = 1;
+  string user_id = 2;
+  bool cancel_at_period_end = 3;
+  string reason = 4;
+}
+
+message CancelSubscriptionResponse {
+  bool success = 1;
+  string message = 2;
+  Subscription subscription = 3;
+}
+
+// Analytics
+message GetPaymentAnalyticsRequest {
+  string vendor_id = 1;
+  int64 start_date = 2;
+  int64 end_date = 3;
+  string currency = 4;
+}
+
+message GetPaymentAnalyticsResponse {
+  bool success = 1;
+  PaymentAnalytics analytics = 2;
+}
+
+message GetVendorPayoutsRequest {
+  string vendor_id = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  PayoutStatus status = 4;
+}
+
+message GetVendorPayoutsResponse {
+  bool success = 1;
+  repeated VendorPayout payouts = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+// Admin Operations
+message GetAllOrdersRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  OrderStatus status = 3;
+  PaymentStatus payment_status = 4;
+  int64 start_date = 5;
+  int64 end_date = 6;
+  string search = 7;
+}
+
+message GetAllOrdersResponse {
+  bool success = 1;
+  repeated Order orders = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+message UpdateOrderStatusRequest {
+  string order_id = 1;
+  OrderStatus status = 2;
+  string admin_id = 3;
+  string notes = 4;
+}
+
+message UpdateOrderStatusResponse {
+  bool success = 1;
+  string message = 2;
+  Order order = 3;
+}
+
+// Data Models
+message Cart {
+  string id = 1;
+  string user_id = 2;
+  repeated CartItem items = 3;
+  float subtotal = 4;
+  float discount = 5;
+  float tax = 6;
+  float total = 7;
+  CouponDetails applied_coupon = 8;
+  string currency = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
+}
+
+message CartItem {
+  string id = 1;
+  string product_id = 2;
+  string product_name = 3;
+  string product_image = 4;
+  string vendor_id = 5;
+  string vendor_name = 6;
+  int32 quantity = 7;
+  float unit_price = 8;
+  float total_price = 9;
+  string pricing_tier = 10;
+  string currency = 11;
+}
+
+message Order {
+  string id = 1;
+  string order_number = 2;
+  string user_id = 3;
+  repeated OrderItem items = 4;
+  OrderStatus status = 5;
+  float subtotal = 6;
+  float discount = 7;
+  float tax = 8;
+  float total = 9;
+  string currency = 10;
+  BillingAddress billing_address = 11;
+  Payment payment = 12;
+  CouponDetails applied_coupon = 13;
+  map<string, string> metadata = 14;
+  int64 created_at = 15;
+  int64 updated_at = 16;
+}
+
+message OrderItem {
+  string id = 1;
+  string product_id = 2;
+  string product_name = 3;
+  string product_image = 4;
+  string vendor_id = 5;
+  string vendor_name = 6;
+  int32 quantity = 7;
+  float unit_price = 8;
+  float total_price = 9;
+  string pricing_tier = 10;
+  string license_key = 11;
+  repeated string download_urls = 12;
+  int64 purchased_at = 13;
+}
+
+message Payment {
+  string id = 1;
+  string order_id = 2;
+  PaymentProvider provider = 3;
+  string provider_payment_id = 4;
+  PaymentMethod payment_method = 5;
+  float amount = 6;
+  string currency = 7;
+  PaymentStatus status = 8;
+  string failure_reason = 9;
+  map<string, string> provider_data = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message Subscription {
+  string id = 1;
+  string user_id = 2;
+  string plan_id = 3;
+  string plan_name = 4;
+  SubscriptionStatus status = 5;
+  float amount = 6;
+  string currency = 7;
+  string billing_cycle = 8;
+  int64 current_period_start = 9;
+  int64 current_period_end = 10;
+  bool cancel_at_period_end = 11;
+  int64 canceled_at = 12;
+  PaymentMethod payment_method = 13;
+  int64 created_at = 14;
+  int64 updated_at = 15;
+}
+
+message Refund {
+  string id = 1;
+  string order_id = 2;
+  string payment_id = 3;
+  float amount = 4;
+  string currency = 5;
+  string reason = 6;
+  RefundStatus status = 7;
+  string provider_refund_id = 8;
+  string admin_id = 9;
+  string notes = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message VendorPayout {
+  string id = 1;
+  string vendor_id = 2;
+  float amount = 3;
+  string currency = 4;
+  PayoutStatus status = 5;
+  repeated string order_ids = 6;
+  int64 period_start = 7;
+  int64 period_end = 8;
+  int64 paid_at = 9;
+  int64 created_at = 10;
+}
+
+message BillingAddress {
+  string first_name = 1;
+  string last_name = 2;
+  string email = 3;
+  string phone = 4;
+  string company = 5;
+  string address_line_1 = 6;
+  string address_line_2 = 7;
+  string city = 8;
+  string state = 9;
+  string postal_code = 10;
+  string country = 11;
+}
+
+message PaymentMethod {
+  PaymentProvider provider = 1;
+  string type = 2;
+  map<string, string> details = 3;
+}
+
+message CouponDetails {
+  string code = 1;
+  string name = 2;
+  CouponType type = 3;
+  float value = 4;
+  float discount_amount = 5;
+  int64 expires_at = 6;
+  int32 usage_count = 7;
+  int32 usage_limit = 8;
+}
+
+message PaymentAnalytics {
+  float total_revenue = 1;
+  int32 total_orders = 2;
+  float average_order_value = 3;
+  int32 total_customers = 4;
+  repeated DailyRevenue daily_revenue = 5;
+  repeated PaymentMethodStats payment_methods = 6;
+  repeated TopProduct top_products = 7;
+}
+
+message DailyRevenue {
+  string date = 1;
+  float revenue = 2;
+  int32 orders = 3;
+}
+
+message PaymentMethodStats {
+  string method = 1;
+  int32 count = 2;
+  float percentage = 3;
+}
+
+message TopProduct {
+  string product_id = 1;
+  string product_name = 2;
+  float revenue = 3;
+  int32 sales = 4;
+}
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  ORDER_STATUS_PENDING = 1;
+  ORDER_STATUS_PROCESSING = 2;
+  ORDER_STATUS_COMPLETED = 3;
+  ORDER_STATUS_CANCELED = 4;
+  ORDER_STATUS_REFUNDED = 5;
+  ORDER_STATUS_FAILED = 6;
+}
+
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PAYMENT_STATUS_PENDING = 1;
+  PAYMENT_STATUS_PROCESSING = 2;
+  PAYMENT_STATUS_SUCCEEDED = 3;
+  PAYMENT_STATUS_FAILED = 4;
+  PAYMENT_STATUS_CANCELED = 5;
+  PAYMENT_STATUS_REFUNDED = 6;
+}
+
+enum PaymentProvider {
+  PAYMENT_PROVIDER_UNSPECIFIED = 0;
+  PAYMENT_PROVIDER_STRIPE = 1;
+  PAYMENT_PROVIDER_RAZORPAY = 2;
+  PAYMENT_PROVIDER_PAYPAL = 3;
+}
+
+enum SubscriptionStatus {
+  SUBSCRIPTION_STATUS_UNSPECIFIED = 0;
+  SUBSCRIPTION_STATUS_ACTIVE = 1;
+  SUBSCRIPTION_STATUS_CANCELED = 2;
+  SUBSCRIPTION_STATUS_PAST_DUE = 3;
+  SUBSCRIPTION_STATUS_UNPAID = 4;
+  SUBSCRIPTION_STATUS_TRIALING = 5;
+}
+
+enum RefundStatus {
+  REFUND_STATUS_UNSPECIFIED = 0;
+  REFUND_STATUS_PENDING = 1;
+  REFUND_STATUS_APPROVED = 2;
+  REFUND_STATUS_REJECTED = 3;
+  REFUND_STATUS_PROCESSED = 4;
+  REFUND_STATUS_FAILED = 5;
+}
+
+enum PayoutStatus {
+  PAYOUT_STATUS_UNSPECIFIED = 0;
+  PAYOUT_STATUS_PENDING = 1;
+  PAYOUT_STATUS_PROCESSING = 2;
+  PAYOUT_STATUS_PAID = 3;
+  PAYOUT_STATUS_FAILED = 4;
+}
+
+enum CouponType {
+  COUPON_TYPE_UNSPECIFIED = 0;
+  COUPON_TYPE_PERCENTAGE = 1;
+  COUPON_TYPE_FIXED_AMOUNT = 2;
+  COUPON_TYPE_FREE_SHIPPING = 3;
+}

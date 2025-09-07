@@ -1,0 +1,507 @@
+syntax = "proto3";
+
+package autopilot.catalog;
+
+option go_package = "github.com/autopilot-monster/shared/proto/catalog";
+
+// Catalog Service
+service CatalogService {
+  // Product Management
+  rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
+  rpc GetProduct(GetProductRequest) returns (GetProductResponse);
+  rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse);
+  rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse);
+  rpc GetProducts(GetProductsRequest) returns (GetProductsResponse);
+  
+  // Product Search
+  rpc SearchProducts(SearchProductsRequest) returns (SearchProductsResponse);
+  rpc GetFeaturedProducts(GetFeaturedProductsRequest) returns (GetFeaturedProductsResponse);
+  rpc GetTrendingProducts(GetTrendingProductsRequest) returns (GetTrendingProductsResponse);
+  
+  // Categories
+  rpc CreateCategory(CreateCategoryRequest) returns (CreateCategoryResponse);
+  rpc GetCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
+  rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse);
+  rpc DeleteCategory(DeleteCategoryRequest) returns (DeleteCategoryResponse);
+  
+  // Reviews & Ratings
+  rpc CreateReview(CreateReviewRequest) returns (CreateReviewResponse);
+  rpc GetReviews(GetReviewsRequest) returns (GetReviewsResponse);
+  rpc UpdateReview(UpdateReviewRequest) returns (UpdateReviewResponse);
+  rpc DeleteReview(DeleteReviewRequest) returns (DeleteReviewResponse);
+  
+  // Vendor Products
+  rpc GetVendorProducts(GetVendorProductsRequest) returns (GetVendorProductsResponse);
+  rpc UpdateProductStatus(UpdateProductStatusRequest) returns (UpdateProductStatusResponse);
+  
+  // Analytics
+  rpc GetProductAnalytics(GetProductAnalyticsRequest) returns (GetProductAnalyticsResponse);
+  rpc TrackProductView(TrackProductViewRequest) returns (TrackProductViewResponse);
+  rpc TrackProductDownload(TrackProductDownloadRequest) returns (TrackProductDownloadResponse);
+}
+
+// Product Management
+message CreateProductRequest {
+  string vendor_id = 1;
+  string name = 2;
+  string description = 3;
+  string short_description = 4;
+  ProductType type = 5;
+  string category_id = 6;
+  repeated string tags = 7;
+  ProductPricing pricing = 8;
+  repeated ProductFile files = 9;
+  repeated string screenshots = 10;
+  ProductMetadata metadata = 11;
+}
+
+message CreateProductResponse {
+  bool success = 1;
+  string message = 2;
+  string product_id = 3;
+}
+
+message GetProductRequest {
+  string product_id = 1;
+  string user_id = 2;
+}
+
+message GetProductResponse {
+  bool success = 1;
+  Product product = 2;
+  bool is_purchased = 3;
+  ProductAnalytics analytics = 4;
+}
+
+message UpdateProductRequest {
+  string product_id = 1;
+  string vendor_id = 2;
+  string name = 3;
+  string description = 4;
+  string short_description = 5;
+  string category_id = 6;
+  repeated string tags = 7;
+  ProductPricing pricing = 8;
+  repeated ProductFile files = 9;
+  repeated string screenshots = 10;
+  ProductMetadata metadata = 11;
+}
+
+message UpdateProductResponse {
+  bool success = 1;
+  string message = 2;
+  Product product = 3;
+}
+
+message DeleteProductRequest {
+  string product_id = 1;
+  string vendor_id = 2;
+  string reason = 3;
+}
+
+message DeleteProductResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetProductsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string category_id = 3;
+  ProductType type = 4;
+  ProductStatus status = 5;
+  PriceRange price_range = 6;
+  string sort_by = 7;
+  string sort_order = 8;
+}
+
+message GetProductsResponse {
+  bool success = 1;
+  repeated Product products = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+// Search
+message SearchProductsRequest {
+  string query = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  repeated string categories = 4;
+  repeated ProductType types = 5;
+  PriceRange price_range = 6;
+  repeated string tags = 7;
+  float min_rating = 8;
+}
+
+message SearchProductsResponse {
+  bool success = 1;
+  repeated Product products = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+  repeated SearchFacet facets = 6;
+}
+
+message GetFeaturedProductsRequest {
+  int32 limit = 1;
+  ProductType type = 2;
+}
+
+message GetFeaturedProductsResponse {
+  bool success = 1;
+  repeated Product products = 2;
+}
+
+message GetTrendingProductsRequest {
+  int32 limit = 1;
+  ProductType type = 2;
+  int32 days = 3;
+}
+
+message GetTrendingProductsResponse {
+  bool success = 1;
+  repeated Product products = 2;
+}
+
+// Categories
+message CreateCategoryRequest {
+  string name = 1;
+  string description = 2;
+  string slug = 3;
+  string parent_id = 4;
+  string icon = 5;
+  string color = 6;
+}
+
+message CreateCategoryResponse {
+  bool success = 1;
+  string message = 2;
+  string category_id = 3;
+}
+
+message GetCategoriesRequest {
+  bool include_products_count = 1;
+  string parent_id = 2;
+}
+
+message GetCategoriesResponse {
+  bool success = 1;
+  repeated Category categories = 2;
+}
+
+message UpdateCategoryRequest {
+  string category_id = 1;
+  string name = 2;
+  string description = 3;
+  string slug = 4;
+  string parent_id = 5;
+  string icon = 6;
+  string color = 7;
+}
+
+message UpdateCategoryResponse {
+  bool success = 1;
+  string message = 2;
+  Category category = 3;
+}
+
+message DeleteCategoryRequest {
+  string category_id = 1;
+}
+
+message DeleteCategoryResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Reviews
+message CreateReviewRequest {
+  string product_id = 1;
+  string user_id = 2;
+  int32 rating = 3;
+  string title = 4;
+  string comment = 5;
+}
+
+message CreateReviewResponse {
+  bool success = 1;
+  string message = 2;
+  string review_id = 3;
+}
+
+message GetReviewsRequest {
+  string product_id = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  int32 min_rating = 4;
+  string sort_by = 5;
+}
+
+message GetReviewsResponse {
+  bool success = 1;
+  repeated Review reviews = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+  ReviewStats stats = 6;
+}
+
+message UpdateReviewRequest {
+  string review_id = 1;
+  string user_id = 2;
+  int32 rating = 3;
+  string title = 4;
+  string comment = 5;
+}
+
+message UpdateReviewResponse {
+  bool success = 1;
+  string message = 2;
+  Review review = 3;
+}
+
+message DeleteReviewRequest {
+  string review_id = 1;
+  string user_id = 2;
+}
+
+message DeleteReviewResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Vendor Operations
+message GetVendorProductsRequest {
+  string vendor_id = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  ProductStatus status = 4;
+}
+
+message GetVendorProductsResponse {
+  bool success = 1;
+  repeated Product products = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+message UpdateProductStatusRequest {
+  string product_id = 1;
+  ProductStatus status = 2;
+  string reason = 3;
+  string admin_id = 4;
+}
+
+message UpdateProductStatusResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Analytics
+message GetProductAnalyticsRequest {
+  string product_id = 1;
+  string vendor_id = 2;
+  int64 start_date = 3;
+  int64 end_date = 4;
+}
+
+message GetProductAnalyticsResponse {
+  bool success = 1;
+  ProductAnalytics analytics = 2;
+}
+
+message TrackProductViewRequest {
+  string product_id = 1;
+  string user_id = 2;
+  string ip_address = 3;
+  string user_agent = 4;
+}
+
+message TrackProductViewResponse {
+  bool success = 1;
+}
+
+message TrackProductDownloadRequest {
+  string product_id = 1;
+  string user_id = 2;
+  string file_id = 3;
+}
+
+message TrackProductDownloadResponse {
+  bool success = 1;
+}
+
+// Data Models
+message Product {
+  string id = 1;
+  string vendor_id = 2;
+  string name = 3;
+  string description = 4;
+  string short_description = 5;
+  string slug = 6;
+  ProductType type = 7;
+  string category_id = 8;
+  Category category = 9;
+  repeated string tags = 10;
+  ProductPricing pricing = 11;
+  repeated ProductFile files = 12;
+  repeated string screenshots = 13;
+  ProductStatus status = 14;
+  ProductMetadata metadata = 15;
+  ProductStats stats = 16;
+  int64 created_at = 17;
+  int64 updated_at = 18;
+}
+
+message Category {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string slug = 4;
+  string parent_id = 5;
+  string icon = 6;
+  string color = 7;
+  int32 products_count = 8;
+  repeated Category children = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
+}
+
+message ProductPricing {
+  PricingType type = 1;
+  float price = 2;
+  float discount_price = 3;
+  int64 discount_until = 4;
+  string currency = 5;
+  repeated PricingTier tiers = 6;
+}
+
+message PricingTier {
+  string name = 1;
+  string description = 2;
+  float price = 3;
+  map<string, string> features = 4;
+}
+
+message ProductFile {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string file_url = 4;
+  string file_type = 5;
+  int64 file_size = 6;
+  string checksum = 7;
+  int32 download_count = 8;
+  int64 created_at = 9;
+}
+
+message ProductMetadata {
+  string version = 1;
+  repeated string compatibility = 2;
+  repeated string requirements = 3;
+  string documentation_url = 4;
+  string demo_url = 5;
+  string github_url = 6;
+  map<string, string> custom_fields = 7;
+}
+
+message ProductStats {
+  int32 total_views = 1;
+  int32 total_downloads = 2;
+  int32 total_purchases = 3;
+  float average_rating = 4;
+  int32 total_reviews = 5;
+  int32 views_last_30_days = 6;
+  int32 downloads_last_30_days = 7;
+}
+
+message Review {
+  string id = 1;
+  string product_id = 2;
+  string user_id = 3;
+  string user_name = 4;
+  string user_avatar = 5;
+  int32 rating = 6;
+  string title = 7;
+  string comment = 8;
+  bool is_verified_purchase = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
+}
+
+message ReviewStats {
+  float average_rating = 1;
+  int32 total_reviews = 2;
+  map<int32, int32> rating_distribution = 3;
+}
+
+message ProductAnalytics {
+  int32 total_views = 1;
+  int32 total_downloads = 2;
+  int32 total_purchases = 3;
+  float total_revenue = 4;
+  repeated DailyStats daily_stats = 5;
+  repeated CountryStats country_stats = 6;
+  repeated string top_referrers = 7;
+}
+
+message DailyStats {
+  string date = 1;
+  int32 views = 2;
+  int32 downloads = 3;
+  int32 purchases = 4;
+  float revenue = 5;
+}
+
+message CountryStats {
+  string country = 1;
+  int32 views = 2;
+  int32 downloads = 3;
+  int32 purchases = 4;
+}
+
+message SearchFacet {
+  string name = 1;
+  repeated FacetValue values = 2;
+}
+
+message FacetValue {
+  string value = 1;
+  int32 count = 2;
+}
+
+message PriceRange {
+  float min_price = 1;
+  float max_price = 2;
+}
+
+enum ProductType {
+  PRODUCT_TYPE_UNSPECIFIED = 0;
+  PRODUCT_TYPE_AI_AGENT = 1;
+  PRODUCT_TYPE_N8N_WORKFLOW = 2;
+  PRODUCT_TYPE_AUTOMATION_TEMPLATE = 3;
+  PRODUCT_TYPE_API_INTEGRATION = 4;
+  PRODUCT_TYPE_CHATBOT = 5;
+  PRODUCT_TYPE_DATASET = 6;
+}
+
+enum ProductStatus {
+  PRODUCT_STATUS_UNSPECIFIED = 0;
+  PRODUCT_STATUS_DRAFT = 1;
+  PRODUCT_STATUS_PENDING_REVIEW = 2;
+  PRODUCT_STATUS_APPROVED = 3;
+  PRODUCT_STATUS_REJECTED = 4;
+  PRODUCT_STATUS_SUSPENDED = 5;
+  PRODUCT_STATUS_ARCHIVED = 6;
+}
+
+enum PricingType {
+  PRICING_TYPE_UNSPECIFIED = 0;
+  PRICING_TYPE_FREE = 1;
+  PRICING_TYPE_ONE_TIME = 2;
+  PRICING_TYPE_SUBSCRIPTION = 3;
+  PRICING_TYPE_TIERED = 4;
+}

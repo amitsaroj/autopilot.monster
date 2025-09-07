@@ -1,0 +1,268 @@
+syntax = "proto3";
+
+package autopilot.auth;
+
+option go_package = "github.com/autopilot-monster/shared/proto/auth";
+
+// Authentication Service
+service AuthService {
+  // User Authentication
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  
+  // OAuth
+  rpc GoogleAuth(GoogleAuthRequest) returns (AuthResponse);
+  rpc GithubAuth(GithubAuthRequest) returns (AuthResponse);
+  
+  // Password Management
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse);
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+  
+  // Token Validation
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+  rpc GetUserByToken(GetUserByTokenRequest) returns (GetUserByTokenResponse);
+  
+  // User Profile
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  
+  // Admin Operations
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
+  rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponse);
+  rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+}
+
+// Request/Response Messages
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+  bool remember_me = 3;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  AuthTokens tokens = 3;
+  User user = 4;
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string company = 5;
+  UserRole role = 6;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string message = 2;
+  string user_id = 3;
+  bool requires_verification = 4;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  bool success = 1;
+  string message = 2;
+  AuthTokens tokens = 3;
+}
+
+message LogoutRequest {
+  string user_id = 1;
+  string access_token = 2;
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GoogleAuthRequest {
+  string id_token = 1;
+  string access_token = 2;
+}
+
+message GithubAuthRequest {
+  string code = 1;
+  string state = 2;
+}
+
+message AuthResponse {
+  bool success = 1;
+  string message = 2;
+  AuthTokens tokens = 3;
+  User user = 4;
+  bool is_new_user = 5;
+}
+
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message ForgotPasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ResetPasswordRequest {
+  string token = 1;
+  string new_password = 2;
+}
+
+message ResetPasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ChangePasswordRequest {
+  string user_id = 1;
+  string current_password = 2;
+  string new_password = 3;
+}
+
+message ChangePasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ValidateTokenRequest {
+  string access_token = 1;
+}
+
+message ValidateTokenResponse {
+  bool is_valid = 1;
+  string user_id = 2;
+  repeated string permissions = 3;
+  int64 expires_at = 4;
+}
+
+message GetUserByTokenRequest {
+  string access_token = 1;
+}
+
+message GetUserByTokenResponse {
+  bool success = 1;
+  User user = 2;
+}
+
+message GetProfileRequest {
+  string user_id = 1;
+}
+
+message GetProfileResponse {
+  bool success = 1;
+  User user = 2;
+}
+
+message UpdateProfileRequest {
+  string user_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string company = 4;
+  string bio = 5;
+  string avatar_url = 6;
+  map<string, string> social_links = 7;
+}
+
+message UpdateProfileResponse {
+  bool success = 1;
+  string message = 2;
+  User user = 3;
+}
+
+message GetUsersRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string search = 3;
+  UserRole role = 4;
+  UserStatus status = 5;
+}
+
+message GetUsersResponse {
+  bool success = 1;
+  repeated User users = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 limit = 5;
+}
+
+message GetUserByIdRequest {
+  string user_id = 1;
+}
+
+message GetUserByIdResponse {
+  bool success = 1;
+  User user = 2;
+}
+
+message UpdateUserStatusRequest {
+  string user_id = 1;
+  UserStatus status = 2;
+  string reason = 3;
+}
+
+message UpdateUserStatusResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message DeleteUserRequest {
+  string user_id = 1;
+  string reason = 2;
+}
+
+message DeleteUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Data Models
+message User {
+  string id = 1;
+  string email = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string company = 5;
+  string bio = 6;
+  string avatar_url = 7;
+  UserRole role = 8;
+  UserStatus status = 9;
+  bool email_verified = 10;
+  map<string, string> social_links = 11;
+  int64 created_at = 12;
+  int64 updated_at = 13;
+  int64 last_login = 14;
+}
+
+message AuthTokens {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 access_token_expires_at = 3;
+  int64 refresh_token_expires_at = 4;
+}
+
+enum UserRole {
+  USER_ROLE_UNSPECIFIED = 0;
+  USER_ROLE_CUSTOMER = 1;
+  USER_ROLE_VENDOR = 2;
+  USER_ROLE_ADMIN = 3;
+  USER_ROLE_SUPER_ADMIN = 4;
+}
+
+enum UserStatus {
+  USER_STATUS_UNSPECIFIED = 0;
+  USER_STATUS_PENDING = 1;
+  USER_STATUS_ACTIVE = 2;
+  USER_STATUS_SUSPENDED = 3;
+  USER_STATUS_BANNED = 4;
+  USER_STATUS_DELETED = 5;
+}
