@@ -14,7 +14,7 @@
     "dev:auth": "cd services/auth-service && npm run start:dev",
     "dev:catalog": "cd services/catalog-service && npm run start:dev",
     "dev:payments": "cd services/payment-service && npm run start:dev",
-    "dev:frontend": "cd apps/customer-portal && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
     "build": "npm run build:shared && npm run build:services && npm run build:apps",
     "build:shared": "cd shared/common && npm run build",
     "build:services": "concurrently \"npm run build:gateway\" \"npm run build:auth\" \"npm run build:catalog\" \"npm run build:payments\"",
