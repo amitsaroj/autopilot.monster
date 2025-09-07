@@ -1,0 +1,631 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.partnersPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/partners-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: partnersFlow 25s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes partnersFlow {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-40px) translateY(-30px); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-primary-400;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-primary-500;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-primary);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-8;
+  margin-bottom: $space-10;
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.stat {
+  text-align: center;
+  
+  .statNumber {
+    font-size: 2.5rem;
+    font-weight: $font-weight-black;
+    color: $color-primary-400;
+    line-height: 1;
+    margin-bottom: $space-2;
+  }
+  
+  .statLabel {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Categories Section
+.categories {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.categoriesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.categoryCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(59, 130, 246, 0.15));
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.categoryHeader {
+  @include flex-start;
+  gap: $space-4;
+  margin-bottom: $space-8;
+  align-items: center;
+  
+  h3 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    text-align: center;
+    gap: $space-3;
+  }
+}
+
+.categoryIcon {
+  @include flex-center;
+  width: 64px;
+  height: 64px;
+  border-radius: $radius-2xl;
+  flex-shrink: 0;
+  
+  svg {
+    color: white;
+  }
+}
+
+.partnersList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $space-4;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.partnerItem {
+  @include flex-start;
+  gap: $space-4;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.partnerLogo {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  @include flex-center;
+  flex-shrink: 0;
+  
+  img {
+    width: 40px;
+    height: 20px;
+    object-fit: contain;
+  }
+}
+
+.partnerInfo {
+  flex: 1;
+}
+
+.partnerHeader {
+  @include flex-between;
+  margin-bottom: $space-2;
+  align-items: center;
+  
+  h4 {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+  }
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-1;
+  }
+}
+
+.partnerTier {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: $color-primary-400;
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.partnerInfo p {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+// Success Stories Section
+.stories {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.storiesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.storyCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  overflow: hidden;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(59, 130, 246, 0.1));
+  }
+}
+
+.storyImage {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $transition-base;
+  }
+  
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.storyContent {
+  padding: $space-6;
+  
+  @include respond-below(md) {
+    padding: $space-4;
+  }
+}
+
+.storyPartner {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: $color-primary-400;
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  display: inline-block;
+  margin-bottom: $space-4;
+}
+
+.storyContent h3 {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-3;
+}
+
+.storyContent p {
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: $space-6;
+}
+
+.storyMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+  }
+}
+
+.metric {
+  text-align: center;
+  
+  .metricValue {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-primary-400;
+    line-height: 1;
+    margin-bottom: $space-1;
+  }
+  
+  .metricLabel {
+    font-size: $font-size-xs;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Benefits Section
+.benefits {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%);
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $space-6;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.benefitCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  text-align: center;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(59, 130, 246, 0.1));
+  }
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.benefitIcon {
+  @include flex-center;
+  width: 64px;
+  height: 64px;
+  background: $gradient-primary;
+  border-radius: $radius-2xl;
+  margin: 0 auto $space-6;
+  
+  svg {
+    color: white;
+  }
+}
+
+// Process Section
+.process {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.processSteps {
+  @include flex-center;
+  gap: $space-6;
+  max-width: 1000px;
+  margin: 0 auto;
+  
+  @include respond-below(lg) {
+    flex-direction: column;
+    gap: $space-8;
+  }
+}
+
+.processStep {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-4;
+  text-align: center;
+  flex: 1;
+  position: relative;
+  
+  @include respond-below(lg) {
+    @include flex-start;
+    flex-direction: row;
+    text-align: left;
+    width: 100%;
+    max-width: 600px;
+  }
+}
+
+.stepNumber {
+  @include flex-center;
+  width: 64px;
+  height: 64px;
+  background: $gradient-primary;
+  border-radius: 50%;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: white;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.stepContent {
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+  }
+  
+  @include respond-below(lg) {
+    flex: 1;
+  }
+}
+
+.stepArrow {
+  color: $color-primary-400;
+  position: absolute;
+  right: -24px;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  @include respond-below(lg) {
+    display: none;
+  }
+}
+
+// CTA Section
+.cta {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+}
+
+.ctaContent {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+  }
+}
+
+.ctaActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Responsive adjustments
+@include respond-below(lg) {
+  .categoriesGrid {
+    gap: $space-6;
+  }
+  
+  .categoryHeader {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .processSteps {
+    flex-direction: column;
+  }
+}
+
+@include respond-below(md) {
+  .heroStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .partnersList {
+    grid-template-columns: 1fr;
+  }
+  
+  .storiesGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include respond-below(sm) {
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+  
+  .storyMetrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .partnerHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

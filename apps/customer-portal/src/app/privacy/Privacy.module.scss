@@ -1,0 +1,396 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.privacyPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/legal-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: legalFlow 25s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes legalFlow {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-50px) translateY(-30px); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-primary-400;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-primary-500;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-primary);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroMeta {
+  @include flex-center;
+  gap: $space-8;
+  margin-bottom: $space-10;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-4;
+  }
+}
+
+.lastUpdated,
+.effectiveDate {
+  @include flex-center;
+  gap: $space-2;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Sections
+.sections {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.sectionsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sectionCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(59, 130, 246, 0.1));
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.sectionHeader {
+  @include flex-start;
+  gap: $space-4;
+  margin-bottom: $space-6;
+  align-items: center;
+  
+  h2 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+  }
+}
+
+.sectionIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: $gradient-primary;
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+  
+  svg {
+    color: white;
+  }
+}
+
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.contentItem {
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+  }
+}
+
+// Data Retention Section
+.retention {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(79, 70, 229, 0.05) 100%);
+}
+
+.retentionContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.retentionTable {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  overflow: hidden;
+}
+
+.retentionRow {
+  @include flex-between;
+  padding: $space-4 $space-6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all $transition-base;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-2;
+    align-items: flex-start;
+    padding: $space-4;
+  }
+}
+
+.dataType {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  flex: 1;
+}
+
+.retentionPeriod {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: right;
+  
+  @include respond-below(md) {
+    text-align: left;
+  }
+}
+
+// Contact Section
+.contact {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.contactContent {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $space-6;
+  margin-bottom: $space-12;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contactCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  text-align: center;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+  }
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+  
+  p {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: $space-4;
+  }
+}
+
+.contactEmail {
+  @include flex-center;
+  gap: $space-2;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: $radius-lg;
+  padding: $space-2 $space-4;
+  color: $color-primary-400;
+  text-decoration: none;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+  }
+}
+
+.legalNotice {
+  @include flex-start;
+  gap: $space-4;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  text-align: left;
+  
+  svg {
+    color: #f59e0b;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+  
+  p {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-3;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .heroMeta {
+    flex-direction: column;
+  }
+  
+  .sectionHeader {
+    flex-direction: column;
+    text-align: center;
+    gap: $space-3;
+    
+    h2 {
+      font-size: $font-size-xl;
+    }
+  }
+  
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include respond-below(sm) {
+  .retentionRow {
+    padding: $space-3;
+  }
+  
+  .contactCard {
+    padding: $space-4;
+  }
+  
+  .legalNotice {
+    padding: $space-4;
+  }
+}

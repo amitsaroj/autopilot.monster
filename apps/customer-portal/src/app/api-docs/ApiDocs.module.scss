@@ -1,0 +1,634 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.apiDocsPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/api-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: codeFlow 25s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes codeFlow {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-60px) translateY(-30px); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-success;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-success;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-success);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-8;
+  margin-bottom: $space-10;
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.stat {
+  text-align: center;
+  
+  .statNumber {
+    font-size: 2.5rem;
+    font-weight: $font-weight-black;
+    color: $color-success;
+    line-height: 1;
+    margin-bottom: $space-2;
+  }
+  
+  .statLabel {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Quick Start Section
+.quickstart {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.quickstartGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-12;
+  align-items: flex-start;
+  
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-8;
+  }
+}
+
+.quickstartSteps {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.step {
+  @include flex-start;
+  gap: $space-4;
+  padding: $space-6;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+}
+
+.stepNumber {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: $gradient-success;
+  border-radius: 50%;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: white;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: $space-4;
+  }
+}
+
+// Code Example
+.codeExample {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  overflow: hidden;
+  height: fit-content;
+  position: sticky;
+  top: $space-8;
+}
+
+.codeHeader {
+  @include flex-between;
+  padding: $space-4 $space-6;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.codeTabs {
+  @include flex-start;
+  gap: $space-2;
+}
+
+.codeTab {
+  background: none;
+  border: none;
+  padding: $space-2 $space-4;
+  border-radius: $radius-lg;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all $transition-base;
+  
+  &:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  &.active {
+    color: $text-inverse;
+    background: rgba(16, 185, 129, 0.2);
+  }
+}
+
+.codeContent {
+  padding: $space-6;
+  background: rgba(0, 0, 0, 0.3);
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  overflow-x: auto;
+  
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  
+  code {
+    font-family: inherit;
+  }
+}
+
+// Endpoints Section
+.endpoints {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.endpointsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.endpointCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(16, 185, 129, 0.15));
+  }
+}
+
+.endpointHeader {
+  @include flex-start;
+  gap: $space-4;
+  margin-bottom: $space-4;
+  align-items: center;
+}
+
+.methodBadge {
+  padding: $space-1 $space-3;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  
+  &[data-method="get"] {
+    background: rgba(34, 197, 94, 0.2);
+    color: $color-success;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+  
+  &[data-method="post"] {
+    background: rgba(59, 130, 246, 0.2);
+    color: $color-primary-400;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  
+  &[data-method="put"] {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+  
+  &[data-method="delete"] {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+}
+
+.endpointPath {
+  font-family: $font-family-mono;
+  font-size: $font-size-lg;
+  color: $text-inverse;
+  background: rgba(255, 255, 255, 0.05);
+  padding: $space-2 $space-3;
+  border-radius: $radius-md;
+}
+
+.endpointDescription {
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: $space-6;
+}
+
+.endpointDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-8;
+  
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.endpointParams,
+.endpointResponse {
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+}
+
+.param {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  padding: $space-4;
+  margin-bottom: $space-3;
+}
+
+.paramHeader {
+  @include flex-start;
+  gap: $space-2;
+  margin-bottom: $space-2;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.paramName {
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  color: $color-success;
+  background: rgba(16, 185, 129, 0.1);
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+}
+
+.paramType {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+}
+
+.required {
+  font-size: $font-size-xs;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+}
+
+.paramDescription {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.responseCode {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-4;
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.9);
+  overflow-x: auto;
+  
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+  }
+}
+
+// SDKs Section
+.sdks {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, rgba(34, 197, 94, 0.03) 100%);
+}
+
+.sdksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $space-6;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sdkCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(16, 185, 129, 0.1));
+  }
+}
+
+.sdkIcon {
+  font-size: 2rem;
+  margin-bottom: $space-4;
+}
+
+.sdkInfo {
+  margin-bottom: $space-6;
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+}
+
+.sdkMeta {
+  @include flex-start;
+  gap: $space-4;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sdkInstall {
+  @include flex-between;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-3;
+  margin-bottom: $space-4;
+  
+  code {
+    font-family: $font-family-mono;
+    font-size: $font-size-sm;
+    color: $color-success;
+    flex: 1;
+  }
+}
+
+.sdkActions {
+  .button {
+    width: 100%;
+  }
+}
+
+// Resources Section
+.resources {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.resourcesContent {
+  text-align: center;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-12;
+  }
+}
+
+.resourcesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $space-6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.resourceCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  text-align: center;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+  }
+}
+
+.resourceIcon {
+  width: 48px;
+  height: 48px;
+  color: $color-success;
+  margin: 0 auto $space-4;
+}
+
+.resourceCard {
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: $space-6;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(lg) {
+  .quickstartGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .codeExample {
+    position: static;
+  }
+  
+  .endpointDetails {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include respond-below(md) {
+  .heroStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .step {
+    padding: $space-4;
+  }
+  
+  .endpointCard {
+    padding: $space-6;
+  }
+  
+  .sdkCard {
+    padding: $space-4;
+  }
+}
+
+@include respond-below(sm) {
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+  
+  .methodBadge {
+    font-size: $font-size-xs;
+    padding: $space-1 $space-2;
+  }
+  
+  .endpointPath {
+    font-size: $font-size-base;
+    word-break: break-all;
+  }
+  
+  .paramHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-1;
+  }
+}

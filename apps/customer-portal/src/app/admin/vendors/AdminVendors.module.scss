@@ -1,0 +1,491 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.adminVendorsPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  padding: $space-8 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Header
+.header {
+  margin-bottom: $space-8;
+}
+
+.headerContent {
+  @include flex-between;
+  align-items: flex-start;
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+  }
+}
+
+.headerText {
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.headerActions {
+  @include flex-start;
+  gap: $space-3;
+  
+  @include respond-below(md) {
+    width: 100%;
+    justify-content: stretch;
+    
+    .button {
+      flex: 1;
+    }
+  }
+}
+
+// Stats
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $space-6;
+  margin-bottom: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+  }
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  padding: $space-6;
+  @include flex-start;
+  gap: $space-4;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(168, 85, 247, 0.1));
+  }
+  
+  &.blue .statIcon {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
+  
+  &.green .statIcon {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+  }
+  
+  &.purple .statIcon {
+    background: rgba(168, 85, 247, 0.2);
+    color: $color-primary-400;
+  }
+  
+  &.orange .statIcon {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+  }
+}
+
+.statIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statValue {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-inverse;
+  line-height: 1;
+  margin-bottom: $space-1;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: $space-1;
+}
+
+.statChange {
+  font-size: $font-size-sm;
+  color: #4ade80;
+  font-weight: $font-weight-medium;
+}
+
+// Filters
+.filters {
+  @include flex-between;
+  gap: $space-4;
+  margin-bottom: $space-6;
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.searchBox {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+  
+  @include respond-below(md) {
+    max-width: none;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: $space-4;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  z-index: 1;
+}
+
+.searchInput {
+  width: 100%;
+  padding: $space-3 $space-4 $space-3 $space-12;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  color: $text-inverse;
+  font-size: $font-size-base;
+  transition: all $transition-base;
+  
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: rgba(168, 85, 247, 0.5);
+    @include glow(rgba(168, 85, 247, 0.2));
+  }
+}
+
+.filterButtons {
+  @include flex-start;
+  gap: $space-2;
+  
+  @include respond-below(md) {
+    flex-wrap: wrap;
+  }
+}
+
+// Vendors Grid
+.vendorsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: $space-6;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.vendorCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  padding: $space-6;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(168, 85, 247, 0.1));
+  }
+  
+  @include respond-below(md) {
+    padding: $space-4;
+  }
+}
+
+.vendorHeader {
+  @include flex-between;
+  margin-bottom: $space-4;
+  align-items: flex-start;
+}
+
+.vendorLogo {
+  position: relative;
+  
+  img {
+    width: 60px;
+    height: 60px;
+    border-radius: $radius-lg;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.verifiedBadge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  @include flex-center;
+  width: 20px;
+  height: 20px;
+  background: #4ade80;
+  border: 2px solid $bg-dark;
+  border-radius: 50%;
+  color: white;
+}
+
+.vendorActions {
+  @include flex-start;
+  gap: $space-1;
+}
+
+.vendorContent {
+  // Content styles
+}
+
+.vendorInfo {
+  margin-bottom: $space-4;
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+}
+
+.category {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  margin-bottom: $space-3;
+}
+
+.statusBadge {
+  @include flex-center;
+  gap: $space-1;
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  
+  &.approved {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+  }
+  
+  &.pending {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+  }
+  
+  &.suspended {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+  }
+}
+
+.vendorContact {
+  margin-bottom: $space-4;
+  padding: $space-3;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: $radius-lg;
+}
+
+.contactItem {
+  @include flex-start;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: $space-2;
+  align-items: center;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  svg {
+    color: $color-primary-400;
+    flex-shrink: 0;
+  }
+  
+  span {
+    word-break: break-all;
+  }
+}
+
+.vendorStats {
+  margin-bottom: $space-4;
+}
+
+.statRow {
+  @include flex-between;
+  margin-bottom: $space-2;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-2;
+  }
+}
+
+.stat {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  
+  svg {
+    color: $color-primary-400;
+  }
+  
+  span {
+    font-weight: $font-weight-medium;
+  }
+}
+
+.vendorDates {
+  padding-top: $space-3;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: $space-4;
+}
+
+.date {
+  @include flex-start;
+  gap: $space-2;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: $space-1;
+  align-items: center;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.pendingActions {
+  @include flex-start;
+  gap: $space-3;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      flex: 1;
+    }
+  }
+}
+
+.approveBtn {
+  flex: 1;
+  
+  @include respond-below(sm) {
+    width: 100%;
+  }
+}
+
+.rejectBtn {
+  flex: 1;
+  
+  @include respond-below(sm) {
+    width: 100%;
+  }
+}
+
+.suspendedInfo {
+  @include flex-start;
+  gap: $space-2;
+  padding: $space-3;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: $radius-lg;
+  color: #f87171;
+  font-size: $font-size-sm;
+  align-items: center;
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// Responsive
+@include respond-below(lg) {
+  .vendorsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@include respond-below(md) {
+  .vendorsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .headerActions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .filterButtons {
+    justify-content: stretch;
+    
+    .button {
+      flex: 1;
+    }
+  }
+  
+  .statRow {
+    flex-direction: column;
+    gap: $space-2;
+  }
+}
+
+@include respond-below(sm) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .pendingActions {
+    flex-direction: column;
+    width: 100%;
+  }
+}

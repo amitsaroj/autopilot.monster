@@ -1,0 +1,503 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.integrationsPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/grid-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: gridFlow 20s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes gridFlow {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-50px) translateY(-50px); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-primary-400;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-primary-500;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-primary);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-8;
+  margin-bottom: $space-10;
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.stat {
+  text-align: center;
+  
+  .statNumber {
+    font-size: 2.5rem;
+    font-weight: $font-weight-black;
+    color: $color-primary-400;
+    line-height: 1;
+    margin-bottom: $space-2;
+  }
+  
+  .statLabel {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Categories Section
+.categories {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.categoryCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(59, 130, 246, 0.2));
+  }
+}
+
+.categoryHeader {
+  @include flex-start;
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+.categoryIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+  
+  svg {
+    color: white;
+  }
+}
+
+.categoryTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-1;
+}
+
+.categoryDescription {
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.integrationsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+.integrationItem {
+  @include flex-between;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.integrationLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.1);
+  @include flex-center;
+  flex-shrink: 0;
+  
+  img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+}
+
+.integrationInfo {
+  flex: 1;
+  margin-left: $space-3;
+  
+  h4 {
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $text-inverse;
+    margin-bottom: $space-1;
+  }
+  
+  p {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: $space-2;
+  }
+}
+
+.integrationMeta {
+  @include flex-start;
+  gap: $space-3;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.users {
+  color: $color-success;
+}
+
+.setupTime {
+  @include flex-center;
+  gap: $space-1;
+}
+
+.categoryFooter {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: $space-4;
+}
+
+// Workflows Section
+.workflows {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.workflowsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.workflowCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(168, 85, 247, 0.15));
+  }
+}
+
+.workflowHeader {
+  @include flex-between;
+  align-items: flex-start;
+  margin-bottom: $space-4;
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    flex: 1;
+  }
+}
+
+.savings {
+  background: $gradient-success;
+  color: white;
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.workflowDescription {
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: $space-6;
+}
+
+.workflowSteps {
+  @include flex-start;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-bottom: $space-6;
+  align-items: center;
+}
+
+.step {
+  @include flex-center;
+  gap: $space-2;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-2 $space-3;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.stepNumber {
+  @include flex-center;
+  width: 20px;
+  height: 20px;
+  background: $gradient-primary;
+  border-radius: 50%;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: white;
+  flex-shrink: 0;
+}
+
+.stepArrow {
+  color: $color-primary-400;
+  margin: 0 $space-2;
+}
+
+.workflowIntegrations {
+  margin-bottom: $space-6;
+}
+
+.integrationsLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+  margin-right: $space-2;
+}
+
+.integrationTag {
+  display: inline-block;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: $color-primary-400;
+  padding: $space-1 $space-2;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  margin-right: $space-2;
+  margin-bottom: $space-1;
+}
+
+.workflowCta {
+  width: 100%;
+}
+
+// CTA Section
+.cta {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/circuit-pattern.svg') center/cover no-repeat;
+    opacity: 0.05;
+  }
+}
+
+.ctaContent {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+  }
+}
+
+.ctaActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Responsive adjustments
+@include respond-below(lg) {
+  .categoriesGrid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+}
+
+@include respond-below(md) {
+  .heroStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .categoriesGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .workflowSteps {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .step {
+      justify-content: flex-start;
+    }
+    
+    .stepArrow {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+@include respond-below(sm) {
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+  
+  .categoryCard,
+  .workflowCard {
+    padding: $space-6;
+  }
+  
+  .integrationItem {
+    padding: $space-3;
+  }
+}

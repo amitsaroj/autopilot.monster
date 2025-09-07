@@ -1,0 +1,635 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.companyPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/corporate-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: corporateFlow 30s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes corporateFlow {
+  0% { transform: translateX(0) translateY(0) rotate(0deg); }
+  100% { transform: translateX(-40px) translateY(-40px) rotate(2deg); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-primary-400;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-primary-500;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-primary);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Stats Section
+.stats {
+  padding: 80px 0;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $space-6;
+  
+  @include respond-below(md) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+  }
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  text-align: center;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+  }
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  color: $color-primary-400;
+  margin: 0 auto $space-4;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: $font-weight-black;
+  color: $text-inverse;
+  line-height: 1;
+  margin-bottom: $space-2;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Mission Section
+.mission {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.missionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-12;
+  
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-8;
+  }
+}
+
+.missionCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(168, 85, 247, 0.15));
+  }
+  
+  h3 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-6;
+  }
+}
+
+.missionIcon {
+  @include flex-center;
+  width: 64px;
+  height: 64px;
+  background: $gradient-primary;
+  border-radius: $radius-2xl;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: white;
+  }
+}
+
+.missionPoints {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.point {
+  @include flex-start;
+  gap: $space-3;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: $font-size-base;
+  align-items: center;
+  
+  svg {
+    color: $color-success;
+    flex-shrink: 0;
+  }
+}
+
+// Timeline Section
+.timeline {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 40px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: $gradient-primary;
+    
+    @include respond-below(md) {
+      left: 20px;
+    }
+  }
+}
+
+.timelineItem {
+  @include flex-start;
+  gap: $space-6;
+  position: relative;
+  
+  @include respond-below(md) {
+    gap: $space-4;
+  }
+}
+
+.timelineYear {
+  @include flex-center;
+  width: 80px;
+  height: 80px;
+  background: $gradient-primary;
+  border-radius: 50%;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: white;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  
+  @include respond-below(md) {
+    width: 60px;
+    height: 60px;
+    font-size: $font-size-base;
+  }
+}
+
+.timelineContent {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  flex: 1;
+  transition: all $transition-base;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-6;
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.timelineMilestone {
+  display: inline-block;
+  background: rgba(168, 85, 247, 0.2);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: $color-primary-400;
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  margin-bottom: $space-4;
+}
+
+.achievements {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.achievement {
+  @include flex-start;
+  gap: $space-2;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: $font-size-sm;
+  align-items: center;
+  
+  svg {
+    color: $color-success;
+    flex-shrink: 0;
+  }
+}
+
+// Leadership Section
+.leadership {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.leadershipGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.leaderCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  text-align: center;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(168, 85, 247, 0.1));
+  }
+}
+
+.leaderImage {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto $space-6;
+  background: $gradient-primary;
+  padding: 4px;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+}
+
+.leaderInfo {
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+}
+
+.leaderPosition {
+  font-size: $font-size-base;
+  color: $color-primary-400;
+  font-weight: $font-weight-medium;
+  margin-bottom: $space-4;
+}
+
+.leaderBio {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: $space-6;
+  text-align: left;
+}
+
+.leaderAchievements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  justify-content: center;
+  margin-bottom: $space-6;
+}
+
+.achievementTag {
+  display: inline-block;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  color: $color-primary-400;
+  padding: $space-1 $space-2;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.leaderSocial {
+  @include flex-center;
+  gap: $space-3;
+  
+  a {
+    @include flex-center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all $transition-base;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: $text-inverse;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Values Section
+.values {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $space-6;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.valueCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  text-align: center;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+  }
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+  }
+}
+
+.valueIcon {
+  @include flex-center;
+  width: 64px;
+  height: 64px;
+  border-radius: $radius-2xl;
+  margin: 0 auto $space-6;
+  
+  svg {
+    color: white;
+  }
+}
+
+// CTA Section
+.cta {
+  padding: 100px 0;
+  background: $bg-dark;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/network-pattern.svg') center/cover no-repeat;
+    opacity: 0.05;
+  }
+}
+
+.ctaContent {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+  }
+}
+
+.ctaActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Responsive adjustments
+@include respond-below(lg) {
+  .missionGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .leadershipGrid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+@include respond-below(md) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .timelineContainer::before {
+    left: 30px;
+  }
+  
+  .timelineYear {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .leaderCard,
+  .valueCard {
+    padding: $space-6;
+  }
+}
+
+@include respond-below(sm) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .timelineItem {
+    flex-direction: column;
+    gap: $space-4;
+  }
+  
+  .timelineContainer::before {
+    display: none;
+  }
+  
+  .leaderAchievements {
+    justify-content: flex-start;
+  }
+}

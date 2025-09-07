@@ -1,0 +1,666 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.statusPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/status-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: statusFlow 20s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes statusFlow {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-30px) translateY(-20px); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-success;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-success;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-8;
+  
+  .gradient {
+    @include text-gradient($gradient-success);
+  }
+}
+
+.overallStatus {
+  @include flex-center;
+  gap: $space-4;
+  max-width: 500px;
+  margin: 0 auto $space-10;
+  padding: $space-6;
+  border-radius: $radius-2xl;
+  transition: all $transition-base;
+  
+  &[data-status="operational"] {
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    
+    svg {
+      color: $color-success;
+    }
+  }
+  
+  &[data-status="degraded"] {
+    background: rgba(245, 158, 11, 0.1);
+    border: 2px solid rgba(245, 158, 11, 0.3);
+    
+    svg {
+      color: #f59e0b;
+    }
+  }
+  
+  &[data-status="outage"] {
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    
+    svg {
+      color: #ef4444;
+    }
+  }
+  
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-1;
+  }
+  
+  p {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Services Section
+.services {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.servicesList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.serviceCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(16, 185, 129, 0.1));
+  }
+}
+
+.serviceMain {
+  @include flex-between;
+  align-items: center;
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.serviceInfo {
+  flex: 1;
+}
+
+.serviceName {
+  @include flex-start;
+  gap: $space-3;
+  margin-bottom: $space-2;
+  align-items: center;
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+  }
+}
+
+.statusIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.serviceInfo p {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.serviceMetrics {
+  @include flex-center;
+  gap: $space-6;
+  
+  @include respond-below(md) {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-3;
+    align-items: flex-start;
+  }
+}
+
+.metric {
+  text-align: center;
+  
+  @include respond-below(sm) {
+    text-align: left;
+  }
+}
+
+.metricValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  line-height: 1;
+}
+
+.metricLabel {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: $space-1;
+}
+
+.statusBadge {
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-transform: capitalize;
+  
+  &[data-status="operational"] {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: $color-success;
+  }
+  
+  &[data-status="degraded"] {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+  }
+  
+  &[data-status="outage"] {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+  }
+}
+
+// Uptime Section
+.uptime {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.uptimeChart {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  max-width: 900px;
+  margin: 0 auto;
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.chartHeader {
+  margin-bottom: $space-8;
+}
+
+.chartLegend {
+  @include flex-center;
+  gap: $space-6;
+  flex-wrap: wrap;
+  
+  @include respond-below(sm) {
+    justify-content: flex-start;
+    gap: $space-4;
+  }
+}
+
+.legendItem {
+  @include flex-center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.legendColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: repeat(90, 1fr);
+  gap: 2px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  padding: $space-2;
+  margin-bottom: $space-4;
+  align-items: end;
+}
+
+.chartBar {
+  min-height: 4px;
+  border-radius: 1px;
+  cursor: pointer;
+  transition: all $transition-base;
+  
+  &:hover {
+    opacity: 0.8;
+    transform: scaleY(1.1);
+  }
+}
+
+.chartLabels {
+  @include flex-between;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+// Incidents Section
+.incidents {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, rgba(34, 197, 94, 0.03) 100%);
+}
+
+.incidentsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.incidentCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.incidentHeader {
+  @include flex-between;
+  margin-bottom: $space-6;
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.incidentInfo {
+  flex: 1;
+}
+
+.incidentTitle {
+  @include flex-start;
+  gap: $space-3;
+  margin-bottom: $space-3;
+  align-items: center;
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+  }
+}
+
+.impactIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.incidentMeta {
+  @include flex-start;
+  gap: $space-4;
+  flex-wrap: wrap;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-2;
+  }
+}
+
+.incidentId {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-md;
+  padding: $space-1 $space-2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.incidentTime {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  
+  svg {
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.incidentStatus {
+  @include flex-center;
+  gap: $space-3;
+  
+  @include respond-below(md) {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.statusBadge,
+.impactBadge {
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  text-transform: capitalize;
+  
+  &.investigating {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+  }
+  
+  &.completed {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: $color-success;
+  }
+  
+  &.critical {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+  }
+  
+  &.major {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+  }
+  
+  &.minor {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+  }
+  
+  &.none {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: $color-success;
+  }
+}
+
+.incidentDescription {
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: $space-6;
+}
+
+.incidentUpdates {
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+}
+
+.updateItem {
+  @include flex-start;
+  gap: $space-4;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  margin-bottom: $space-3;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-2;
+  }
+}
+
+.updateTime {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  flex-shrink: 0;
+  
+  @include respond-below(sm) {
+    white-space: normal;
+  }
+}
+
+.updateMessage {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+  flex: 1;
+}
+
+// Subscription Section
+.subscription {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.subscriptionContent {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+  }
+}
+
+.subscriptionActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .serviceMain {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .serviceMetrics {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .incidentHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .chartGrid {
+    grid-template-columns: repeat(45, 1fr);
+  }
+}
+
+@include respond-below(sm) {
+  .overallStatus {
+    flex-direction: column;
+    text-align: center;
+    padding: $space-4;
+  }
+  
+  .serviceMetrics {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .chartGrid {
+    grid-template-columns: repeat(30, 1fr);
+  }
+  
+  .incidentMeta {
+    flex-direction: column;
+  }
+  
+  .incidentStatus {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

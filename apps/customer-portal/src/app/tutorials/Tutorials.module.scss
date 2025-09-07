@@ -1,0 +1,578 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.tutorialsPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/tutorials-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: tutorialsFlow 30s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes tutorialsFlow {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-35px) translateY(-45px); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-success;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-success;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-success);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-8;
+  margin-bottom: $space-10;
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.stat {
+  text-align: center;
+  
+  .statNumber {
+    font-size: 2.5rem;
+    font-weight: $font-weight-black;
+    color: $color-success;
+    line-height: 1;
+    margin-bottom: $space-2;
+  }
+  
+  .statLabel {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Featured Section
+.featured {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.featuredGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.featuredCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  overflow: hidden;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(34, 197, 94, 0.15));
+  }
+}
+
+.featuredImage {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $transition-base;
+  }
+  
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.playButton {
+  @include flex-center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  color: white;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.duration {
+  position: absolute;
+  bottom: $space-3;
+  right: $space-3;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: $space-1 $space-2;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.featuredContent {
+  padding: $space-6;
+  
+  @include respond-below(md) {
+    padding: $space-4;
+  }
+}
+
+.featuredMeta {
+  @include flex-between;
+  margin-bottom: $space-4;
+  align-items: center;
+}
+
+.difficulty {
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rating {
+  @include flex-center;
+  gap: $space-1;
+  color: #fbbf24;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  
+  svg {
+    fill: currentColor;
+  }
+}
+
+.featuredContent h3 {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-3;
+  line-height: 1.4;
+}
+
+.featuredContent p {
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: $space-6;
+}
+
+.featuredStats {
+  @include flex-between;
+  margin-bottom: $space-6;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: $font-size-sm;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-2;
+    align-items: flex-start;
+  }
+}
+
+.students {
+  @include flex-center;
+  gap: $space-1;
+}
+
+.lessons {
+  font-weight: $font-weight-medium;
+}
+
+.featuredCta {
+  width: 100%;
+}
+
+// Tutorials Section
+.tutorials {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.controls {
+  margin-bottom: $space-12;
+}
+
+.searchBox {
+  position: relative;
+  margin-bottom: $space-6;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  
+  svg {
+    position: absolute;
+    left: $space-4;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    z-index: 1;
+  }
+  
+  input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: $radius-xl;
+    padding: $space-4 $space-4 $space-4 $space-12;
+    color: $text-inverse;
+    font-size: $font-size-base;
+    transition: all $transition-base;
+    
+    &:focus {
+      outline: none;
+      border-color: rgba(34, 197, 94, 0.5);
+      background: rgba(255, 255, 255, 0.08);
+      @include glow(rgba(34, 197, 94, 0.2));
+    }
+    
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+.categories {
+  @include flex-center;
+  gap: $space-3;
+  flex-wrap: wrap;
+}
+
+.categoryBtn {
+  @include flex-center;
+  gap: $space-2;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  padding: $space-3 $space-5;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  &.active {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.4);
+    color: $color-success;
+  }
+}
+
+.count {
+  background: rgba(255, 255, 255, 0.1);
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+}
+
+.tutorialsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: $space-6;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.tutorialCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(34, 197, 94, 0.1));
+  }
+  
+  @include respond-below(md) {
+    padding: $space-4;
+  }
+}
+
+.tutorialHeader {
+  @include flex-between;
+  margin-bottom: $space-4;
+  align-items: flex-start;
+}
+
+.typeIcon {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: $radius-lg;
+  color: $color-success;
+}
+
+.tutorialMeta {
+  @include flex-start;
+  gap: $space-2;
+  align-items: center;
+}
+
+.free {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: $color-success;
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+}
+
+.tutorialCard h3 {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-inverse;
+  margin-bottom: $space-3;
+  line-height: 1.4;
+}
+
+.tutorialCard p {
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: $space-6;
+}
+
+.tutorialFooter {
+  @include flex-between;
+  align-items: center;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.tutorialStats {
+  @include flex-start;
+  gap: $space-4;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: $font-size-sm;
+  
+  @include respond-below(sm) {
+    gap: $space-3;
+  }
+}
+
+.duration,
+.rating,
+.students {
+  @include flex-center;
+  gap: $space-1;
+}
+
+// CTA Section
+.cta {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.ctaContent {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+  }
+}
+
+.ctaActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Responsive adjustments
+@include respond-below(lg) {
+  .featuredGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tutorialsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+@include respond-below(md) {
+  .heroStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .featuredStats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .categories {
+    justify-content: flex-start;
+  }
+  
+  .tutorialFooter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@include respond-below(sm) {
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+  
+  .tutorialsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tutorialStats {
+    flex-wrap: wrap;
+  }
+}

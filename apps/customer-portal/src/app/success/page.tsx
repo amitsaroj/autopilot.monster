@@ -238,7 +238,7 @@ export default function SuccessPage() {
             className={styles.nextSteps}
             variants={itemVariants}
           >
-            <h2 className={styles.sectionTitle}>What's Next?</h2>
+            <h2 className={styles.sectionTitle}>What&apos;s Next?</h2>
             <div className={styles.stepsList}>
               <div className={styles.step}>
                 <div className={styles.stepIcon}>
@@ -255,7 +255,7 @@ export default function SuccessPage() {
                 </div>
                 <div className={styles.stepContent}>
                   <h3>Save License Keys</h3>
-                  <p>Keep your license keys safe - you'll need them for activation and support.</p>
+                  <p>Keep your license keys safe - you&apos;ll need them for activation and support.</p>
                 </div>
               </div>
               <div className={styles.step}>

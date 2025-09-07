@@ -1,0 +1,429 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+// Extend base legal page styles and add terms-specific styling
+.termsPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/legal-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: legalFlow 25s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes legalFlow {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-50px) translateY(-30px); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-primary-400;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-primary-500;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-primary);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroMeta {
+  @include flex-center;
+  gap: $space-8;
+  margin-bottom: $space-10;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-4;
+  }
+}
+
+.lastUpdated,
+.effectiveDate {
+  @include flex-center;
+  gap: $space-2;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Quick Navigation
+.quickNav {
+  padding: 60px 0;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(79, 70, 229, 0.05) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quickNavContent {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-6;
+  }
+}
+
+.navLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  justify-content: center;
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.navLink {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: $space-2 $space-4;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 0.3);
+    color: $color-primary-400;
+    transform: translateY(-2px);
+  }
+}
+
+// Sections
+.sections {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.sectionsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sectionCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  scroll-margin-top: 100px; // Account for fixed header
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(168, 85, 247, 0.1));
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.sectionHeader {
+  @include flex-start;
+  gap: $space-4;
+  margin-bottom: $space-6;
+  align-items: center;
+  
+  h2 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+  }
+}
+
+.sectionNumber {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  background: $gradient-primary;
+  border-radius: 50%;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: white;
+  flex-shrink: 0;
+}
+
+.sectionIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: rgba(168, 85, 247, 0.2);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+  
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.contentItem {
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+  }
+}
+
+// Footer Information
+.footer {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(79, 70, 229, 0.05) 100%);
+}
+
+.footerContent {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.legalInfo {
+  margin-bottom: $space-12;
+  
+  h3 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-6;
+    text-align: center;
+  }
+}
+
+.legalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $space-6;
+  margin-bottom: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.legalItem {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+  
+  p {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+  }
+}
+
+.companyInfo {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  margin-bottom: $space-8;
+  text-align: center;
+  
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+}
+
+.address {
+  p {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-1;
+    
+    &:last-of-type {
+      margin-bottom: $space-4;
+    }
+  }
+}
+
+.email {
+  @include flex-center;
+  gap: $space-2;
+  justify-content: center;
+  color: $color-primary-400;
+  font-weight: $font-weight-medium;
+}
+
+.acknowledgment {
+  @include flex-start;
+  gap: $space-4;
+  background: rgba(168, 85, 247, 0.1);
+  border: 2px solid rgba(168, 85, 247, 0.2);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  
+  svg {
+    color: $color-primary-400;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-3;
+    padding: $space-6;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .heroMeta {
+    flex-direction: column;
+  }
+  
+  .sectionHeader {
+    flex-direction: column;
+    text-align: center;
+    gap: $space-3;
+    
+    h2 {
+      font-size: $font-size-xl;
+    }
+  }
+  
+  .legalGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .navLinks {
+    flex-direction: column;
+  }
+}
+
+@include respond-below(sm) {
+  .sectionCard {
+    padding: $space-4;
+  }
+  
+  .legalItem {
+    padding: $space-4;
+  }
+  
+  .acknowledgment {
+    padding: $space-4;
+  }
+}

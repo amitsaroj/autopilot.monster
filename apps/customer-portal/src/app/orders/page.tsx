@@ -264,7 +264,7 @@ export default function OrdersPage() {
               <div className={styles.emptyState}>
                 <Package size={48} />
                 <h3>No orders found</h3>
-                <p>You haven't placed any orders yet or no orders match your search.</p>
+                <p>You haven&apos;t placed any orders yet or no orders match your search.</p>
                 <Link href="/marketplace">
                   <Button variant="primary" size="lg">
                     Start Shopping
@@ -400,21 +400,21 @@ export default function OrdersPage() {
                         <div className={styles.downloadInfo}>
                           <div className={styles.downloadStats}>
                             <span>Downloads: {order.downloadCount}/{order.maxDownloads}</span>
-                            <span>License keys are permanent and don't expire</span>
+                            <span>License keys are permanent and don&apos;t expire</span>
                           </div>
                         </div>
                       )}
 
                       <div className={styles.orderActions}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          leftIcon={<Eye size={16} />}
-                          as={Link}
-                          href={`/orders/${order.id}`}
-                        >
-                          View Details
-                        </Button>
+                        <Link href={`/orders/${order.id}`}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            leftIcon={<Eye size={16} />}
+                          >
+                            View Details
+                          </Button>
+                        </Link>
                         <Button
                           variant="ghost"
                           size="sm"

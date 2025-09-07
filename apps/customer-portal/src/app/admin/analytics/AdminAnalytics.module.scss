@@ -1,0 +1,575 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.adminAnalyticsPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  padding: $space-8 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Header
+.header {
+  margin-bottom: $space-8;
+}
+
+.headerContent {
+  @include flex-between;
+  align-items: flex-start;
+  
+  @include respond-below(lg) {
+    flex-direction: column;
+    gap: $space-4;
+  }
+}
+
+.headerText {
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.headerActions {
+  @include flex-start;
+  gap: $space-3;
+  
+  @include respond-below(lg) {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+.timeRangeSelector {
+  @include flex-start;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  padding: 2px;
+  
+  .button {
+    border-radius: calc($radius-lg - 2px);
+    margin: 0;
+  }
+}
+
+// Overview Stats
+.overviewStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $space-6;
+  margin-bottom: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+  }
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  padding: $space-6;
+  @include flex-start;
+  gap: $space-4;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(168, 85, 247, 0.1));
+  }
+  
+  &.green .statIcon {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+  }
+  
+  &.blue .statIcon {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
+  
+  &.purple .statIcon {
+    background: rgba(168, 85, 247, 0.2);
+    color: $color-primary-400;
+  }
+  
+  &.orange .statIcon {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+  }
+}
+
+.statIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statValue {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-inverse;
+  line-height: 1;
+  margin-bottom: $space-1;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: $space-2;
+}
+
+.statMeta {
+  @include flex-start;
+  gap: $space-2;
+  align-items: center;
+}
+
+.statChange {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  
+  &.increase {
+    color: #4ade80;
+  }
+  
+  &.decrease {
+    color: #f87171;
+  }
+}
+
+.statPeriod {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+// Content Grid
+.contentGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $space-8;
+  
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+// Section Styles
+.trafficSection,
+.topProductsSection,
+.activitySection,
+.metricsSection {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-xl;
+  padding: $space-6;
+  
+  @include respond-below(md) {
+    padding: $space-4;
+  }
+}
+
+.sectionHeader {
+  @include flex-between;
+  margin-bottom: $space-6;
+  align-items: center;
+  
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+  }
+}
+
+// Traffic Section
+.trafficSection {
+  grid-column: 1 / -1;
+  margin-bottom: $space-6;
+}
+
+.trafficGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-6;
+  margin-bottom: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+  }
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trafficStat {
+  text-align: center;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: $radius-lg;
+}
+
+.trafficValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-inverse;
+  margin-bottom: $space-1;
+}
+
+.trafficLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: $space-2;
+}
+
+.trafficChange {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  justify-content: center;
+  
+  &.increase {
+    color: #4ade80;
+  }
+  
+  &.decrease {
+    color: #f87171;
+  }
+}
+
+.chartPlaceholder {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-4;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: $radius-lg;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  
+  svg {
+    color: $color-primary-400;
+  }
+  
+  span {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  p {
+    max-width: 300px;
+    line-height: 1.5;
+  }
+}
+
+// Top Products Section
+.productsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.productItem {
+  @include flex-start;
+  gap: $space-4;
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.productRank {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  background: rgba(168, 85, 247, 0.2);
+  color: $color-primary-400;
+  border-radius: 50%;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+  flex-shrink: 0;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+  
+  h4 {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.productCategory {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.productStats {
+  @include flex-start;
+  gap: $space-3;
+  align-items: center;
+  
+  @include respond-below(md) {
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+}
+
+.productStat {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  
+  svg {
+    color: $color-primary-400;
+  }
+}
+
+.productGrowth {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  
+  &.increase {
+    color: #4ade80;
+  }
+}
+
+// Activity Section
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.activityItem {
+  @include flex-start;
+  gap: $space-3;
+  padding: $space-3;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.activityIcon {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  
+  &.sale {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+  }
+  
+  &.user {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
+  
+  &.download {
+    background: rgba(168, 85, 247, 0.2);
+    color: $color-primary-400;
+  }
+  
+  &.vendor {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+  }
+}
+
+.activityContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.activityDescription {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-inverse;
+  margin-bottom: $space-1;
+}
+
+.activityUser {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activityMeta {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.activityAmount {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: #4ade80;
+  margin-bottom: $space-1;
+}
+
+.activityTime {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+// Metrics Section
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metricCard {
+  padding: $space-4;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: $radius-lg;
+  text-align: center;
+}
+
+.metricLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: $space-2;
+}
+
+.metricValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-inverse;
+  margin-bottom: $space-2;
+}
+
+.metricChange {
+  @include flex-center;
+  gap: $space-1;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  justify-content: center;
+  
+  &.increase {
+    color: #4ade80;
+  }
+  
+  &.decrease {
+    color: #f87171;
+  }
+}
+
+// Responsive
+@include respond-below(lg) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .trafficGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .productStats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-2;
+  }
+}
+
+@include respond-below(md) {
+  .overviewStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .trafficGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .headerActions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .timeRangeSelector {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .productItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-3;
+  }
+  
+  .activityItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-2;
+  }
+  
+  .activityMeta {
+    text-align: left;
+    width: 100%;
+  }
+}
+
+@include respond-below(sm) {
+  .overviewStats,
+  .trafficGrid,
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}

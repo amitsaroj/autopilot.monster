@@ -114,7 +114,7 @@ export default function FailurePage() {
             </motion.div>
             <h1 className={styles.failureTitle}>Payment Failed</h1>
             <p className={styles.failureSubtitle}>
-              We couldn't process your payment. Don't worry, no charges were made to your account.
+              We couldn&apos;t process your payment. Don&apos;t worry, no charges were made to your account.
             </p>
           </motion.div>
 
@@ -183,15 +183,15 @@ export default function FailurePage() {
             >
               {isRetrying ? 'Processing...' : 'Retry Payment'}
             </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              leftIcon={<CreditCard size={20} />}
-              as={Link}
-              href="/checkout"
-            >
-              Update Payment Method
-            </Button>
+            <Link href="/checkout">
+              <Button
+                variant="secondary"
+                size="lg"
+                leftIcon={<CreditCard size={20} />}
+              >
+                Update Payment Method
+              </Button>
+            </Link>
           </motion.div>
 
           {/* Alternative Actions */}

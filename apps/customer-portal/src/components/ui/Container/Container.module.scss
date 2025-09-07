@@ -1,0 +1,23 @@
+@use '../../../styles/settings/variables' as *;
+@use '../../../styles/tools/mixins' as *;
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $space-6;
+  
+  @include respond-below(lg) {
+    max-width: 1024px;
+    padding: 0 $space-4;
+  }
+  
+  @include respond-below(md) {
+    max-width: 768px;
+    padding: 0 $space-4;
+  }
+  
+  @include respond-below(sm) {
+    padding: 0 $space-3;
+  }
+}

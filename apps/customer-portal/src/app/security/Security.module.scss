@@ -1,0 +1,525 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.securityPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/security-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: securityFlow 30s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes securityFlow {
+  0% { transform: translateX(0) translateY(0) rotate(0deg); }
+  100% { transform: translateX(-40px) translateY(-30px) rotate(1deg); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-success;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-success;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-success);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-8;
+  margin-bottom: $space-10;
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.stat {
+  text-align: center;
+  
+  .statNumber {
+    font-size: 2.5rem;
+    font-weight: $font-weight-black;
+    color: $color-success;
+    line-height: 1;
+    margin-bottom: $space-2;
+  }
+  
+  .statLabel {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Security Measures Section
+.measures {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.measuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.measureCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(34, 197, 94, 0.15));
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.measureHeader {
+  @include flex-start;
+  gap: $space-4;
+  margin-bottom: $space-6;
+  align-items: center;
+  
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+  }
+}
+
+.measureIcon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: $gradient-success;
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+  
+  svg {
+    color: white;
+  }
+}
+
+.measureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  
+  li {
+    @include flex-start;
+    gap: $space-3;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: $font-size-base;
+    align-items: flex-start;
+    
+    svg {
+      color: $color-success;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
+}
+
+// Certifications Section
+.certifications {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.certificationsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.certCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(34, 197, 94, 0.1));
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.certIcon {
+  @include flex-center;
+  width: 64px;
+  height: 64px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: $radius-2xl;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-success;
+  }
+}
+
+.certInfo {
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-6;
+  }
+}
+
+.certStatus {
+  @include flex-between;
+  align-items: center;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    gap: $space-2;
+    align-items: flex-start;
+  }
+}
+
+.status {
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  
+  &.current {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: $color-success;
+  }
+  
+  &.in-progress {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+  }
+  
+  &.available {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: $color-primary-400;
+  }
+}
+
+.validity {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+// Features Section
+.features {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.03) 0%, rgba(16, 185, 129, 0.03) 100%);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $space-6;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.featureCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  text-align: center;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(34, 197, 94, 0.1));
+  }
+  
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+  }
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.featureIcon {
+  @include flex-center;
+  width: 64px;
+  height: 64px;
+  background: $gradient-success;
+  border-radius: $radius-2xl;
+  margin: 0 auto $space-6;
+  
+  svg {
+    color: white;
+  }
+}
+
+// Contact Section
+.contact {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.contactContent {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+  }
+}
+
+.contactActions {
+  @include flex-center;
+  gap: $space-4;
+  margin-bottom: $space-12;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+.emergencyContact {
+  @include flex-start;
+  gap: $space-4;
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid rgba(239, 68, 68, 0.2);
+  border-radius: $radius-2xl;
+  padding: $space-6;
+  text-align: left;
+  
+  svg {
+    color: #ef4444;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-2;
+  }
+  
+  p {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: $space-1;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    a {
+      color: #ef4444;
+      text-decoration: none;
+      font-weight: $font-weight-medium;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-3;
+    padding: $space-4;
+  }
+}
+
+// Responsive adjustments
+@include respond-below(lg) {
+  .measuresGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .certificationsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@include respond-below(md) {
+  .heroStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .measuresGrid,
+  .certificationsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include respond-below(sm) {
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+  
+  .measureCard,
+  .certCard,
+  .featureCard {
+    padding: $space-4;
+  }
+  
+  .emergencyContact {
+    padding: $space-4;
+  }
+}

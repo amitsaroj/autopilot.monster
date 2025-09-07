@@ -40,7 +40,7 @@ const footerLinks = {
   ],
   resources: [
     { name: 'Blog', href: '/blog' },
-    { name: 'Help Center', href: '/faq' },
+    { name: 'Help Center', href: '/help-center' },
     { name: 'Tutorials', href: '/tutorials' },
     { name: 'Community', href: '/community' },
     { name: 'Status', href: '/status' }

@@ -1,0 +1,641 @@
+@use '../../styles/settings/variables' as *;
+@use '../../styles/tools/mixins' as *;
+
+.careersPage {
+  min-height: 100vh;
+  background: $bg-dark;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Hero Section
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.1) 0%, transparent 70%);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/careers-pattern.svg') repeat;
+    opacity: 0.03;
+    animation: careerFlow 20s linear infinite;
+  }
+  
+  @include respond-below(md) {
+    padding: 100px 0 60px;
+  }
+}
+
+@keyframes careerFlow {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-30px) translateY(-40px); }
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  @include flex-center;
+  gap: $space-2;
+  display: inline-flex;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: $radius-full;
+  padding: $space-2 $space-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-success;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: $color-success;
+  }
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: $font-weight-black;
+  line-height: 1.1;
+  color: $text-inverse;
+  margin-bottom: $space-6;
+  
+  .gradient {
+    @include text-gradient($gradient-success);
+  }
+}
+
+.heroDescription {
+  font-size: $font-size-xl;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: $space-8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-8;
+  margin-bottom: $space-10;
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.stat {
+  text-align: center;
+  
+  .statNumber {
+    font-size: 2.5rem;
+    font-weight: $font-weight-black;
+    color: $color-success;
+    line-height: 1;
+    margin-bottom: $space-2;
+  }
+  
+  .statLabel {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.heroActions {
+  @include flex-center;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Benefits Section
+.benefits {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: $space-8;
+  margin-bottom: $space-12;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.benefitCard {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    @include glow(rgba(34, 197, 94, 0.15));
+  }
+  
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-6;
+  }
+}
+
+.benefitIcon {
+  @include flex-center;
+  width: 64px;
+  height: 64px;
+  background: $gradient-success;
+  border-radius: $radius-2xl;
+  margin-bottom: $space-6;
+  
+  svg {
+    color: white;
+  }
+}
+
+.benefitList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  
+  li {
+    @include flex-start;
+    gap: $space-3;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: $font-size-base;
+    align-items: center;
+    
+    svg {
+      color: $color-success;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Perks Section
+.perks {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  text-align: center;
+  
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-6;
+  }
+}
+
+.perksList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $space-4;
+  
+  @include respond-below(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.perk {
+  @include flex-center;
+  gap: $space-2;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: $radius-lg;
+  padding: $space-3 $space-4;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: $font-size-sm;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+  
+  svg {
+    color: $color-success;
+    flex-shrink: 0;
+  }
+}
+
+// Jobs Section
+.jobs {
+  padding: 100px 0;
+  background: $bg-dark;
+}
+
+.jobsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.jobCard {
+  @include glass-dark(0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  overflow: hidden;
+  transition: all $transition-base $ease-out-expo;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  &.expanded {
+    border-color: rgba(34, 197, 94, 0.3);
+    @include glow(rgba(34, 197, 94, 0.1));
+  }
+}
+
+.jobHeader {
+  @include flex-between;
+  padding: $space-6 $space-8;
+  cursor: pointer;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
+}
+
+.jobBasic {
+  flex: 1;
+  
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-3;
+  }
+}
+
+.jobMeta {
+  @include flex-start;
+  gap: $space-6;
+  flex-wrap: wrap;
+  
+  @include respond-below(lg) {
+    gap: $space-4;
+  }
+  
+  @include respond-below(md) {
+    flex-direction: column;
+    gap: $space-2;
+  }
+}
+
+.department {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: $color-success;
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.location,
+.type,
+.salary {
+  @include flex-center;
+  gap: $space-1;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: $font-size-sm;
+  
+  svg {
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.jobDetails {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: $space-8;
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.jobDescription,
+.jobRequirements,
+.jobBenefits {
+  margin-bottom: $space-8;
+  
+  h4 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-base;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+  }
+}
+
+.jobRequirements {
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    
+    li {
+      @include flex-start;
+      gap: $space-3;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: $font-size-base;
+      align-items: flex-start;
+      
+      svg {
+        color: $color-success;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+.benefitTags {
+  @include flex-start;
+  gap: $space-2;
+  flex-wrap: wrap;
+}
+
+.benefitTag {
+  display: inline-block;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: $color-success;
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.jobActions {
+  @include flex-start;
+  gap: $space-4;
+  
+  @include respond-below(sm) {
+    flex-direction: column;
+    width: 100%;
+    
+    .button {
+      width: 100%;
+    }
+  }
+}
+
+// Application Section
+.application {
+  padding: 100px 0;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.applicationContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.applicationText {
+  text-align: center;
+  margin-bottom: $space-12;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: $font-weight-bold;
+    color: $text-inverse;
+    margin-bottom: $space-4;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+  }
+}
+
+.applicationForm {
+  @include glass-dark(0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-2xl;
+  padding: $space-8;
+  
+  @include respond-below(md) {
+    padding: $space-6;
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-6;
+  margin-bottom: $space-8;
+  
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $text-inverse;
+  }
+}
+
+.inputWrapper,
+.textareaWrapper {
+  position: relative;
+  
+  svg {
+    position: absolute;
+    left: $space-4;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    z-index: 1;
+  }
+  
+  input,
+  textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: $radius-lg;
+    padding: $space-4 $space-4 $space-4 $space-12;
+    color: $text-inverse;
+    font-size: $font-size-base;
+    transition: all $transition-base;
+    
+    &:focus {
+      outline: none;
+      border-color: rgba(34, 197, 94, 0.5);
+      background: rgba(255, 255, 255, 0.08);
+      @include glow(rgba(34, 197, 94, 0.2));
+    }
+    
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+  
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+}
+
+.fileUpload {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-2;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: $radius-lg;
+  padding: $space-8;
+  cursor: pointer;
+  transition: all $transition-base;
+  position: relative;
+  
+  &:hover {
+    border-color: rgba(34, 197, 94, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  svg {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  span {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: $font-size-sm;
+  }
+  
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.submitButton {
+  width: 100%;
+}
+
+// Responsive adjustments
+@include respond-below(lg) {
+  .benefitsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .perksList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@include respond-below(md) {
+  .heroStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .perksList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .jobHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .jobMeta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@include respond-below(sm) {
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+  
+  .perksList {
+    grid-template-columns: 1fr;
+  }
+  
+  .jobActions {
+    flex-direction: column;
+  }
+}
