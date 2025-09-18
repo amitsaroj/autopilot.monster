@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { HttpModule } from '@nestjs/axios';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { CatalogModule } from './catalog/catalog.module';
@@ -9,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { AdminModule } from './admin/admin.module';
 import { HealthModule } from './health/health.module';
 import { LoggingModule } from './common/logging/logging.module';
+import { SwaggerModule } from './swagger/swagger.module';
 import { GrpcClientModule } from './grpc/grpc-client.module';
 import { KafkaModule } from './kafka/kafka.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
@@ -46,10 +48,12 @@ import configuration from './config/configuration';
     ]),
 
     // Core modules
+    HttpModule,
     LoggingModule,
     GrpcClientModule,
     KafkaModule,
     HealthModule,
+    SwaggerModule,
 
     // Feature modules
     AuthModule,

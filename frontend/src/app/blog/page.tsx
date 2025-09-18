@@ -1,407 +1,236 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { motion } from 'framer-motion'
-import { useInView } from 'framer-motion'
-import { useRef, useState } from 'react'
-import { Button } from '@/components/ui/Button/Button'
-import Link from 'next/link'
-import { 
-  Search,
-  Filter,
-  Calendar,
-  User,
-  Clock,
-  ArrowRight,
-  BookOpen,
-  Lightbulb,
-  TrendingUp,
-  Zap,
-  Tag,
-  Eye,
-  Heart,
-  Share2,
-  Star,
-  Shield,
-  Workflow
-} from 'lucide-react'
-import styles from './Blog.module.scss'
+import { useState, useEffect } from 'react';
+import { contentApi } from '@/lib/api/client';
+import Link from 'next/link';
 
-const blogPosts = [
-  {
-    id: 1,
-    title: 'The Future of AI Automation: Trends to Watch in 2024',
-    excerpt: 'Discover the latest trends in AI automation that are reshaping how businesses operate and compete in the digital landscape.',
-    content: 'Full article content...',
-    author: 'Sarah Chen',
-    authorAvatar: '/api/placeholder/40/40',
-    publishDate: '2024-01-15',
-    readTime: '8 min read',
-    category: 'AI Trends',
-    tags: ['AI', 'Automation', 'Future Tech'],
-    image: '/api/placeholder/600/400',
-    featured: true,
-    views: 1250,
-    likes: 89
-  },
-  {
-    id: 2,
-    title: 'Building Your First n8n Workflow: A Complete Guide',
-    excerpt: 'Learn how to create powerful automation workflows using n8n, from basic concepts to advanced integrations.',
-    content: 'Full article content...',
-    author: 'Marcus Rodriguez',
-    authorAvatar: '/api/placeholder/40/40',
-    publishDate: '2024-01-12',
-    readTime: '12 min read',
-    category: 'Tutorials',
-    tags: ['n8n', 'Workflows', 'Tutorial'],
-    image: '/api/placeholder/600/400',
-    featured: false,
-    views: 980,
-    likes: 67
-  },
-  {
-    id: 3,
-    title: 'Customer Support AI: Reducing Response Time by 80%',
-    excerpt: 'How one company transformed their customer support with AI agents, achieving faster response times and higher satisfaction.',
-    content: 'Full article content...',
-    author: 'Dr. Priya Patel',
-    authorAvatar: '/api/placeholder/40/40',
-    publishDate: '2024-01-10',
-    readTime: '6 min read',
-    category: 'Case Studies',
-    tags: ['Customer Support', 'AI Agents', 'Case Study'],
-    image: '/api/placeholder/600/400',
-    featured: false,
-    views: 750,
-    likes: 45
-  },
-  {
-    id: 4,
-    title: 'The Complete Guide to AI Agent Security',
-    excerpt: 'Essential security practices for deploying AI agents in production environments, including data protection and access control.',
-    content: 'Full article content...',
-    author: 'Alex Thompson',
-    authorAvatar: '/api/placeholder/40/40',
-    publishDate: '2024-01-08',
-    readTime: '10 min read',
-    category: 'Security',
-    tags: ['Security', 'AI Agents', 'Best Practices'],
-    image: '/api/placeholder/600/400',
-    featured: false,
-    views: 620,
-    likes: 38
-  },
-  {
-    id: 5,
-    title: 'Integrating AI Agents with Your Existing CRM',
-    excerpt: 'Step-by-step guide to connecting AI agents with popular CRM systems like Salesforce, HubSpot, and Pipedrive.',
-    content: 'Full article content...',
-    author: 'Elena Volkov',
-    authorAvatar: '/api/placeholder/40/40',
-    publishDate: '2024-01-05',
-    readTime: '9 min read',
-    category: 'Integrations',
-    tags: ['CRM', 'Integrations', 'Salesforce'],
-    image: '/api/placeholder/600/400',
-    featured: false,
-    views: 890,
-    likes: 52
-  },
-  {
-    id: 6,
-    title: 'ROI Calculator: Measuring Automation Success',
-    excerpt: 'Learn how to calculate the return on investment for your automation projects and justify your automation budget.',
-    content: 'Full article content...',
-    author: 'David Kim',
-    authorAvatar: '/api/placeholder/40/40',
-    publishDate: '2024-01-03',
-    readTime: '7 min read',
-    category: 'Business',
-    tags: ['ROI', 'Business', 'Analytics'],
-    image: '/api/placeholder/600/400',
-    featured: false,
-    views: 540,
-    likes: 29
-  }
-]
-
-const categories = [
-  { name: 'All', count: 24, icon: BookOpen },
-  { name: 'AI Trends', count: 6, icon: TrendingUp },
-  { name: 'Tutorials', count: 8, icon: Lightbulb },
-  { name: 'Case Studies', count: 4, icon: Zap },
-  { name: 'Security', count: 3, icon: Shield },
-  { name: 'Integrations', count: 2, icon: Workflow },
-  { name: 'Business', count: 1, icon: TrendingUp }
-]
-
-const featuredPost = blogPosts.find(post => post.featured) || blogPosts[0]
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  author: {
+    name: string;
+    email: string;
+  };
+  tags: string[];
+  category: string;
+  publishedAt: string;
+  updatedAt: string;
+  readTime: number;
+  views: number;
+  featuredImage?: string;
+  status: 'draft' | 'published' | 'archived';
+}
 
 export default function BlogPage() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const [activeCategory, setActiveCategory] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const filteredPosts = blogPosts.filter(post => {
-    const matchesCategory = activeCategory === 'All' || post.category === activeCategory
-    const matchesSearch = searchQuery === '' || 
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-    
-    return matchesCategory && matchesSearch
-  })
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
+
+  const fetchBlogPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await contentApi.getBlogPosts({
+        status: 'published',
+        limit: 20,
+        sort: 'publishedAt',
+        order: 'desc'
+      });
+      setPosts(response.data || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch blog posts');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredPosts = posts.filter(post => {
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const categories = ['all', ...Array.from(new Set(posts.map(post => post.category)))];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading blog posts...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-600 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Blog</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={fetchBlogPosts}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-      <main className={styles.blogPage}>
-        {/* Hero Section */}
-        <section className={styles.hero}>
-          <div className="container">
-            <motion.div
-              className={styles.heroContent}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <motion.div
-                className={styles.badge}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <BookOpen size={16} />
-                <span>Latest Insights & Tutorials</span>
-              </motion.div>
-
-              <h1 className={styles.heroTitle}>
-                Learn <span className={styles.gradientText}>Automation</span> from the Experts
-              </h1>
-              
-              <p className={styles.heroDescription}>
-                Discover the latest trends, tutorials, and case studies in AI automation. 
-                Stay ahead of the curve with insights from industry leaders.
-              </p>
-
-              {/* Search Bar */}
-              <motion.div
-                className={styles.searchContainer}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-              >
-                <div className={styles.searchBar}>
-                  <Search size={20} className={styles.searchIcon} />
-                  <input
-                    type="text"
-                    placeholder="Search articles, tutorials, and insights..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={styles.searchInput}
-                  />
-                </div>
-              </motion.div>
-            </motion.div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-12 text-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Blog</h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Stay updated with the latest insights, tutorials, and news from the Autopilot.Monster team
+            </p>
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* Featured Post */}
-        <section className={styles.featuredSection}>
-          <div className="container">
-            <motion.div
-              className={styles.featuredPost}
-              initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className={styles.featuredImage}>
-                <div className={styles.imagePlaceholder}>
-                  <BookOpen size={60} />
-                </div>
-                <div className={styles.featuredBadge}>
-                  <Star size={16} />
-                  <span>Featured</span>
-                </div>
-              </div>
-              <div className={styles.featuredContent}>
-                <div className={styles.featuredCategory}>{featuredPost.category}</div>
-                <h2 className={styles.featuredTitle}>{featuredPost.title}</h2>
-                <p className={styles.featuredExcerpt}>{featuredPost.excerpt}</p>
-                <div className={styles.featuredMeta}>
-                  <div className={styles.author}>
-                    <div className={styles.authorAvatar}>
-                      <User size={16} />
-                    </div>
-                    <span>{featuredPost.author}</span>
-                  </div>
-                  <div className={styles.metaItem}>
-                    <Calendar size={16} />
-                    <span>{new Date(featuredPost.publishDate).toLocaleDateString()}</span>
-                  </div>
-                  <div className={styles.metaItem}>
-                    <Clock size={16} />
-                    <span>{featuredPost.readTime}</span>
-                  </div>
-                </div>
-                <div className={styles.featuredTags}>
-                  {featuredPost.tags.map((tag, index) => (
-                    <span key={index} className={styles.tag}>
-                      <Tag size={12} />
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <Link href={`/blog/${featuredPost.id}`} className={styles.featuredLink}>
-                  <Button variant="primary" size="lg">
-                    Read Article
-                    <ArrowRight size={20} />
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Categories and Posts */}
-        <section className={styles.postsSection} ref={ref}>
-          <div className="container">
-            <motion.div
-              className={styles.sectionHeader}
-              initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className={styles.sectionTitle}>Latest Articles</h2>
-              <p className={styles.sectionDescription}>
-                {filteredPosts.length} articles found
-              </p>
-            </motion.div>
-
-            <div className={styles.contentLayout}>
-              {/* Categories Sidebar */}
-              <motion.div
-                className={styles.categoriesSidebar}
-                initial={{ opacity: 0, x: -50 }}
-                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search and Filter */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Search blog posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="md:w-48">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <h3 className={styles.sidebarTitle}>Categories</h3>
-                <div className={styles.categoriesList}>
-                  {categories.map((category) => (
-                    <button
-                      key={category.name}
-                      className={`${styles.categoryItem} ${activeCategory === category.name ? styles.active : ''}`}
-                      onClick={() => setActiveCategory(category.name)}
-                    >
-                      <category.icon size={18} />
-                      <span>{category.name}</span>
-                      <span className={styles.categoryCount}>({category.count})</span>
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Posts Grid */}
-              <motion.div
-                className={styles.postsGrid}
-                initial={{ opacity: 0 }}
-                animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-              >
-                {filteredPosts.map((post, index) => (
-                  <motion.article
-                    key={post.id}
-                    className={styles.postCard}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-                    transition={{ duration: 0.6, delay: 0.1 * index }}
-                    whileHover={{ scale: 1.02, y: -8 }}
-                  >
-                    <Link href={`/blog/${post.id}`} className={styles.postLink}>
-                      <div className={styles.postImage}>
-                        <div className={styles.imagePlaceholder}>
-                          <BookOpen size={40} />
-                        </div>
-                        <div className={styles.postCategory}>{post.category}</div>
-                      </div>
-
-                      <div className={styles.postContent}>
-                        <h3 className={styles.postTitle}>{post.title}</h3>
-                        <p className={styles.postExcerpt}>{post.excerpt}</p>
-
-                        <div className={styles.postMeta}>
-                          <div className={styles.author}>
-                            <div className={styles.authorAvatar}>
-                              <User size={14} />
-                            </div>
-                            <span>{post.author}</span>
-                          </div>
-                          <div className={styles.metaItem}>
-                            <Calendar size={14} />
-                            <span>{new Date(post.publishDate).toLocaleDateString()}</span>
-                          </div>
-                          <div className={styles.metaItem}>
-                            <Clock size={14} />
-                            <span>{post.readTime}</span>
-                          </div>
-                        </div>
-
-                        <div className={styles.postTags}>
-                          {post.tags.slice(0, 2).map((tag, idx) => (
-                            <span key={idx} className={styles.tag}>
-                              <Tag size={10} />
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-
-                        <div className={styles.postStats}>
-                          <div className={styles.stat}>
-                            <Eye size={14} />
-                            <span>{post.views}</span>
-                          </div>
-                          <div className={styles.stat}>
-                            <Heart size={14} />
-                            <span>{post.likes}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.article>
+                {categories.map(category => (
+                  <option key={category} value={category}>
+                    {category === 'all' ? 'All Categories' : category}
+                  </option>
                 ))}
-              </motion.div>
+              </select>
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Newsletter CTA */}
-        <section className={styles.newsletterSection}>
-          <div className="container">
-            <motion.div
-              className={styles.newsletterContent}
-              initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-              transition={{ duration: 0.8 }}
-            >
-              <h2 className={styles.newsletterTitle}>Stay Updated</h2>
-              <p className={styles.newsletterDescription}>
-                Get the latest automation insights, tutorials, and industry news delivered to your inbox.
-              </p>
-              <div className={styles.newsletterForm}>
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  className={styles.newsletterInput}
-                />
-                <Button variant="primary" size="lg">
-                  Subscribe
-                  <ArrowRight size={20} />
-                </Button>
-              </div>
-            </motion.div>
+        {/* Blog Posts Grid */}
+        {filteredPosts.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">📝</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No posts found</h3>
+            <p className="text-gray-600">
+              {searchQuery || selectedCategory !== 'all' 
+                ? 'Try adjusting your search or filter criteria'
+                : 'No blog posts available at the moment'
+              }
+            </p>
           </div>
-        </section>
-      </main>
-  )
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPosts.map((post) => (
+              <article key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                {post.featuredImage && (
+                  <div className="aspect-w-16 aspect-h-9">
+                    <img
+                      src={post.featuredImage}
+                      alt={post.title}
+                      className="w-full h-48 object-cover"
+                    />
+                  </div>
+                )}
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                      {post.category}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {post.readTime} min read
+                    </span>
+                  </div>
+                  
+                  <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                    <Link href={`/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">
+                      {post.title}
+                    </Link>
+                  </h2>
+                  
+                  <p className="text-gray-600 mb-4 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-medium text-gray-600">
+                          {post.author.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-900">{post.author.name}</p>
+                        <p className="text-sm text-gray-500">
+                          {new Date(post.publishedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <span className="mr-1">👁️</span>
+                      {post.views}
+                    </div>
+                  </div>
+                  
+                  {post.tags.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {post.tags.slice(0, 3).map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                      {post.tags.length > 3 && (
+                        <span className="text-xs text-gray-500">
+                          +{post.tags.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {filteredPosts.length > 0 && (
+          <div className="text-center mt-12">
+            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+              Load More Posts
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

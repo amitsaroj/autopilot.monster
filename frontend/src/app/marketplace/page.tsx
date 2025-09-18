@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
@@ -28,8 +28,9 @@ import {
   SortDesc
 } from 'lucide-react'
 import styles from './Marketplace.module.scss'
+import { productApi } from '@/lib/api/client'
 
-const categories = [
+const defaultCategories = [
   { id: 'all', name: 'All Products', count: 5840, icon: Grid },
   { id: 'ai-agents', name: 'AI Agents', count: 1250, icon: Bot },
   { id: 'workflows', name: 'n8n Workflows', count: 890, icon: Workflow },
@@ -46,7 +47,7 @@ const sortOptions = [
   { id: 'price-high', name: 'Price: High to Low', icon: SortDesc }
 ]
 
-const products = [
+const defaultProducts = [
   {
     id: 1,
     name: 'Customer Support AI Agent',
@@ -193,6 +194,51 @@ export default function MarketplacePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Fetch products and categories on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const [productsData, categoriesData] = await Promise.all([
+          productApi.getProducts({ limit: 50 }),
+          productApi.getCategories()
+        ])
+        setProducts(productsData.products || productsData)
+        setCategories(categoriesData)
+      } catch (err) {
+        setError(err.message)
+        console.error('Failed to fetch marketplace data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Search products when search query changes
+  useEffect(() => {
+    const searchProducts = async () => {
+      if (searchQuery.trim()) {
+        try {
+          const searchResults = await productApi.searchProducts(searchQuery, {
+            category: activeCategory !== 'all' ? activeCategory : undefined
+          })
+          setProducts(searchResults.products || searchResults)
+        } catch (err) {
+          console.error('Search failed:', err)
+        }
+      }
+    }
+
+    const timeoutId = setTimeout(searchProducts, 500)
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, activeCategory])
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = activeCategory === 'all' || product.category.toLowerCase().includes(activeCategory.replace('-', ' '))

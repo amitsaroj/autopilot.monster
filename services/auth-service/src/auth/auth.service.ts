@@ -8,13 +8,13 @@ import { User, UserDocument } from '../user/schemas/user.schema';
 import { RedisService } from '../redis/redis.service';
 import { KafkaService } from '../kafka/kafka.service';
 import { EmailService } from '../email/email.service';
-import { GoogleAuth } from 'google-auth-library';
+import { OAuth2Client } from 'google-auth-library';
 import { randomBytes, createHash } from 'crypto';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
-  private readonly googleAuth: GoogleAuth;
+  private readonly googleAuthClient: OAuth2Client;
 
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
@@ -24,9 +24,7 @@ export class AuthService {
     private readonly kafkaService: KafkaService,
     private readonly emailService: EmailService,
   ) {
-    this.googleAuth = new GoogleAuth({
-      clientId: this.configService.get('oauth.google.clientId'),
-    });
+    this.googleAuthClient = new OAuth2Client(this.configService.get('oauth.google.clientId'));
   }
 
   async register(data: any) {
@@ -552,8 +550,7 @@ export class AuthService {
       const { idToken } = data;
 
       // Verify Google ID token
-      const client = this.googleAuth.getClient();
-      const ticket = await client.verifyIdToken({
+      const ticket = await this.googleAuthClient.verifyIdToken({
         idToken,
         audience: this.configService.get('oauth.google.clientId'),
       });

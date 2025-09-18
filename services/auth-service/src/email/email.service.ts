@@ -1,211 +1,274 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import * as handlebars from 'handlebars';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private transporter: nodemailer.Transporter;
+  private templates: Map<string, HandlebarsTemplateDelegate> = new Map();
 
-  constructor(private readonly configService: ConfigService) {
-    this.transporter = nodemailer.createTransporter({
-      host: this.configService.get('email.smtp.host'),
-      port: this.configService.get('email.smtp.port'),
-      secure: this.configService.get('email.smtp.secure'),
-      auth: {
-        user: this.configService.get('email.smtp.user'),
-        pass: this.configService.get('email.smtp.password'),
-      },
+  constructor(private configService: ConfigService) {
+    this.initializeTransporter();
+    this.loadTemplates();
+  }
+
+  private initializeTransporter() {
+    try {
+      const smtpConfig = this.configService.get('email.smtp');
+      
+      if (!smtpConfig || !smtpConfig.user || !smtpConfig.password) {
+        this.logger.warn('Email configuration incomplete - email service will be disabled');
+        return;
+      }
+      
+      this.transporter = nodemailer.createTransport({
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        secure: smtpConfig.secure,
+        auth: {
+          user: smtpConfig.user,
+          pass: smtpConfig.password,
+        },
+      });
+
+      this.transporter.verify((error, success) => {
+        if (error) {
+          this.logger.warn('SMTP connection failed (email service will be disabled):', error.message);
+        } else {
+          this.logger.log('SMTP connection established');
+        }
+      });
+    } catch (error) {
+      this.logger.warn('Failed to initialize email transporter:', error.message);
+    }
+  }
+
+  private loadTemplates() {
+    const templatesDir = path.join(__dirname, 'templates');
+    
+    try {
+      const templateFiles = fs.readdirSync(templatesDir);
+      
+      templateFiles.forEach(file => {
+        if (file.endsWith('.hbs')) {
+          const templateName = file.replace('.hbs', '');
+          const templateContent = fs.readFileSync(path.join(templatesDir, file), 'utf8');
+          const template = handlebars.compile(templateContent);
+          this.templates.set(templateName, template);
+        }
+      });
+      
+      this.logger.log(`Loaded ${this.templates.size} email templates`);
+    } catch (error) {
+      this.logger.warn('Could not load email templates:', error.message);
+    }
+  }
+
+  async sendEmail(to: string, subject: string, html: string, text?: string): Promise<boolean> {
+    if (!this.transporter) {
+      this.logger.warn('Email service not available - email not sent');
+      return false;
+    }
+
+    try {
+      const mailOptions = {
+        from: this.configService.get('email.from'),
+        to,
+        subject,
+        html,
+        text: text || this.stripHtml(html),
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
+      this.logger.log(`Email sent to ${to}: ${result.messageId}`);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to send email to ${to}:`, error.message);
+      return false;
+    }
+  }
+
+  async sendVerificationEmail(email: string, token: string): Promise<boolean> {
+    const verificationUrl = `${this.configService.get('app.frontendUrl')}/verify-email?token=${token}`;
+    
+    const template = this.templates.get('verification') || this.getDefaultVerificationTemplate();
+    const html = template({
+      email,
+      verificationUrl,
+      appName: this.configService.get('app.name', 'Autopilot.Monster'),
     });
+
+    return await this.sendEmail(
+      email,
+      'Verify Your Email Address',
+      html
+    );
   }
 
-  async sendVerificationEmail(email: string, token: string): Promise<void> {
-    try {
-      const verificationUrl = `${this.configService.get('frontend.url')}/verify-email?token=${token}`;
-      
-      const mailOptions = {
-        from: this.configService.get('email.from'),
-        to: email,
-        subject: 'Verify Your Email - Autopilot Monster',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">Welcome to Autopilot Monster!</h2>
-            <p>Thank you for registering with us. Please click the button below to verify your email address:</p>
-            <a href="${verificationUrl}" style="
-              display: inline-block;
-              background-color: #007bff;
-              color: white;
-              padding: 12px 24px;
-              text-decoration: none;
-              border-radius: 4px;
-              margin: 20px 0;
-            ">Verify Email</a>
-            <p>If you can't click the button, copy and paste this link into your browser:</p>
-            <p style="word-break: break-all;">${verificationUrl}</p>
-            <p style="color: #666; font-size: 14px;">
-              This link will expire in 24 hours. If you didn't create an account, please ignore this email.
-            </p>
-          </div>
-        `,
-        text: `
-          Welcome to Autopilot Monster!
-          
-          Thank you for registering with us. Please verify your email by visiting:
-          ${verificationUrl}
-          
-          This link will expire in 24 hours. If you didn't create an account, please ignore this email.
-        `,
-      };
+  async sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
+    const resetUrl = `${this.configService.get('app.frontendUrl')}/reset-password?token=${token}`;
+    
+    const template = this.templates.get('password-reset') || this.getDefaultPasswordResetTemplate();
+    const html = template({
+      email,
+      resetUrl,
+      appName: this.configService.get('app.name', 'Autopilot.Monster'),
+    });
 
-      await this.transporter.sendMail(mailOptions);
-      this.logger.log(`Verification email sent to: ${email}`);
-    } catch (error) {
-      this.logger.error('Failed to send verification email:', error);
-      throw error;
-    }
+    return await this.sendEmail(
+      email,
+      'Reset Your Password',
+      html
+    );
   }
 
-  async sendPasswordResetEmail(email: string, token: string): Promise<void> {
-    try {
-      const resetUrl = `${this.configService.get('frontend.url')}/reset-password?token=${token}`;
-      
-      const mailOptions = {
-        from: this.configService.get('email.from'),
-        to: email,
-        subject: 'Reset Your Password - Autopilot Monster',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">Password Reset Request</h2>
-            <p>We received a request to reset your password. Click the button below to reset it:</p>
-            <a href="${resetUrl}" style="
-              display: inline-block;
-              background-color: #dc3545;
-              color: white;
-              padding: 12px 24px;
-              text-decoration: none;
-              border-radius: 4px;
-              margin: 20px 0;
-            ">Reset Password</a>
-            <p>If you can't click the button, copy and paste this link into your browser:</p>
-            <p style="word-break: break-all;">${resetUrl}</p>
-            <p style="color: #666; font-size: 14px;">
-              This link will expire in 1 hour. If you didn't request a password reset, please ignore this email.
-            </p>
-          </div>
-        `,
-        text: `
-          Password Reset Request
-          
-          We received a request to reset your password. Visit the following link to reset it:
-          ${resetUrl}
-          
-          This link will expire in 1 hour. If you didn't request a password reset, please ignore this email.
-        `,
-      };
+  async sendWelcomeEmail(email: string, firstName: string): Promise<boolean> {
+    const template = this.templates.get('welcome') || this.getDefaultWelcomeTemplate();
+    const html = template({
+      firstName,
+      email,
+      appName: this.configService.get('app.name', 'Autopilot.Monster'),
+      dashboardUrl: `${this.configService.get('app.frontendUrl')}/dashboard`,
+    });
 
-      await this.transporter.sendMail(mailOptions);
-      this.logger.log(`Password reset email sent to: ${email}`);
-    } catch (error) {
-      this.logger.error('Failed to send password reset email:', error);
-      throw error;
-    }
+    return await this.sendEmail(
+      email,
+      'Welcome to Autopilot.Monster!',
+      html
+    );
   }
 
-  async sendWelcomeEmail(email: string, firstName: string): Promise<void> {
-    try {
-      const mailOptions = {
-        from: this.configService.get('email.from'),
-        to: email,
-        subject: 'Welcome to Autopilot Monster!',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">Welcome ${firstName}!</h2>
-            <p>Thank you for joining Autopilot Monster. We're excited to have you on board!</p>
-            <p>Here are some things you can do to get started:</p>
-            <ul>
-              <li>Browse our marketplace of AI agents and workflows</li>
-              <li>Upload your own AI agents and start earning</li>
-              <li>Join our community of AI enthusiasts</li>
-            </ul>
-            <a href="${this.configService.get('frontend.url')}" style="
-              display: inline-block;
-              background-color: #28a745;
-              color: white;
-              padding: 12px 24px;
-              text-decoration: none;
-              border-radius: 4px;
-              margin: 20px 0;
-            ">Explore Marketplace</a>
-            <p style="color: #666; font-size: 14px;">
-              If you have any questions, feel free to contact our support team.
-            </p>
-          </div>
-        `,
-        text: `
-          Welcome ${firstName}!
-          
-          Thank you for joining Autopilot Monster. We're excited to have you on board!
-          
-          Visit our marketplace: ${this.configService.get('frontend.url')}
-          
-          If you have any questions, feel free to contact our support team.
-        `,
-      };
+  async sendPasswordChangedEmail(email: string, firstName: string): Promise<boolean> {
+    const template = this.templates.get('password-changed') || this.getDefaultPasswordChangedTemplate();
+    const html = template({
+      firstName,
+      email,
+      appName: this.configService.get('app.name', 'Autopilot.Monster'),
+      supportUrl: `${this.configService.get('app.frontendUrl')}/support`,
+    });
 
-      await this.transporter.sendMail(mailOptions);
-      this.logger.log(`Welcome email sent to: ${email}`);
-    } catch (error) {
-      this.logger.error('Failed to send welcome email:', error);
-      throw error;
-    }
+    return await this.sendEmail(
+      email,
+      'Password Changed Successfully',
+      html
+    );
   }
 
-  async sendSecurityAlert(email: string, alertType: string, details: any): Promise<void> {
-    try {
-      const mailOptions = {
-        from: this.configService.get('email.from'),
-        to: email,
-        subject: `Security Alert - ${alertType}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #dc3545;">Security Alert: ${alertType}</h2>
-            <p>We detected unusual activity on your account. Here are the details:</p>
-            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px; margin: 20px 0;">
-              <strong>Time:</strong> ${details.timestamp}<br>
-              <strong>IP Address:</strong> ${details.ipAddress}<br>
-              <strong>Location:</strong> ${details.location || 'Unknown'}<br>
-              <strong>Device:</strong> ${details.userAgent || 'Unknown'}
-            </div>
-            <p>If this was you, no action is needed. If you don't recognize this activity, please:</p>
-            <ul>
-              <li>Change your password immediately</li>
-              <li>Review your account settings</li>
-              <li>Contact our support team</li>
-            </ul>
-            <p style="color: #666; font-size: 14px;">
-              This is an automated security alert. Please do not reply to this email.
-            </p>
-          </div>
-        `,
-        text: `
-          Security Alert: ${alertType}
-          
-          We detected unusual activity on your account.
-          
-          Time: ${details.timestamp}
-          IP Address: ${details.ipAddress}
-          Location: ${details.location || 'Unknown'}
-          Device: ${details.userAgent || 'Unknown'}
-          
-          If this was you, no action is needed. If you don't recognize this activity, please change your password immediately.
-        `,
-      };
+  async sendAccountLockedEmail(email: string, firstName: string, unlockTime: Date): Promise<boolean> {
+    const template = this.templates.get('account-locked') || this.getDefaultAccountLockedTemplate();
+    const html = template({
+      firstName,
+      email,
+      unlockTime: unlockTime.toLocaleString(),
+      appName: this.configService.get('app.name', 'Autopilot.Monster'),
+      supportUrl: `${this.configService.get('app.frontendUrl')}/support`,
+    });
 
-      await this.transporter.sendMail(mailOptions);
-      this.logger.log(`Security alert email sent to: ${email}`);
-    } catch (error) {
-      this.logger.error('Failed to send security alert email:', error);
-      throw error;
-    }
+    return await this.sendEmail(
+      email,
+      'Account Temporarily Locked',
+      html
+    );
+  }
+
+  async sendSuspiciousActivityEmail(email: string, firstName: string, activity: string): Promise<boolean> {
+    const template = this.templates.get('suspicious-activity') || this.getDefaultSuspiciousActivityTemplate();
+    const html = template({
+      firstName,
+      email,
+      activity,
+      appName: this.configService.get('app.name', 'Autopilot.Monster'),
+      securityUrl: `${this.configService.get('app.frontendUrl')}/security`,
+    });
+
+    return await this.sendEmail(
+      email,
+      'Suspicious Activity Detected',
+      html
+    );
+  }
+
+  private stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  }
+
+  private getDefaultVerificationTemplate(): HandlebarsTemplateDelegate {
+    return handlebars.compile(`
+      <h2>Verify Your Email Address</h2>
+      <p>Hello,</p>
+      <p>Thank you for registering with {{appName}}. Please click the link below to verify your email address:</p>
+      <p><a href="{{verificationUrl}}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a></p>
+      <p>If the button doesn't work, copy and paste this link into your browser:</p>
+      <p>{{verificationUrl}}</p>
+      <p>This link will expire in 24 hours.</p>
+      <p>Best regards,<br>The {{appName}} Team</p>
+    `);
+  }
+
+  private getDefaultPasswordResetTemplate(): HandlebarsTemplateDelegate {
+    return handlebars.compile(`
+      <h2>Reset Your Password</h2>
+      <p>Hello,</p>
+      <p>You requested to reset your password for {{appName}}. Click the link below to reset your password:</p>
+      <p><a href="{{resetUrl}}" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+      <p>If the button doesn't work, copy and paste this link into your browser:</p>
+      <p>{{resetUrl}}</p>
+      <p>This link will expire in 1 hour.</p>
+      <p>If you didn't request this password reset, please ignore this email.</p>
+      <p>Best regards,<br>The {{appName}} Team</p>
+    `);
+  }
+
+  private getDefaultWelcomeTemplate(): HandlebarsTemplateDelegate {
+    return handlebars.compile(`
+      <h2>Welcome to {{appName}}!</h2>
+      <p>Hello {{firstName}},</p>
+      <p>Welcome to {{appName}}! We're excited to have you on board.</p>
+      <p>You can now access your dashboard and start exploring our AI automation platform:</p>
+      <p><a href="{{dashboardUrl}}" style="background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Go to Dashboard</a></p>
+      <p>If you have any questions, feel free to reach out to our support team.</p>
+      <p>Best regards,<br>The {{appName}} Team</p>
+    `);
+  }
+
+  private getDefaultPasswordChangedTemplate(): HandlebarsTemplateDelegate {
+    return handlebars.compile(`
+      <h2>Password Changed Successfully</h2>
+      <p>Hello {{firstName}},</p>
+      <p>Your password has been successfully changed for your {{appName}} account.</p>
+      <p>If you made this change, no further action is required.</p>
+      <p>If you didn't make this change, please contact our support team immediately.</p>
+      <p><a href="{{supportUrl}}" style="background-color: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Contact Support</a></p>
+      <p>Best regards,<br>The {{appName}} Team</p>
+    `);
+  }
+
+  private getDefaultAccountLockedTemplate(): HandlebarsTemplateDelegate {
+    return handlebars.compile(`
+      <h2>Account Temporarily Locked</h2>
+      <p>Hello {{firstName}},</p>
+      <p>Your {{appName}} account has been temporarily locked due to multiple failed login attempts.</p>
+      <p>Your account will be automatically unlocked at: {{unlockTime}}</p>
+      <p>If you believe this is an error, please contact our support team.</p>
+      <p><a href="{{supportUrl}}" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Contact Support</a></p>
+      <p>Best regards,<br>The {{appName}} Team</p>
+    `);
+  }
+
+  private getDefaultSuspiciousActivityTemplate(): HandlebarsTemplateDelegate {
+    return handlebars.compile(`
+      <h2>Suspicious Activity Detected</h2>
+      <p>Hello {{firstName}},</p>
+      <p>We detected suspicious activity on your {{appName}} account:</p>
+      <p><strong>{{activity}}</strong></p>
+      <p>If this was you, no further action is required.</p>
+      <p>If this wasn't you, please secure your account immediately:</p>
+      <p><a href="{{securityUrl}}" style="background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Secure Account</a></p>
+      <p>Best regards,<br>The {{appName}} Team</p>
+    `);
   }
 }

@@ -18,13 +18,13 @@ export class User {
   lastName: string;
 
   @Prop()
-  company: string;
+  company?: string;
 
   @Prop()
-  bio: string;
+  bio?: string;
 
   @Prop()
-  avatarUrl: string;
+  avatarUrl?: string;
 
   @Prop({ 
     type: String, 
@@ -35,7 +35,7 @@ export class User {
 
   @Prop({ 
     type: String, 
-    enum: ['USER_STATUS_PENDING', 'USER_STATUS_ACTIVE', 'USER_STATUS_SUSPENDED', 'USER_STATUS_BANNED', 'USER_STATUS_DELETED'],
+    enum: ['USER_STATUS_ACTIVE', 'USER_STATUS_PENDING', 'USER_STATUS_SUSPENDED', 'USER_STATUS_DELETED'],
     default: 'USER_STATUS_PENDING'
   })
   status: string;
@@ -44,91 +44,110 @@ export class User {
   emailVerified: boolean;
 
   @Prop()
-  emailVerificationToken: string;
+  emailVerificationToken?: string;
 
   @Prop()
-  emailVerificationExpiry: Date;
+  emailVerificationExpiry?: Date;
 
   @Prop()
-  passwordResetToken: string;
+  passwordResetToken?: string;
 
   @Prop()
-  passwordResetExpiry: Date;
+  passwordResetExpiry?: Date;
 
   @Prop({ type: [String], default: [] })
   passwordHistory: string[];
-
-  @Prop({ type: Object, default: {} })
-  socialLinks: Record<string, string>;
-
-  @Prop({ type: Object, default: {} })
-  oauthProviders: Record<string, any>;
 
   @Prop({ default: 0 })
   loginAttempts: number;
 
   @Prop()
-  lockUntil: Date;
+  lockUntil?: Date;
 
   @Prop()
-  lastLogin: Date;
+  lastLogin?: Date;
 
-  @Prop()
-  lastLoginIp: string;
+  @Prop({ default: false })
+  isLocked: boolean;
+
+  @Prop({ type: Object })
+  socialLinks?: {
+    website?: string;
+    linkedin?: string;
+    twitter?: string;
+    github?: string;
+  };
+
+  @Prop({ type: Object })
+  oauthProviders?: {
+    google?: {
+      id: string;
+      email: string;
+    };
+    github?: {
+      id: string;
+      email: string;
+    };
+  };
 
   @Prop({ default: false })
   twoFactorEnabled: boolean;
 
   @Prop()
-  twoFactorSecret: string;
+  twoFactorSecret?: string;
 
-  @Prop({ type: [String], default: [] })
-  twoFactorBackupCodes: string[];
+  @Prop({ type: [String] })
+  twoFactorBackupCodes?: string[];
 
-  @Prop({ type: Object, default: {} })
-  preferences: Record<string, any>;
+  @Prop({ type: Object })
+  preferences?: {
+    notifications: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+    };
+    privacy: {
+      profileVisibility: string;
+      showEmail: boolean;
+    };
+    language: string;
+    timezone: string;
+  };
 
-  @Prop({ type: Object, default: {} })
-  metadata: Record<string, any>;
-
-  // Virtual for full name
-  get fullName(): string {
-    return `${this.firstName} ${this.lastName}`;
-  }
-
-  // Virtual for checking if account is locked
-  get isLocked(): boolean {
-    return !!(this.lockUntil && this.lockUntil > new Date());
-  }
+  @Prop({ type: Object })
+  metadata?: {
+    ipAddress?: string;
+    userAgent?: string;
+    lastSeen?: Date;
+    registrationSource?: string;
+  };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
 // Indexes
 UserSchema.index({ email: 1 });
-UserSchema.index({ status: 1 });
 UserSchema.index({ role: 1 });
+UserSchema.index({ status: 1 });
+UserSchema.index({ emailVerificationToken: 1 });
+UserSchema.index({ passwordResetToken: 1 });
 UserSchema.index({ createdAt: -1 });
+UserSchema.index({ lastLogin: -1 });
 
-// Virtuals
+// Virtual for full name
 UserSchema.virtual('fullName').get(function() {
   return `${this.firstName} ${this.lastName}`;
 });
 
-UserSchema.virtual('isLocked').get(function() {
+// Virtual for account lock status
+UserSchema.virtual('isAccountLocked').get(function() {
   return !!(this.lockUntil && this.lockUntil > new Date());
 });
 
-// Transform output
-UserSchema.set('toJSON', {
-  virtuals: true,
-  transform: function(doc, ret) {
-    delete ret.password;
-    delete ret.passwordHistory;
-    delete ret.emailVerificationToken;
-    delete ret.passwordResetToken;
-    delete ret.twoFactorSecret;
-    delete ret.twoFactorBackupCodes;
-    return ret;
-  },
+// Pre-save middleware
+UserSchema.pre('save', function(next) {
+  if (this.isModified('lockUntil')) {
+    this.isLocked = !!(this.lockUntil && this.lockUntil > new Date());
+  }
+  next();
 });

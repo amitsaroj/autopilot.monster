@@ -31,26 +31,8 @@ async function bootstrap() {
     }),
   );
 
-  // Connect gRPC microservice
-  const grpcUrl = configService.get<string>('GRPC_URL', 'localhost:3002');
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.GRPC,
-    options: {
-      package: 'autopilot.auth',
-      protoPath: join(__dirname, '../../../shared/proto/auth.proto'),
-      url: grpcUrl,
-      keepalive: {
-        keepaliveTimeMs: 120000,
-        keepaliveTimeoutMs: 5000,
-        keepalivePermitWithoutCalls: true,
-        http2MaxPingsWithoutData: 0,
-        http2MinTimeBetweenPingsMs: 10000,
-      },
-    },
-  });
-
-  // Start all microservices
-  await app.startAllMicroservices();
+  // gRPC microservice disabled for now
+  // TODO: Enable gRPC when proto files are available
   
   // Start HTTP server for health checks
   await app.listen(port);
@@ -67,7 +49,6 @@ async function bootstrap() {
   });
 
   logger.log(`🔐 Auth Service is running on: http://localhost:${port}`);
-  logger.log(`🔗 gRPC Service is running on: ${grpcUrl}`);
   logger.log(`🌍 Environment: ${nodeEnv}`);
 }
 

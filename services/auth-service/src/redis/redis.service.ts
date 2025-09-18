@@ -1,287 +1,161 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createClient, RedisClientType } from 'redis';
+import Redis from 'ioredis';
 
 @Injectable()
-export class RedisService implements OnModuleInit, OnModuleDestroy {
+export class RedisService {
   private readonly logger = new Logger(RedisService.name);
-  private client: RedisClientType;
+  private readonly redis: Redis;
 
-  constructor(private readonly configService: ConfigService) {
-    this.client = createClient({
-      url: this.configService.get<string>('database.redis.url'),
-    });
-
-    this.client.on('error', (error) => {
-      this.logger.error('Redis client error:', error);
-    });
-
-    this.client.on('connect', () => {
-      this.logger.log('Redis client connected');
-    });
-
-    this.client.on('ready', () => {
-      this.logger.log('Redis client ready');
-    });
-  }
-
-  async onModuleInit() {
+  constructor(private configService: ConfigService) {
     try {
-      await this.client.connect();
+      this.redis = new Redis({
+        host: this.configService.get('redis.host', 'localhost'),
+        port: this.configService.get('redis.port', 6379),
+        password: this.configService.get('redis.password'),
+        db: this.configService.get('redis.db', 0),
+        maxRetriesPerRequest: 3,
+        lazyConnect: true, // Don't connect immediately
+      });
+
+      this.redis.on('error', (error) => {
+        this.logger.warn('Redis connection error (service will continue without Redis):', error.message);
+      });
+
+      this.redis.on('connect', () => {
+        this.logger.log('Connected to Redis');
+      });
     } catch (error) {
-      this.logger.error('Failed to connect to Redis:', error);
+      this.logger.warn('Failed to initialize Redis (service will continue without Redis):', error.message);
     }
   }
 
-  async onModuleDestroy() {
+  async get(key: string): Promise<string | null> {
     try {
-      await this.client.disconnect();
-      this.logger.log('Redis client disconnected');
+      if (!this.redis) return null;
+      return await this.redis.get(key);
     } catch (error) {
-      this.logger.error('Error disconnecting from Redis:', error);
-    }
-  }
-
-  // Session management
-  async setRefreshToken(userId: string, token: string, ttl: number): Promise<void> {
-    try {
-      const key = `refresh_token:${userId}`;
-      await this.client.setEx(key, ttl, token);
-    } catch (error) {
-      this.logger.error('Failed to set refresh token:', error);
-      throw error;
-    }
-  }
-
-  async getRefreshToken(userId: string): Promise<string | null> {
-    try {
-      const key = `refresh_token:${userId}`;
-      return await this.client.get(key);
-    } catch (error) {
-      this.logger.error('Failed to get refresh token:', error);
-      throw error;
-    }
-  }
-
-  async deleteRefreshToken(userId: string): Promise<void> {
-    try {
-      const key = `refresh_token:${userId}`;
-      await this.client.del(key);
-    } catch (error) {
-      this.logger.error('Failed to delete refresh token:', error);
-      throw error;
-    }
-  }
-
-  // Token blacklisting
-  async blacklistToken(token: string, ttl: number): Promise<void> {
-    try {
-      const key = `blacklist:${token}`;
-      await this.client.setEx(key, ttl, 'blacklisted');
-    } catch (error) {
-      this.logger.error('Failed to blacklist token:', error);
-      throw error;
-    }
-  }
-
-  async isTokenBlacklisted(token: string): Promise<boolean> {
-    try {
-      const key = `blacklist:${token}`;
-      const result = await this.client.get(key);
-      return result === 'blacklisted';
-    } catch (error) {
-      this.logger.error('Failed to check token blacklist:', error);
-      return false;
-    }
-  }
-
-  // Rate limiting
-  async incrementRateLimit(key: string, windowMs: number): Promise<number> {
-    try {
-      const current = await this.client.incr(key);
-      if (current === 1) {
-        await this.client.expire(key, Math.ceil(windowMs / 1000));
-      }
-      return current;
-    } catch (error) {
-      this.logger.error('Failed to increment rate limit:', error);
-      throw error;
-    }
-  }
-
-  async getRateLimit(key: string): Promise<number> {
-    try {
-      const result = await this.client.get(key);
-      return result ? parseInt(result, 10) : 0;
-    } catch (error) {
-      this.logger.error('Failed to get rate limit:', error);
-      return 0;
-    }
-  }
-
-  // General cache operations
-  async set(key: string, value: any, ttl?: number): Promise<void> {
-    try {
-      const serializedValue = JSON.stringify(value);
-      if (ttl) {
-        await this.client.setEx(key, ttl, serializedValue);
-      } else {
-        await this.client.set(key, serializedValue);
-      }
-    } catch (error) {
-      this.logger.error('Failed to set cache value:', error);
-      throw error;
-    }
-  }
-
-  async get<T>(key: string): Promise<T | null> {
-    try {
-      const value = await this.client.get(key);
-      return value ? JSON.parse(value) : null;
-    } catch (error) {
-      this.logger.error('Failed to get cache value:', error);
+      this.logger.warn(`Failed to get key ${key} (Redis not available):`, error.message);
       return null;
+    }
+  }
+
+  async set(key: string, value: string, ttl?: number): Promise<void> {
+    try {
+      if (!this.redis) return;
+      if (ttl) {
+        await this.redis.setex(key, ttl, value);
+      } else {
+        await this.redis.set(key, value);
+      }
+    } catch (error) {
+      this.logger.warn(`Failed to set key ${key} (Redis not available):`, error.message);
     }
   }
 
   async del(key: string): Promise<void> {
     try {
-      await this.client.del(key);
+      if (!this.redis) return;
+      await this.redis.del(key);
     } catch (error) {
-      this.logger.error('Failed to delete cache value:', error);
-      throw error;
+      this.logger.warn(`Failed to delete key ${key} (Redis not available):`, error.message);
     }
   }
 
   async exists(key: string): Promise<boolean> {
     try {
-      const result = await this.client.exists(key);
+      if (!this.redis) return false;
+      const result = await this.redis.exists(key);
       return result === 1;
     } catch (error) {
-      this.logger.error('Failed to check if key exists:', error);
+      this.logger.warn(`Failed to check existence of key ${key} (Redis not available):`, error.message);
       return false;
     }
   }
 
-  // Hash operations
-  async hSet(key: string, field: string, value: any): Promise<void> {
+  async setRefreshToken(userId: string, refreshToken: string, ttl: number): Promise<void> {
+    const key = `refresh_token:${userId}`;
+    await this.set(key, refreshToken, ttl);
+  }
+
+  async getRefreshToken(userId: string): Promise<string | null> {
+    const key = `refresh_token:${userId}`;
+    return await this.get(key);
+  }
+
+  async deleteRefreshToken(userId: string): Promise<void> {
+    const key = `refresh_token:${userId}`;
+    await this.del(key);
+  }
+
+  async blacklistToken(token: string, ttl: number): Promise<void> {
+    const key = `blacklist:${token}`;
+    await this.set(key, '1', ttl);
+  }
+
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    const key = `blacklist:${token}`;
+    return await this.exists(key);
+  }
+
+  async setUserSession(userId: string, sessionData: any, ttl: number): Promise<void> {
+    const key = `session:${userId}`;
+    await this.set(key, JSON.stringify(sessionData), ttl);
+  }
+
+  async getUserSession(userId: string): Promise<any | null> {
+    const key = `session:${userId}`;
+    const data = await this.get(key);
+    return data ? JSON.parse(data) : null;
+  }
+
+  async deleteUserSession(userId: string): Promise<void> {
+    const key = `session:${userId}`;
+    await this.del(key);
+  }
+
+  async incrementLoginAttempts(ip: string): Promise<number> {
+    const key = `login_attempts:${ip}`;
+    const attempts = await this.redis.incr(key);
+    if (attempts === 1) {
+      await this.redis.expire(key, 900); // 15 minutes
+    }
+    return attempts;
+  }
+
+  async resetLoginAttempts(ip: string): Promise<void> {
+    const key = `login_attempts:${ip}`;
+    await this.del(key);
+  }
+
+  async getLoginAttempts(ip: string): Promise<number> {
+    const key = `login_attempts:${ip}`;
+    const attempts = await this.get(key);
+    return attempts ? parseInt(attempts, 10) : 0;
+  }
+
+  async setCache(key: string, data: any, ttl: number = 3600): Promise<void> {
+    await this.set(key, JSON.stringify(data), ttl);
+  }
+
+  async getCache(key: string): Promise<any | null> {
+    const data = await this.get(key);
+    return data ? JSON.parse(data) : null;
+  }
+
+  async deleteCache(key: string): Promise<void> {
+    await this.del(key);
+  }
+
+  async flushAll(): Promise<void> {
     try {
-      const serializedValue = JSON.stringify(value);
-      await this.client.hSet(key, field, serializedValue);
+      await this.redis.flushall();
     } catch (error) {
-      this.logger.error('Failed to set hash field:', error);
-      throw error;
+      this.logger.error('Failed to flush Redis:', error);
     }
   }
 
-  async hGet<T>(key: string, field: string): Promise<T | null> {
-    try {
-      const value = await this.client.hGet(key, field);
-      return value ? JSON.parse(value) : null;
-    } catch (error) {
-      this.logger.error('Failed to get hash field:', error);
-      return null;
-    }
-  }
-
-  async hDel(key: string, field: string): Promise<void> {
-    try {
-      await this.client.hDel(key, field);
-    } catch (error) {
-      this.logger.error('Failed to delete hash field:', error);
-      throw error;
-    }
-  }
-
-  async hGetAll<T>(key: string): Promise<Record<string, T>> {
-    try {
-      const result = await this.client.hGetAll(key);
-      const parsed: Record<string, T> = {};
-      
-      for (const [field, value] of Object.entries(result)) {
-        try {
-          parsed[field] = JSON.parse(value);
-        } catch {
-          parsed[field] = value as T;
-        }
-      }
-      
-      return parsed;
-    } catch (error) {
-      this.logger.error('Failed to get all hash fields:', error);
-      return {};
-    }
-  }
-
-  // List operations
-  async lPush(key: string, ...values: any[]): Promise<number> {
-    try {
-      const serializedValues = values.map(v => JSON.stringify(v));
-      return await this.client.lPush(key, serializedValues);
-    } catch (error) {
-      this.logger.error('Failed to push to list:', error);
-      throw error;
-    }
-  }
-
-  async lPop<T>(key: string): Promise<T | null> {
-    try {
-      const value = await this.client.lPop(key);
-      return value ? JSON.parse(value) : null;
-    } catch (error) {
-      this.logger.error('Failed to pop from list:', error);
-      return null;
-    }
-  }
-
-  async lRange<T>(key: string, start: number, stop: number): Promise<T[]> {
-    try {
-      const values = await this.client.lRange(key, start, stop);
-      return values.map(v => JSON.parse(v));
-    } catch (error) {
-      this.logger.error('Failed to get list range:', error);
-      return [];
-    }
-  }
-
-  // Set operations
-  async sAdd(key: string, ...members: any[]): Promise<number> {
-    try {
-      const serializedMembers = members.map(m => JSON.stringify(m));
-      return await this.client.sAdd(key, serializedMembers);
-    } catch (error) {
-      this.logger.error('Failed to add to set:', error);
-      throw error;
-    }
-  }
-
-  async sIsMember(key: string, member: any): Promise<boolean> {
-    try {
-      const serializedMember = JSON.stringify(member);
-      return await this.client.sIsMember(key, serializedMember);
-    } catch (error) {
-      this.logger.error('Failed to check set membership:', error);
-      return false;
-    }
-  }
-
-  async sMembers<T>(key: string): Promise<T[]> {
-    try {
-      const members = await this.client.sMembers(key);
-      return members.map(m => JSON.parse(m));
-    } catch (error) {
-      this.logger.error('Failed to get set members:', error);
-      return [];
-    }
-  }
-
-  async sRem(key: string, ...members: any[]): Promise<number> {
-    try {
-      const serializedMembers = members.map(m => JSON.stringify(m));
-      return await this.client.sRem(key, serializedMembers);
-    } catch (error) {
-      this.logger.error('Failed to remove from set:', error);
-      throw error;
-    }
+  async disconnect(): Promise<void> {
+    await this.redis.disconnect();
   }
 }

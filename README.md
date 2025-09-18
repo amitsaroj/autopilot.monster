@@ -1,306 +1,387 @@
-# 🚀 Autopilot Monster - AI Marketplace Platform
+# Autopilot.Monster - Enterprise AI Automation Platform
 
-A comprehensive full-stack SaaS ecommerce marketplace for AI agents, n8n workflows, and automation tools built with modern microservices architecture.
+## 🚀 Overview
 
-## 🏗️ Architecture Overview
+Autopilot.Monster is a comprehensive enterprise-grade AI automation platform that provides a marketplace for AI agents, n8n workflows, and automation templates. Built with modern microservices architecture, it offers a complete solution for businesses looking to automate their operations.
 
-### Frontend
-- **Framework**: Next.js 14 with App Router (TypeScript, SSR/SSG)
-- **Styling**: SCSS with ITCSS methodology, modular CSS modules
-- **Animations**: Framer Motion, Three.js, GSAP, Lottie
-- **State Management**: Zustand for client state, React Query for server state
-- **Authentication**: JWT with OAuth (Google, GitHub)
-- **Validation**: React Hook Form with Zod schemas
-- **UI Components**: Radix UI primitives with custom design system
+## 🏗️ Architecture
 
-### Backend Microservices
-- **API Gateway**: NestJS with gRPC clients, JWT auth, rate limiting
-- **Auth Service**: User management, authentication, authorization
-- **Catalog Service**: Product management, search, categories
-- **Payment Service**: Stripe/Razorpay integration, orders, subscriptions
-- **License Service**: Software licensing and activation
-- **Notification Service**: Email, SMS, push notifications
+### Microservices Architecture
+- **API Gateway** (Port 3001) - Central entry point, routing, authentication
+- **Auth Service** (Port 3002) - Authentication, authorization, user management
+- **Catalog Service** (Port 3003) - Products, categories, reviews, search
+- **Payment Service** (Port 3004) - Stripe, Razorpay, subscriptions, billing
+- **License Service** (Port 3005) - License management, validation, tracking
+- **Notification Service** (Port 3006) - Email, SMS, push notifications
+- **User Service** (Port 3007) - User profiles, preferences, analytics
+- **Vendor Service** (Port 3008) - Vendor management, KYC, payouts
+- **Admin Service** (Port 3009) - Admin panel, system management
+- **Content Service** (Port 3010) - Blog, help center, tutorials, resources
 
-### Infrastructure
-- **Databases**: MongoDB (primary), Redis (cache/sessions), Elasticsearch (search)
-- **Message Queue**: Kafka for event-driven communication
-- **Communication**: gRPC for inter-service communication
-- **Containerization**: Docker with Docker Compose
-- **Monitoring**: OpenTelemetry, health checks, logging
+### Technology Stack
+- **Backend**: NestJS, TypeScript, MongoDB, Redis, Kafka
+- **Frontend**: Next.js 15, React, TypeScript, SCSS, Framer Motion
+- **Database**: MongoDB with Mongoose ODM
+- **Cache**: Redis for session management and caching
+- **Message Queue**: Apache Kafka for event-driven architecture
+- **Search**: Elasticsearch for product search and analytics
+- **Authentication**: JWT with role-based access control
+- **Payments**: Stripe and Razorpay integration
+- **Documentation**: Unified Swagger/OpenAPI documentation
 
-## 📁 Project Structure
-
-```
-autopilot.monster/
-├── apps/
-│   └── customer-portal/          # Next.js frontend application
-│       ├── src/
-│       │   ├── app/              # App Router pages
-│       │   ├── components/       # Reusable UI components
-│       │   ├── styles/           # SCSS files (ITCSS structure)
-│       │   └── lib/              # Utilities and configurations
-│       ├── public/               # Static assets
-│       └── package.json
-├── services/
-│   ├── api-gateway/              # Main API Gateway service
-│   ├── auth-service/             # Authentication microservice
-│   ├── catalog-service/          # Product catalog microservice
-│   ├── payment-service/          # Payment processing microservice
-│   ├── license-service/          # Software licensing microservice
-│   └── notification-service/     # Notification microservice
-├── shared/
-│   └── proto/                    # Protocol Buffer definitions
-│       ├── auth.proto            # Authentication service contracts
-│       ├── catalog.proto         # Catalog service contracts
-│       ├── payment.proto         # Payment service contracts
-│       ├── license.proto         # License service contracts
-│       ├── notification.proto    # Notification service contracts
-│       └── common.proto          # Common data types
-├── infrastructure/               # Infrastructure configurations
-├── docker-compose.yml            # Multi-service container setup
-└── package.json                  # Root workspace configuration
-```
-
-## 🛠️ Technology Stack
-
-### Frontend Technologies
-- **Next.js 14**: React framework with App Router, SSR, and SSG
-- **TypeScript**: Type-safe development
-- **SCSS**: Advanced CSS with variables, mixins, and modular architecture
-- **Framer Motion**: Smooth animations and transitions
-- **Three.js**: 3D graphics and WebGL animations
-- **React Query**: Server state management and caching
-- **Zustand**: Lightweight client state management
-- **React Hook Form + Zod**: Form handling with validation
-- **Radix UI**: Accessible headless UI components
-
-### Backend Technologies
-- **NestJS**: Enterprise-grade Node.js framework
-- **gRPC**: High-performance RPC framework
-- **MongoDB**: Primary database with Mongoose ODM
-- **Redis**: Caching, sessions, and rate limiting
-- **Kafka**: Event streaming and message queuing
-- **JWT**: JSON Web Tokens for authentication
-- **Stripe & Razorpay**: Payment processing
-- **Nodemailer**: Email service
-- **Sharp**: Image processing
-- **AWS SDK**: File storage and cloud services
-
-### DevOps & Infrastructure
-- **Docker**: Containerization
-- **Docker Compose**: Multi-container orchestration
-- **Elasticsearch**: Search and analytics
-- **NATS**: Lightweight messaging system
-- **Winston**: Logging framework
-- **Class Validator**: Request validation
-- **Helmet**: Security middleware
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm
+- Node.js 18+ 
 - Docker and Docker Compose
-- Git
+- MongoDB 7.0+
+- Redis 7.2+
+- Apache Kafka
+- Elasticsearch 8.11+
 
 ### Installation
 
 1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd autopilot.monster
-   ```
+```bash
+git clone https://github.com/your-org/autopilot.monster.git
+cd autopilot.monster
+```
 
-2. **Install dependencies**
-   ```bash
-   # Install root dependencies
-   npm install
-   
-   # Install frontend dependencies
-   cd apps/customer-portal
-   npm install
-   
-   # Install backend service dependencies
-   cd ../../services/api-gateway
-   npm install
-   
-   cd ../auth-service
-   npm install
-   ```
+2. **Start infrastructure services**
+```bash
+docker-compose up -d mongodb redis kafka elasticsearch
+```
 
-3. **Environment Setup**
-   Create `.env` files in each service directory:
-   
-   **API Gateway (.env)**
-   ```env
-   PORT=3001
-   NODE_ENV=development
-   JWT_SECRET=your-super-secret-jwt-key
-   MONGODB_URI=mongodb://admin:password123@localhost:27017/autopilot?authSource=admin
-   REDIS_URL=redis://:redis123@localhost:6379
-   KAFKA_BROKERS=localhost:9092
-   ```
-   
-   **Auth Service (.env)**
-   ```env
-   PORT=3002
-   NODE_ENV=development
-   JWT_SECRET=your-super-secret-jwt-key
-   MONGODB_URI=mongodb://admin:password123@localhost:27017/autopilot_auth?authSource=admin
-   REDIS_URL=redis://:redis123@localhost:6379
-   KAFKA_BROKERS=localhost:9092
-   GOOGLE_CLIENT_ID=your-google-client-id
-   GOOGLE_CLIENT_SECRET=your-google-client-secret
-   ```
+3. **Install dependencies**
+```bash
+# Install root dependencies
+npm install
 
-4. **Start Infrastructure Services**
-   ```bash
-   # Start databases and message brokers
-   docker compose up -d mongodb redis kafka elasticsearch nats
-   ```
+# Install frontend dependencies
+cd frontend
+npm install
 
-5. **Start Backend Services**
-   ```bash
-   # Terminal 1: API Gateway
-   cd services/api-gateway
-   npm run start:dev
-   
-   # Terminal 2: Auth Service
-   cd services/auth-service
-   npm run start:dev
-   ```
+# Install service dependencies
+cd ../services/api-gateway
+npm install
 
-6. **Start Frontend**
-   ```bash
-   # Terminal 3: Frontend
-   cd apps/customer-portal
-   npm run dev
-   ```
+cd ../auth-service
+npm install
 
-### Access Points
-- **Frontend**: http://localhost:3000
-- **API Gateway**: http://localhost:3001
-- **API Documentation**: http://localhost:3001/api/docs
-- **Auth Service**: http://localhost:3002
+cd ../catalog-service
+npm install
 
-## 📋 Features Implemented
+cd ../payment-service
+npm install
 
-### Frontend Features ✅
-- **Landing Page**: Futuristic design with Three.js animations
-- **User Authentication**: Login, register, password reset with OAuth
-- **Product Marketplace**: Browse AI agents and workflows
-- **User Dashboard**: Profile management, orders, downloads
-- **Vendor Dashboard**: Product management, analytics
-- **Admin Panel**: User and product administration
-- **Shopping Cart**: Add to cart, checkout process
-- **Payment Integration**: Stripe and Razorpay support
-- **Responsive Design**: Mobile-first approach
-- **SEO Optimization**: Meta tags, structured data, sitemap
-- **Complete Page Set**: 25+ pages including legal, help, etc.
+cd ../user-service
+npm install
 
-### Backend Features ✅
-- **API Gateway**: Centralized routing, authentication, rate limiting
-- **Auth Service**: JWT authentication, OAuth, user management
-- **gRPC Communication**: Inter-service communication
-- **Event-Driven Architecture**: Kafka message queues
-- **Comprehensive Validation**: Input validation with class-validator
-- **Health Monitoring**: Health checks and metrics
-- **Security**: Helmet, CORS, input sanitization
-- **Documentation**: Swagger API documentation
-- **Database Models**: MongoDB schemas with validation
-- **Caching**: Redis for sessions and rate limiting
+cd ../vendor-service
+npm install
+```
 
-### Infrastructure ✅
-- **Docker Compose**: Multi-service development environment
-- **Protocol Buffers**: Type-safe service contracts
-- **Microservices**: Scalable service architecture
-- **Event Streaming**: Kafka for async communication
-- **Search Engine**: Elasticsearch integration ready
-- **Monitoring**: Structured logging and health checks
+4. **Environment Configuration**
+```bash
+# Copy environment files
+cp .env.example .env
+cp frontend/.env.example frontend/.env.local
+cp services/api-gateway/.env.example services/api-gateway/.env
+cp services/auth-service/.env.example services/auth-service/.env
+cp services/catalog-service/.env.example services/catalog-service/.env
+cp services/payment-service/.env.example services/payment-service/.env
+cp services/user-service/.env.example services/user-service/.env
+cp services/vendor-service/.env.example services/vendor-service/.env
+```
 
-## 🔧 API Endpoints
+5. **Start all services**
+```bash
+# Start all services with Docker Compose
+docker-compose up -d
 
-### Authentication API
-- `POST /api/v1/auth/register` - User registration
-- `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/refresh` - Refresh JWT token
-- `POST /api/v1/auth/logout` - User logout
-- `POST /api/v1/auth/forgot-password` - Password reset request
-- `POST /api/v1/auth/reset-password` - Reset password
-- `GET /api/v1/auth/profile` - Get user profile
-- `POST /api/v1/auth/profile` - Update user profile
+# Or start services individually
+npm run start:dev
+```
 
-### Health Monitoring
-- `GET /health` - Basic health check
-- `GET /health/detailed` - Detailed health information
-- `GET /health/ready` - Readiness probe
-- `GET /health/live` - Liveness probe
+6. **Access the application**
+- Frontend: http://localhost:3000
+- API Gateway: http://localhost:3001
+- Swagger Documentation: http://localhost:3001/api-docs
+
+## 📚 API Documentation
+
+### Unified Swagger Documentation
+Access the comprehensive API documentation at: **http://localhost:3001/api-docs**
+
+The unified Swagger documentation includes:
+- All microservice endpoints
+- Authentication and authorization
+- Request/response schemas
+- Error handling
+- Interactive API testing
+
+### Key API Endpoints
+
+#### Authentication
+```
+POST   /api/v1/auth/register
+POST   /api/v1/auth/login
+POST   /api/v1/auth/logout
+POST   /api/v1/auth/refresh
+GET    /api/v1/auth/profile
+```
+
+#### Products
+```
+GET    /api/v1/products
+GET    /api/v1/products/:id
+GET    /api/v1/products/search
+GET    /api/v1/products/categories
+POST   /api/v1/products/:id/reviews
+```
+
+#### Orders
+```
+POST   /api/v1/orders
+GET    /api/v1/orders
+GET    /api/v1/orders/:id
+PATCH  /api/v1/orders/:id
+```
+
+#### Payments
+```
+POST   /api/v1/payments/create-intent
+POST   /api/v1/payments/confirm
+GET    /api/v1/payments/history
+POST   /api/v1/payments/:id/refund
+```
+
+#### User Management
+```
+GET    /api/v1/users/profile
+PATCH  /api/v1/users/profile
+GET    /api/v1/users/orders
+GET    /api/v1/users/wishlist
+```
+
+#### Vendor Management
+```
+GET    /api/v1/vendors/profile
+PATCH  /api/v1/vendors/profile
+POST   /api/v1/kyc/submit
+GET    /api/v1/analytics/vendor
+```
+
+## 🔐 Authentication & Authorization
+
+### JWT Token Structure
+```json
+{
+  "sub": "user_id",
+  "email": "user@example.com",
+  "role": "user|vendor|admin",
+  "permissions": ["read:products", "write:orders"],
+  "iat": 1640995200,
+  "exp": 1641081600,
+  "iss": "autopilot.monster"
+}
+```
+
+### Role-Based Access Control
+- **User**: Basic access to marketplace, cart, orders
+- **Vendor**: Product management, analytics, payouts
+- **Admin**: Full system access, user management, analytics
+
+## 🛒 Frontend Features
+
+### Marketplace
+- Product browsing and search
+- Category filtering
+- Advanced search with filters
+- Product reviews and ratings
+- Wishlist functionality
+
+### User Dashboard
+- Order history and tracking
+- Download management
+- Profile settings
+- Analytics and insights
+
+### Vendor Portal
+- Product management
+- Sales analytics
+- KYC verification
+- Payout management
+
+### Admin Panel
+- User management
+- Vendor approval
+- System analytics
+- Content management
+
+## 💳 Payment Integration
+
+### Supported Payment Methods
+- **Stripe**: Credit cards, digital wallets
+- **Razorpay**: Indian payment methods
+- **Subscription Management**: Recurring billing
+- **Refund Processing**: Automated refund handling
+
+### Pricing Models
+- One-time purchases
+- Monthly subscriptions
+- Annual subscriptions
+- Enterprise licensing
+
+## 🔍 Search & Analytics
+
+### Elasticsearch Integration
+- Full-text product search
+- Faceted search with filters
+- Search analytics
+- Recommendation engine
+
+### Analytics Features
+- User behavior tracking
+- Sales analytics
+- Performance metrics
+- Custom reporting
+
+## 🚀 Deployment
+
+### Docker Deployment
+```bash
+# Build and start all services
+docker-compose up -d
+
+# Scale specific services
+docker-compose up -d --scale api-gateway=3
+```
+
+### Production Environment
+1. Set up production environment variables
+2. Configure SSL certificates
+3. Set up monitoring and logging
+4. Configure backup strategies
+5. Set up CI/CD pipelines
+
+### Environment Variables
+```bash
+# Database
+MONGODB_URI=mongodb://localhost:27017/autopilot
+REDIS_URL=redis://localhost:6379
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key
+JWT_EXPIRATION=24h
+
+# Payment
+STRIPE_SECRET_KEY=sk_live_...
+RAZORPAY_KEY_ID=rzp_live_...
+
+# Email
+SMTP_HOST=smtp.gmail.com
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+```
 
 ## 🧪 Testing
 
+### Running Tests
 ```bash
+# Run all tests
+npm test
+
+# Run specific service tests
+cd services/auth-service
+npm test
+
 # Run frontend tests
-cd apps/customer-portal
+cd frontend
 npm test
 
-# Run backend service tests
-cd services/api-gateway
-npm test
-
-cd ../auth-service
-npm test
+# Run e2e tests
+npm run test:e2e
 ```
 
-## 📈 Performance & Scalability
+### Test Coverage
+- Unit tests for all services
+- Integration tests for API endpoints
+- E2E tests for critical user flows
+- Performance testing
 
-- **Frontend**: SSR/SSG with Next.js for optimal loading
-- **Backend**: Horizontal scaling with load balancers
-- **Database**: MongoDB sharding and read replicas
-- **Caching**: Redis for session and data caching
-- **CDN**: Static asset delivery optimization
-- **Search**: Elasticsearch for fast product search
+## 📊 Monitoring & Observability
 
-## 🔒 Security Features
+### Health Checks
+- Service health endpoints
+- Database connectivity
+- External service status
+- Resource utilization
 
-- **Authentication**: JWT with refresh tokens
-- **Authorization**: Role-based access control
-- **Rate Limiting**: API rate limiting and DDoS protection
-- **Input Validation**: Comprehensive request validation
-- **Security Headers**: Helmet.js security middleware
-- **CORS**: Configured cross-origin resource sharing
-- **SQL Injection**: MongoDB injection prevention
-- **XSS Protection**: Content Security Policy
+### Logging
+- Structured JSON logging
+- Request/response logging
+- Error tracking with Sentry
+- Performance metrics
 
-## 🌐 Deployment
+### Metrics
+- API response times
+- Error rates
+- User activity
+- System resource usage
 
-### Production Deployment
-1. **Environment Variables**: Set production environment variables
-2. **Database Setup**: Configure MongoDB Atlas or self-hosted
-3. **Container Registry**: Push Docker images to registry
-4. **Orchestration**: Deploy with Kubernetes or Docker Swarm
-5. **Load Balancer**: Configure nginx or cloud load balancer
-6. **SSL/TLS**: Set up HTTPS certificates
-7. **Monitoring**: Configure logging and monitoring tools
+## 🔧 Development
 
-### Cloud Deployment Options
-- **AWS**: EKS, RDS, ElastiCache, ALB
-- **Google Cloud**: GKE, Cloud SQL, Memorystore
-- **Azure**: AKS, Cosmos DB, Redis Cache
-- **Digital Ocean**: Kubernetes, Managed Databases
+### Code Structure
+```
+autopilot.monster/
+├── frontend/                 # Next.js frontend application
+├── services/                 # Microservices
+│   ├── api-gateway/         # API Gateway service
+│   ├── auth-service/        # Authentication service
+│   ├── catalog-service/     # Product catalog service
+│   ├── payment-service/     # Payment processing service
+│   ├── user-service/        # User management service
+│   ├── vendor-service/      # Vendor management service
+│   └── ...
+├── shared/                  # Shared utilities and types
+├── docs/                    # Documentation
+└── infrastructure/          # Infrastructure configuration
+```
 
-## 📚 Documentation
+### Development Commands
+```bash
+# Start development environment
+npm run dev
 
-- **API Documentation**: Available at `/api/docs` when running
-- **Protocol Buffers**: Service contracts in `shared/proto/`
-- **Component Documentation**: Storybook setup available
-- **Architecture Decisions**: Decision records in `docs/`
+# Start specific service
+cd services/auth-service
+npm run start:dev
+
+# Build for production
+npm run build
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+### Code Standards
+- TypeScript for type safety
+- ESLint for code quality
+- Prettier for code formatting
+- Conventional commits for commit messages
 
 ## 📄 License
 
@@ -308,35 +389,32 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-For support and questions:
-- **Email**: support@autopilot.monster
 - **Documentation**: [docs.autopilot.monster](https://docs.autopilot.monster)
-- **Issues**: GitHub Issues
-- **Community**: Discord/Slack community
+- **API Documentation**: [api-docs.autopilot.monster](https://api-docs.autopilot.monster)
+- **Support Email**: support@autopilot.monster
+- **Community**: [Discord](https://discord.gg/autopilot-monster)
+
+## 🎯 Roadmap
+
+### Phase 1 (Current)
+- ✅ Core microservices architecture
+- ✅ User authentication and authorization
+- ✅ Product catalog and marketplace
+- ✅ Payment processing
+- ✅ Basic admin panel
+
+### Phase 2 (Q2 2024)
+- 🔄 Advanced analytics and reporting
+- 🔄 Real-time notifications
+- 🔄 Mobile application
+- 🔄 API rate limiting and quotas
+
+### Phase 3 (Q3 2024)
+- 📋 AI-powered recommendations
+- 📋 Advanced workflow automation
+- 📋 Multi-tenant architecture
+- 📋 Enterprise SSO integration
 
 ---
 
-## 🎯 Next Steps
-
-To complete the platform:
-
-1. **Complete Remaining Services**:
-   - Catalog Service (product management)
-   - Payment Service (Stripe/Razorpay integration)
-   - License Service (software licensing)
-   - Notification Service (email/SMS)
-
-2. **Add Production Features**:
-   - OpenTelemetry monitoring
-   - Kubernetes deployment configs
-   - CI/CD pipelines
-   - Automated testing
-   - Security scanning
-
-3. **Enhance Frontend**:
-   - E2E testing with Playwright
-   - Storybook component documentation
-   - Progressive Web App features
-   - Advanced animations
-
-Built with ❤️ for the AI automation community.
+**Built with ❤️ by the Autopilot.Monster Team**

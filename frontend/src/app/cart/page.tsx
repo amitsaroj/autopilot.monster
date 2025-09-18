@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Gift, Shield, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './Cart.module.scss'
+import { orderApi } from '@/lib/api/client'
 
 interface CartItem {
   id: string
@@ -72,18 +73,38 @@ export default function CartPage() {
   const [promoCode, setPromoCode] = useState('')
   const [promoApplied, setPromoApplied] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [cartData, setCartData] = useState(null)
+
+  // Load cart data from localStorage or API
+  useEffect(() => {
+    const loadCartData = () => {
+      try {
+        const savedCart = localStorage.getItem('cart')
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart)
+          setCartItems(parsedCart)
+        }
+      } catch (error) {
+        console.error('Failed to load cart data:', error)
+      }
+    }
+
+    loadCartData()
+  }, [])
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) return
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
+    const updatedItems = cartItems.map(item =>
+      item.id === id ? { ...item, quantity: newQuantity } : item
     )
+    setCartItems(updatedItems)
+    localStorage.setItem('cart', JSON.stringify(updatedItems))
   }
 
   const removeItem = (id: string) => {
-    setCartItems(items => items.filter(item => item.id !== id))
+    const updatedItems = cartItems.filter(item => item.id !== id)
+    setCartItems(updatedItems)
+    localStorage.setItem('cart', JSON.stringify(updatedItems))
   }
 
   const applyPromoCode = () => {
@@ -97,12 +118,37 @@ export default function CartPage() {
   const tax = (subtotal - discount) * 0.08
   const total = subtotal - discount + tax
 
-  const proceedToCheckout = () => {
+  const proceedToCheckout = async () => {
     setIsLoading(true)
-    // Simulate navigation to checkout
-    setTimeout(() => {
-      window.location.href = '/checkout'
-    }, 1000)
+    try {
+      // Create order with cart items
+      const orderData = {
+        items: cartItems.map(item => ({
+          productId: item.id,
+          productName: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity
+        })),
+        totalAmount: total,
+        currency: 'USD',
+        billing: {
+          // This would come from user profile
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com'
+        }
+      }
+
+      const order = await orderApi.createOrder(orderData)
+      
+      // Clear cart and redirect to checkout
+      localStorage.removeItem('cart')
+      window.location.href = `/checkout?orderId=${order.id}`
+    } catch (error) {
+      console.error('Failed to create order:', error)
+      setIsLoading(false)
+    }
   }
 
   const containerVariants = {

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { JwtModule } from '@nestjs/jwt';
 import { CatalogController } from './catalog.controller';
 import { CatalogService } from './catalog.service';
 import { Product, ProductSchema } from './schemas/product.schema';
@@ -14,6 +15,15 @@ import { RedisModule } from '../redis/redis.module';
       { name: Product.name, schema: ProductSchema },
       { name: Category.name, schema: CategorySchema },
     ]),
+    JwtModule.registerAsync({
+      useFactory: (configService) => ({
+        secret: configService.get('jwt.secret'),
+        signOptions: {
+          expiresIn: configService.get('jwt.expiresIn'),
+        },
+      }),
+      inject: ['ConfigService'],
+    }),
     KafkaModule,
     ElasticsearchModule,
     RedisModule,
