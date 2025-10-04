@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Plus,
@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/Button/Button'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './Vendor.module.scss'
+import { vendorApi } from '@/lib/api/client'
 
 interface Product {
   id: string
@@ -123,8 +124,35 @@ export default function VendorPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'analytics' | 'earnings'>('overview')
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'pending' | 'rejected' | 'draft'>('all')
+  const [vendorProfileData, setVendorProfileData] = useState(vendorProfile)
+  const [products, setProducts] = useState(vendorProducts)
+  const [analyticsData, setAnalyticsData] = useState(analytics)
+  const [loading, setLoading] = useState(true)
 
-  const filteredProducts = vendorProducts.filter(product => {
+  // Load vendor data from API
+  useEffect(() => {
+    const loadVendorData = async () => {
+      try {
+        setLoading(true)
+        const [profileData, productsData, analyticsData] = await Promise.all([
+          vendorApi.getProfile(),
+          vendorApi.getProducts(),
+          vendorApi.getAnalytics()
+        ])
+        setVendorProfileData(profileData)
+        setProducts(productsData.products || productsData)
+        setAnalyticsData(analyticsData)
+      } catch (error) {
+        console.error('Failed to load vendor data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadVendorData()
+  }, [])
+
+  const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || product.status === statusFilter
     return matchesSearch && matchesStatus
@@ -185,19 +213,19 @@ export default function VendorPage() {
               )}
             </div>
             <div className={styles.vendorDetails}>
-              <h1 className={styles.vendorName}>{vendorProfile.name}</h1>
-              <p className={styles.vendorDescription}>{vendorProfile.description}</p>
+              <h1 className={styles.vendorName}>{vendorProfileData.name}</h1>
+              <p className={styles.vendorDescription}>{vendorProfileData.description}</p>
               <div className={styles.vendorMeta}>
                 <span className={styles.joinDate}>
                   <Calendar size={14} />
-                  Vendor since {new Date(vendorProfile.joinDate).toLocaleDateString('en-US', { 
+                  Vendor since {new Date(vendorProfileData.joinDate).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long' 
                   })}
                 </span>
                 <span className={styles.totalProducts}>
                   <Package size={14} />
-                  {analytics.totalProducts} Products
+                  {analyticsData.totalProducts} Products
                 </span>
               </div>
             </div>
@@ -223,7 +251,7 @@ export default function VendorPage() {
               <DollarSign size={24} />
             </div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>${analytics.totalRevenue.toLocaleString()}</div>
+              <div className={styles.statValue}>${analyticsData.totalRevenue.toLocaleString()}</div>
               <div className={styles.statLabel}>Total Revenue</div>
               <div className={styles.statTrend}>
                 <TrendingUp size={12} />
@@ -237,7 +265,7 @@ export default function VendorPage() {
               <Download size={24} />
             </div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>{analytics.totalDownloads.toLocaleString()}</div>
+              <div className={styles.statValue}>{analyticsData.totalDownloads.toLocaleString()}</div>
               <div className={styles.statLabel}>Total Downloads</div>
               <div className={styles.statTrend}>
                 <TrendingUp size={12} />
@@ -251,7 +279,7 @@ export default function VendorPage() {
               <Package size={24} />
             </div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>{analytics.totalProducts}</div>
+              <div className={styles.statValue}>{analyticsData.totalProducts}</div>
               <div className={styles.statLabel}>Active Products</div>
               <div className={styles.statTrend}>
                 <TrendingUp size={12} />
@@ -265,7 +293,7 @@ export default function VendorPage() {
               <Star size={24} />
             </div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>{analytics.averageRating}</div>
+              <div className={styles.statValue}>{analyticsData.averageRating}</div>
               <div className={styles.statLabel}>Average Rating</div>
               <div className={styles.statTrend}>
                 <TrendingUp size={12} />
@@ -346,7 +374,7 @@ export default function VendorPage() {
                   <div className={styles.topProducts}>
                     <h3 className={styles.sectionTitle}>Top Performing Products</h3>
                     <div className={styles.productList}>
-                      {vendorProducts
+                      {products
                         .filter(p => p.status === 'active')
                         .sort((a, b) => b.revenue - a.revenue)
                         .slice(0, 3)
@@ -511,7 +539,7 @@ export default function VendorPage() {
                   </div>
                   <div className={styles.earningCard}>
                     <div className={styles.earningLabel}>Total Lifetime Earnings</div>
-                    <div className={styles.earningValue}>$801,729.56</div>
+                    <div className={styles.earningValue}>${analyticsData.totalRevenue.toLocaleString()}</div>
                   </div>
                 </div>
               </div>

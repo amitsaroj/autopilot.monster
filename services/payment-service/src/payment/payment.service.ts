@@ -27,7 +27,7 @@ export class PaymentService {
   ) {
     // Initialize Stripe
     this.stripe = new Stripe(this.configService.get('stripe.secretKey'), {
-      apiVersion: '2023-10-16',
+      apiVersion: '2023-08-16',
     });
 
     // Initialize Razorpay
@@ -259,9 +259,7 @@ export class PaymentService {
           items: [{
             price_data: {
               currency: currency || 'usd',
-              product_data: {
-                name: planName,
-              },
+              product: 'prod_' + planId, // Use planId as product identifier
               unit_amount: Math.round(amount * 100),
               recurring: {
                 interval: interval === 'monthly' ? 'month' : 'year',

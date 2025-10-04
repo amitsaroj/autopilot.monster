@@ -14,7 +14,9 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
+import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import styles from './Login.module.scss'
 
 interface LoginForm {
@@ -30,8 +32,9 @@ export default function LoginPage() {
     rememberMe: false
   })
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const { login, isLoading } = useAuth()
+  const router = useRouter()
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -57,13 +60,13 @@ export default function LoginPage() {
     
     if (!validateForm()) return
     
-    setIsLoading(true)
+    const result = await login(loginForm.email, loginForm.password)
     
-    // Simulate login process
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    // Redirect to dashboard on success
-    window.location.href = '/dashboard'
+    if (result.success) {
+      router.push('/dashboard')
+    } else {
+      setErrors({ general: result.error || 'Login failed' })
+    }
   }
 
   const handleSocialLogin = (provider: 'google' | 'github') => {
@@ -94,6 +97,13 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleLogin} className={styles.loginForm}>
+              {errors.general && (
+                <div className={styles.errorMessage}>
+                  <AlertCircle size={14} />
+                  {errors.general}
+                </div>
+              )}
+              
               <div className={styles.formGroup}>
                 <label className={styles.label}>
                   <Mail size={16} />

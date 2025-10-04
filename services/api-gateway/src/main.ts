@@ -13,7 +13,7 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT', 3001);
+  const port = configService.get<number>('PORT', 4000);
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
 
   // Security middleware
@@ -67,16 +67,22 @@ async function bootstrap() {
       .addTag('payment', 'Payment and order endpoints')
       .addTag('user', 'User management endpoints')
       .addTag('admin', 'Admin endpoints')
+      .addTag('vendor', 'Vendor management endpoints')
+      .addTag('content', 'Content management endpoints')
+      .addTag('system', 'System and legal endpoints')
+      .addTag('marketplace', 'Marketplace endpoints')
+      .addTag('cart', 'Shopping cart endpoints')
+      .addTag('checkout', 'Checkout and payment endpoints')
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document, {
+    SwaggerModule.setup('api-docs', app, document, {
       swaggerOptions: {
         persistAuthorization: true,
       },
     });
 
-    logger.log(`Swagger documentation available at http://localhost:${port}/api/docs`);
+    logger.log(`Swagger documentation available at http://localhost:${port}/api-docs`);
   }
 
   // Graceful shutdown

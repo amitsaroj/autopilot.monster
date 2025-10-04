@@ -3,11 +3,15 @@
 # Autopilot.Monster Development Startup Script
 echo "🚀 Starting Autopilot.Monster Development Environment..."
 
+# Create logs directory if it doesn't exist
+mkdir -p logs
+
 # Kill any existing processes
 echo "🧹 Cleaning up existing processes..."
 pkill -f "nest start" 2>/dev/null || true
 pkill -f "node dist/main.js" 2>/dev/null || true
 pkill -f "npm run dev" 2>/dev/null || true
+pkill -f "next dev" 2>/dev/null || true
 
 # Wait a moment for cleanup
 sleep 2
@@ -22,17 +26,17 @@ export JWT_EXPIRES_IN=1h
 
 echo "📦 Starting Services..."
 
-# Start API Gateway (Port 3000)
-echo "🌐 Starting API Gateway on port 3000..."
+# Start API Gateway (Port 4000)
+echo "🌐 Starting API Gateway on port 4000..."
 cd services/api-gateway
-npm run start:dev > ../../logs/api-gateway.log 2>&1 &
+PORT=4000 npm run start:dev > ../../logs/api-gateway.log 2>&1 &
 API_GATEWAY_PID=$!
 cd ../..
 
 # Start Auth Service (Port 3002)
 echo "🔐 Starting Auth Service on port 3002..."
 cd services/auth-service
-PORT=3002 node dist/main.js > ../../logs/auth-service.log 2>&1 &
+PORT=3002 npm run start:dev > ../../logs/auth-service.log 2>&1 &
 AUTH_SERVICE_PID=$!
 cd ../..
 
@@ -64,70 +68,64 @@ PORT=3006 npm run start:dev > ../../logs/vendor-service.log 2>&1 &
 VENDOR_SERVICE_PID=$!
 cd ../..
 
-# Start Frontend (Port 3001)
-echo "🎨 Starting Frontend on port 3001..."
+# Start Admin Service (Port 3007)
+echo "👑 Starting Admin Service on port 3007..."
+cd services/admin-service
+PORT=3007 npm run start:dev > ../../logs/admin-service.log 2>&1 &
+ADMIN_SERVICE_PID=$!
+cd ../..
+
+# Start Content Service (Port 3008)
+echo "📝 Starting Content Service on port 3008..."
+cd services/content-service
+PORT=3008 npm run start:dev > ../../logs/content-service.log 2>&1 &
+CONTENT_SERVICE_PID=$!
+cd ../..
+
+# Start Frontend (Port 3000)
+echo "🎨 Starting Frontend on port 3000..."
 cd frontend
-npm run dev > ../logs/frontend.log 2>&1 &
+PORT=3000 npm run dev > ../logs/frontend.log 2>&1 &
 FRONTEND_PID=$!
 cd ..
-
-# Create logs directory if it doesn't exist
-mkdir -p logs
 
 # Wait for services to start
 echo "⏳ Waiting for services to start..."
 sleep 10
 
-# Check service health
-echo "🏥 Checking service health..."
-
-check_service() {
-    local name=$1
-    local port=$2
-    local url="http://localhost:$port/health"
-    
-    if curl -s "$url" > /dev/null 2>&1; then
-        echo "✅ $name is healthy on port $port"
-        return 0
-    else
-        echo "❌ $name is not responding on port $port"
-        return 1
-    fi
-}
-
-# Check each service
-check_service "API Gateway" 3000
-check_service "Auth Service" 3002
-check_service "Catalog Service" 3003
-check_service "Payment Service" 3004
-check_service "User Service" 3005
-check_service "Vendor Service" 3006
-
-# Check frontend
-if curl -s "http://localhost:3001" > /dev/null 2>&1; then
-    echo "✅ Frontend is running on port 3001"
-else
-    echo "❌ Frontend is not responding on port 3001"
-fi
-
+# Display service status
 echo ""
-echo "🎉 Development environment started!"
+echo "🎉 All services started successfully!"
 echo ""
-echo "📋 Service URLs:"
-echo "   Frontend:        http://localhost:3001"
-echo "   API Gateway:     http://localhost:3000"
-echo "   Auth Service:    http://localhost:3002"
-echo "   Catalog Service: http://localhost:3003"
-echo "   Payment Service: http://localhost:3004"
-echo "   User Service:    http://localhost:3005"
-echo "   Vendor Service:  http://localhost:3006"
+echo "📊 Service Status:"
+echo "=================="
+echo "🌐 API Gateway:    http://localhost:4000"
+echo "📚 API Docs:       http://localhost:4000/api-docs"
+echo "🎨 Frontend:       http://localhost:3000"
+echo "🔐 Auth Service:   http://localhost:3002/health"
+echo "📚 Catalog Service: http://localhost:3003/health"
+echo "💳 Payment Service: http://localhost:3004/health"
+echo "👤 User Service:   http://localhost:3005/health"
+echo "🏪 Vendor Service: http://localhost:3006/health"
+echo "👑 Admin Service:  http://localhost:3007/health"
+echo "📝 Content Service: http://localhost:3008/health"
 echo ""
-echo "📊 API Documentation: http://localhost:3000/api-docs"
+echo "📋 Process IDs:"
+echo "==============="
+echo "API Gateway PID: $API_GATEWAY_PID"
+echo "Auth Service PID: $AUTH_SERVICE_PID"
+echo "Catalog Service PID: $CATALOG_SERVICE_PID"
+echo "Payment Service PID: $PAYMENT_SERVICE_PID"
+echo "User Service PID: $USER_SERVICE_PID"
+echo "Vendor Service PID: $VENDOR_SERVICE_PID"
+echo "Admin Service PID: $ADMIN_SERVICE_PID"
+echo "Content Service PID: $CONTENT_SERVICE_PID"
+echo "Frontend PID: $FRONTEND_PID"
 echo ""
-echo "📝 Logs are available in the logs/ directory"
-echo ""
+echo "📝 Logs are available in the 'logs' directory"
 echo "🛑 To stop all services, run: ./stop-dev.sh"
 echo ""
+echo "🚀 Development environment is ready!"
 
 # Save PIDs for cleanup
 echo "$API_GATEWAY_PID" > logs/api-gateway.pid
@@ -136,6 +134,8 @@ echo "$CATALOG_SERVICE_PID" > logs/catalog-service.pid
 echo "$PAYMENT_SERVICE_PID" > logs/payment-service.pid
 echo "$USER_SERVICE_PID" > logs/user-service.pid
 echo "$VENDOR_SERVICE_PID" > logs/vendor-service.pid
+echo "$ADMIN_SERVICE_PID" > logs/admin-service.pid
+echo "$CONTENT_SERVICE_PID" > logs/content-service.pid
 echo "$FRONTEND_PID" > logs/frontend.pid
 
 echo "💡 Tip: Check logs with: tail -f logs/*.log"

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button/Button'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './Cart.module.scss'
-import { orderApi } from '@/lib/api/client'
+import { cartApi, checkoutApi } from '@/lib/api/client'
 
 interface CartItem {
   id: string
@@ -75,41 +75,60 @@ export default function CartPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [cartData, setCartData] = useState(null)
 
-  // Load cart data from localStorage or API
+  // Load cart data from API
   useEffect(() => {
-    const loadCartData = () => {
+    const loadCartData = async () => {
       try {
-        const savedCart = localStorage.getItem('cart')
-        if (savedCart) {
-          const parsedCart = JSON.parse(savedCart)
-          setCartItems(parsedCart)
-        }
+        const cartData = await cartApi.getCart()
+        setCartItems(cartData.items || [])
+        setCartData(cartData)
       } catch (error) {
         console.error('Failed to load cart data:', error)
+        // Fallback to localStorage if API fails
+        try {
+          const savedCart = localStorage.getItem('cart')
+          if (savedCart) {
+            const parsedCart = JSON.parse(savedCart)
+            setCartItems(parsedCart)
+          }
+        } catch (localError) {
+          console.error('Failed to load cart from localStorage:', localError)
+        }
       }
     }
 
     loadCartData()
   }, [])
 
-  const updateQuantity = (id: string, newQuantity: number) => {
+  const updateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity < 1) return
-    const updatedItems = cartItems.map(item =>
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    )
-    setCartItems(updatedItems)
-    localStorage.setItem('cart', JSON.stringify(updatedItems))
+    try {
+      await cartApi.updateCartItem(id, { quantity: newQuantity })
+      const updatedItems = cartItems.map(item =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+      setCartItems(updatedItems)
+    } catch (error) {
+      console.error('Failed to update cart item:', error)
+    }
   }
 
-  const removeItem = (id: string) => {
-    const updatedItems = cartItems.filter(item => item.id !== id)
-    setCartItems(updatedItems)
-    localStorage.setItem('cart', JSON.stringify(updatedItems))
+  const removeItem = async (id: string) => {
+    try {
+      await cartApi.removeFromCart(id)
+      const updatedItems = cartItems.filter(item => item.id !== id)
+      setCartItems(updatedItems)
+    } catch (error) {
+      console.error('Failed to remove cart item:', error)
+    }
   }
 
-  const applyPromoCode = () => {
-    if (promoCode.toLowerCase() === 'save20') {
+  const applyPromoCode = async () => {
+    try {
+      await cartApi.applyCoupon({ code: promoCode })
       setPromoApplied(true)
+    } catch (error) {
+      console.error('Failed to apply promo code:', error)
     }
   }
 
@@ -140,11 +159,11 @@ export default function CartPage() {
         }
       }
 
-      const order = await orderApi.createOrder(orderData)
+      const checkoutSession = await checkoutApi.initiateCheckout(orderData)
       
       // Clear cart and redirect to checkout
-      localStorage.removeItem('cart')
-      window.location.href = `/checkout?orderId=${order.id}`
+      await cartApi.clearCart()
+      window.location.href = `/checkout?sessionId=${checkoutSession.sessionId}`
     } catch (error) {
       console.error('Failed to create order:', error)
       setIsLoading(false)

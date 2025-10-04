@@ -93,10 +93,10 @@ services:
     container_name: autopilot-api-gateway
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "4000:4000"
     environment:
       NODE_ENV: production
-      PORT: 3000
+      PORT: 4000
       MONGODB_URI: mongodb://admin:password123@mongodb:27017/autopilot_gateway?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -316,10 +316,10 @@ services:
     container_name: autopilot-frontend
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3000:3000"
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
     depends_on:
       - api-gateway
     networks:

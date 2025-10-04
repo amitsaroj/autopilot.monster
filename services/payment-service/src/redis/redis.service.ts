@@ -13,7 +13,6 @@ export class RedisService {
       port: this.configService.get('redis.port', 6379),
       password: this.configService.get('redis.password'),
       db: this.configService.get('redis.db', 0),
-      retryDelayOnFailover: 100,
       maxRetriesPerRequest: 3,
     });
 

@@ -1,29 +1,29 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-// Request interceptor to add auth token
+    // Request interceptor to add auth token
 apiClient.interceptors.request.use(
-  (config) => {
+      (config) => {
     // Add auth token if available
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
       }
-    }
-    return config;
-  },
+        }
+        return config;
+      },
   (error) => {
     return Promise.reject(error);
   }
@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
-  async (error) => {
+      async (error) => {
     const originalRequest = error.config;
 
     // Handle 401 errors (unauthorized)
@@ -44,7 +44,7 @@ apiClient.interceptors.response.use(
       try {
         // Try to refresh token
         const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
+          if (refreshToken) {
           const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh`, {
             refreshToken,
           });
@@ -55,23 +55,23 @@ apiClient.interceptors.response.use(
           localStorage.setItem('auth_token', accessToken);
           localStorage.setItem('refresh_token', newRefreshToken);
 
-          // Retry original request
+              // Retry original request
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return apiClient(originalRequest);
         }
-      } catch (refreshError) {
+            } catch (refreshError) {
         // Refresh failed, redirect to login
         if (typeof window !== 'undefined') {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('refresh_token');
-          window.location.href = '/login';
+            window.location.href = '/login';
+          }
         }
-      }
     }
 
-    return Promise.reject(error);
-  }
-);
+        return Promise.reject(error);
+      }
+    );
 
 // Generic API methods
 export const api = {
@@ -184,17 +184,6 @@ export const paymentApi = {
   getSupportedCurrencies: () => api.get('/api/v1/payment/currencies'),
 };
 
-// Vendor API
-export const vendorApi = {
-  getProfile: () => api.get('/api/v1/vendors/profile'),
-  updateProfile: (profileData: any) => api.patch('/api/v1/vendors/profile', profileData),
-  getAnalytics: () => api.get('/api/v1/analytics/vendor'),
-  submitKyc: (documents: any) => api.post('/api/v1/kyc/submit', documents),
-  getKycStatus: () => api.get('/api/v1/kyc/status'),
-  requestPayout: (amount: number) => api.post('/api/v1/payouts/request', { amount }),
-  getPayoutHistory: () => api.get('/api/v1/payouts/history'),
-  getPayoutStats: () => api.get('/api/v1/payouts/stats'),
-};
 
 // Admin API
 export const adminApi = {
@@ -251,71 +240,166 @@ export const adminApi = {
   getSystemStatus: () => api.get('/api/v1/admin/system/status'),
 };
 
-// Content API
-export const contentApi = {
-  // Blog Management
-  getBlogPosts: (query?: any) => api.get('/api/v1/blog/posts', { params: query }),
-  getBlogPost: (slug: string) => api.get(`/api/v1/blog/posts/${slug}`),
-  createBlogPost: (postData: any) => api.post('/api/v1/blog/posts', postData),
-  updateBlogPost: (id: string, postData: any) => api.patch(`/api/v1/blog/posts/${id}`, postData),
-  deleteBlogPost: (id: string) => api.delete(`/api/v1/blog/posts/${id}`),
-  publishBlogPost: (id: string) => api.patch(`/api/v1/blog/posts/${id}/publish`),
-  unpublishBlogPost: (id: string) => api.patch(`/api/v1/blog/posts/${id}/unpublish`),
-  
-  // Help Center
-  getHelpArticles: (query?: any) => api.get('/api/v1/help/articles', { params: query }),
-  getHelpArticle: (id: string) => api.get(`/api/v1/help/articles/${id}`),
-  getHelpCategories: () => api.get('/api/v1/help/categories'),
-  createHelpArticle: (articleData: any) => api.post('/api/v1/help/articles', articleData),
-  updateHelpArticle: (id: string, articleData: any) => api.patch(`/api/v1/help/articles/${id}`, articleData),
-  deleteHelpArticle: (id: string) => api.delete(`/api/v1/help/articles/${id}`),
-  searchHelpArticles: (query: string) => api.get(`/api/v1/help/articles/search?q=${query}`),
-  
-  // Tutorials
-  getTutorials: (query?: any) => api.get('/api/v1/tutorials', { params: query }),
-  getTutorial: (id: string) => api.get(`/api/v1/tutorials/${id}`),
-  createTutorial: (tutorialData: any) => api.post('/api/v1/tutorials', tutorialData),
-  updateTutorial: (id: string, tutorialData: any) => api.patch(`/api/v1/tutorials/${id}`, tutorialData),
-  deleteTutorial: (id: string) => api.delete(`/api/v1/tutorials/${id}`),
-  getTutorialCategories: () => api.get('/api/v1/tutorials/categories'),
-  
-  // Resources
-  getResources: (query?: any) => api.get('/api/v1/resources', { params: query }),
-  getResource: (id: string) => api.get(`/api/v1/resources/${id}`),
-  createResource: (resourceData: any) => api.post('/api/v1/resources', resourceData),
-  updateResource: (id: string, resourceData: any) => api.patch(`/api/v1/resources/${id}`, resourceData),
-  deleteResource: (id: string) => api.delete(`/api/v1/resources/${id}`),
-  downloadResource: (id: string) => api.get(`/api/v1/resources/${id}/download`),
-  
-  // Case Studies
-  getCaseStudies: (query?: any) => api.get('/api/v1/case-studies', { params: query }),
-  getCaseStudy: (id: string) => api.get(`/api/v1/case-studies/${id}`),
-  createCaseStudy: (caseStudyData: any) => api.post('/api/v1/case-studies', caseStudyData),
-  updateCaseStudy: (id: string, caseStudyData: any) => api.patch(`/api/v1/case-studies/${id}`, caseStudyData),
-  deleteCaseStudy: (id: string) => api.delete(`/api/v1/case-studies/${id}`),
-  
-  // Press Releases
-  getPressReleases: (query?: any) => api.get('/api/v1/press', { params: query }),
-  getPressRelease: (id: string) => api.get(`/api/v1/press/${id}`),
-  createPressRelease: (pressData: any) => api.post('/api/v1/press', pressData),
-  updatePressRelease: (id: string, pressData: any) => api.patch(`/api/v1/press/${id}`, pressData),
-  deletePressRelease: (id: string) => api.delete(`/api/v1/press/${id}`),
-  
-  // Careers
-  getJobListings: (query?: any) => api.get('/api/v1/careers/jobs', { params: query }),
-  getJobListing: (id: string) => api.get(`/api/v1/careers/jobs/${id}`),
-  createJobListing: (jobData: any) => api.post('/api/v1/careers/jobs', jobData),
-  updateJobListing: (id: string, jobData: any) => api.patch(`/api/v1/careers/jobs/${id}`, jobData),
-  deleteJobListing: (id: string) => api.delete(`/api/v1/careers/jobs/${id}`),
-  applyForJob: (jobId: string, applicationData: any) => api.post(`/api/v1/careers/jobs/${jobId}/apply`, applicationData),
-  getJobApplications: (query?: any) => api.get('/api/v1/careers/applications', { params: query }),
-};
 
 // System API
 export const systemApi = {
-  getStatus: () => api.get('/api/v1/status'),
-  getHealth: () => api.get('/health'),
-  getServiceHealth: () => api.get('/api-docs/health'),
+  getStatus: () => api.get('/api/v1/system/status'),
+  getHealth: () => api.get('/api/v1/system/health'),
+  getIntegrations: () => api.get('/api/v1/system/integrations'),
+  getIntegrationStatus: (id: string) => api.get(`/api/v1/system/integrations/${id}/status`),
+  connectIntegration: (id: string, data: any) => api.post(`/api/v1/system/integrations/${id}/connect`, data),
+  disconnectIntegration: (id: string) => api.delete(`/api/v1/system/integrations/${id}/disconnect`),
+  getPrivacyPolicy: () => api.get('/api/v1/system/legal/privacy'),
+  getTermsOfService: () => api.get('/api/v1/system/legal/terms'),
+  getCookiePolicy: () => api.get('/api/v1/system/legal/cookies'),
+  getGdprInfo: () => api.get('/api/v1/system/legal/gdpr'),
+  getSecurityPolicy: () => api.get('/api/v1/system/legal/security'),
+  getRefundPolicy: () => api.get('/api/v1/system/legal/refund'),
+  getShippingPolicy: () => api.get('/api/v1/system/legal/shipping'),
+  getAccessibilityStatement: () => api.get('/api/v1/system/legal/accessibility'),
+  getMaintenanceStatus: () => api.get('/api/v1/system/maintenance'),
+  getSystemSettings: () => api.get('/api/v1/system/settings'),
+  updateSystemSettings: (settings: any) => api.put('/api/v1/system/settings', settings),
+};
+
+// Marketplace API
+export const marketplaceApi = {
+  getProducts: (query?: any) => api.get('/api/v1/marketplace/products', { params: query }),
+  getProduct: (id: string) => api.get(`/api/v1/marketplace/products/${id}`),
+  searchProducts: (searchData: any) => api.post('/api/v1/marketplace/search', searchData),
+  getSearchSuggestions: (query: string) => api.get(`/api/v1/marketplace/search/suggestions?q=${query}`),
+  getFeaturedProducts: (query?: any) => api.get('/api/v1/marketplace/featured', { params: query }),
+  getTrendingProducts: (query?: any) => api.get('/api/v1/marketplace/trending', { params: query }),
+  getCategories: () => api.get('/api/v1/marketplace/categories'),
+  getCategoryProducts: (id: string, query?: any) => api.get(`/api/v1/marketplace/categories/${id}/products`, { params: query }),
+  getFilters: (query?: any) => api.get('/api/v1/marketplace/filters', { params: query }),
+  getProductReviews: (id: string, query?: any) => api.get(`/api/v1/marketplace/products/${id}/reviews`, { params: query }),
+  addProductReview: (id: string, review: any) => api.post(`/api/v1/marketplace/products/${id}/reviews`, review),
+  trackProductView: (id: string, data?: any) => api.post(`/api/v1/marketplace/products/${id}/track-view`, data),
+  trackProductDownload: (id: string, data?: any) => api.post(`/api/v1/marketplace/products/${id}/track-download`, data),
+  getVendors: (query?: any) => api.get('/api/v1/marketplace/vendors', { params: query }),
+  getVendor: (id: string) => api.get(`/api/v1/marketplace/vendors/${id}`),
+  getVendorProducts: (id: string, query?: any) => api.get(`/api/v1/marketplace/vendors/${id}/products`, { params: query }),
+  getPopularProducts: (query?: any) => api.get('/api/v1/marketplace/analytics/popular', { params: query }),
+  getRecentProducts: (query?: any) => api.get('/api/v1/marketplace/analytics/recent', { params: query }),
+  getMarketplaceStats: () => api.get('/api/v1/marketplace/analytics/stats'),
+};
+
+// Cart API
+export const cartApi = {
+  getCart: () => api.get('/api/v1/cart'),
+  addToCart: (data: any) => api.post('/api/v1/cart/items', data),
+  updateCartItem: (itemId: string, data: any) => api.put(`/api/v1/cart/items/${itemId}`, data),
+  removeFromCart: (itemId: string) => api.delete(`/api/v1/cart/items/${itemId}`),
+  clearCart: () => api.delete('/api/v1/cart'),
+  applyCoupon: (data: any) => api.post('/api/v1/cart/coupon', data),
+  removeCoupon: () => api.delete('/api/v1/cart/coupon'),
+  getCartSummary: () => api.get('/api/v1/cart/summary'),
+  validateCart: () => api.post('/api/v1/cart/validate'),
+  mergeCart: (data: any) => api.post('/api/v1/cart/merge', data),
+  getCartCount: () => api.get('/api/v1/cart/count'),
+};
+
+// Checkout API
+export const checkoutApi = {
+  initiateCheckout: (data: any) => api.post('/api/v1/checkout/initiate', data),
+  getCheckoutSession: (sessionId: string) => api.get(`/api/v1/checkout/session/${sessionId}`),
+  createPaymentIntent: (data: any) => api.post('/api/v1/checkout/payment-intent', data),
+  confirmPayment: (data: any) => api.post('/api/v1/checkout/payment/confirm', data),
+  cancelPayment: (data: any) => api.post('/api/v1/checkout/payment/cancel', data),
+  getShippingOptions: (query?: any) => api.get('/api/v1/checkout/shipping/options', { params: query }),
+  calculateShipping: (data: any) => api.post('/api/v1/checkout/shipping/calculate', data),
+  calculateTax: (query?: any) => api.get('/api/v1/checkout/tax/calculate', { params: query }),
+  getPaymentMethods: () => api.get('/api/v1/checkout/payment-methods'),
+  addPaymentMethod: (data: any) => api.post('/api/v1/checkout/payment-methods', data),
+  getAddresses: () => api.get('/api/v1/checkout/addresses'),
+  addAddress: (data: any) => api.post('/api/v1/checkout/addresses', data),
+  updateAddress: (addressId: string, data: any) => api.put(`/api/v1/checkout/addresses/${addressId}`, data),
+  validateCheckout: (data: any) => api.post('/api/v1/checkout/validate', data),
+  completeCheckout: (data: any) => api.post('/api/v1/checkout/complete', data),
+  getOrder: (orderId: string) => api.get(`/api/v1/checkout/orders/${orderId}`),
+  cancelOrder: (orderId: string, data: any) => api.post(`/api/v1/checkout/orders/${orderId}/cancel`, data),
+  requestRefund: (orderId: string, data: any) => api.post(`/api/v1/checkout/orders/${orderId}/refund`, data),
+  handlePaymentSuccess: (sessionId: string) => api.get(`/api/v1/checkout/success/${sessionId}`),
+  handlePaymentFailure: (sessionId: string) => api.get(`/api/v1/checkout/failure/${sessionId}`),
+};
+
+// Vendor API (updated)
+export const vendorApi = {
+  getProfile: () => api.get('/api/v1/vendor/profile'),
+  updateProfile: (profileData: any) => api.put('/api/v1/vendor/profile', profileData),
+  getProducts: (query?: any) => api.get('/api/v1/vendor/products', { params: query }),
+  createProduct: (productData: any) => api.post('/api/v1/vendor/products', productData),
+  updateProduct: (id: string, productData: any) => api.put(`/api/v1/vendor/products/${id}`, productData),
+  deleteProduct: (id: string) => api.delete(`/api/v1/vendor/products/${id}`),
+  getOrders: (query?: any) => api.get('/api/v1/vendor/orders', { params: query }),
+  getOrder: (id: string) => api.get(`/api/v1/vendor/orders/${id}`),
+  updateOrderStatus: (id: string, data: any) => api.put(`/api/v1/vendor/orders/${id}/status`, data),
+  getAnalytics: (query?: any) => api.get('/api/v1/vendor/analytics', { params: query }),
+  getPayouts: (query?: any) => api.get('/api/v1/vendor/payouts', { params: query }),
+  requestPayout: (data: any) => api.post('/api/v1/vendor/payouts/request', data),
+  getSettings: () => api.get('/api/v1/vendor/settings'),
+  updateSettings: (settings: any) => api.put('/api/v1/vendor/settings', settings),
+  submitKyc: (data: any) => api.post('/api/v1/vendor/kyc/submit', data),
+  getKycStatus: () => api.get('/api/v1/vendor/kyc/status'),
+};
+
+// Content API (updated)
+export const contentApi = {
+  // Blog Management
+  getBlogPosts: (query?: any) => api.get('/api/v1/content/blog/posts', { params: query }),
+  getBlogPost: (slug: string) => api.get(`/api/v1/content/blog/posts/${slug}`),
+  createBlogPost: (postData: any) => api.post('/api/v1/content/blog/posts', postData),
+  updateBlogPost: (id: string, postData: any) => api.put(`/api/v1/content/blog/posts/${id}`, postData),
+  deleteBlogPost: (id: string) => api.delete(`/api/v1/content/blog/posts/${id}`),
+  
+  // Help Center
+  getHelpArticles: (query?: any) => api.get('/api/v1/content/help/articles', { params: query }),
+  getHelpArticle: (id: string) => api.get(`/api/v1/content/help/articles/${id}`),
+  getHelpCategories: () => api.get('/api/v1/content/help/categories'),
+  createHelpArticle: (articleData: any) => api.post('/api/v1/content/help/articles', articleData),
+  updateHelpArticle: (id: string, articleData: any) => api.put(`/api/v1/content/help/articles/${id}`, articleData),
+  deleteHelpArticle: (id: string) => api.delete(`/api/v1/content/help/articles/${id}`),
+  searchHelpArticles: (query: string) => api.get(`/api/v1/content/help/articles/search?q=${query}`),
+  
+  // Tutorials
+  getTutorials: (query?: any) => api.get('/api/v1/content/tutorials', { params: query }),
+  getTutorial: (id: string) => api.get(`/api/v1/content/tutorials/${id}`),
+  createTutorial: (tutorialData: any) => api.post('/api/v1/content/tutorials', tutorialData),
+  updateTutorial: (id: string, tutorialData: any) => api.put(`/api/v1/content/tutorials/${id}`, tutorialData),
+  deleteTutorial: (id: string) => api.delete(`/api/v1/content/tutorials/${id}`),
+  getTutorialCategories: () => api.get('/api/v1/content/tutorials/categories'),
+  
+  // Resources
+  getResources: (query?: any) => api.get('/api/v1/content/resources', { params: query }),
+  getResource: (id: string) => api.get(`/api/v1/content/resources/${id}`),
+  createResource: (resourceData: any) => api.post('/api/v1/content/resources', resourceData),
+  updateResource: (id: string, resourceData: any) => api.put(`/api/v1/content/resources/${id}`, resourceData),
+  deleteResource: (id: string) => api.delete(`/api/v1/content/resources/${id}`),
+  downloadResource: (id: string) => api.get(`/api/v1/content/resources/${id}/download`),
+  
+  // Case Studies
+  getCaseStudies: (query?: any) => api.get('/api/v1/content/case-studies', { params: query }),
+  getCaseStudy: (id: string) => api.get(`/api/v1/content/case-studies/${id}`),
+  createCaseStudy: (caseStudyData: any) => api.post('/api/v1/content/case-studies', caseStudyData),
+  updateCaseStudy: (id: string, caseStudyData: any) => api.put(`/api/v1/content/case-studies/${id}`, caseStudyData),
+  deleteCaseStudy: (id: string) => api.delete(`/api/v1/content/case-studies/${id}`),
+  
+  // Press Releases
+  getPressReleases: (query?: any) => api.get('/api/v1/content/press', { params: query }),
+  getPressRelease: (id: string) => api.get(`/api/v1/content/press/${id}`),
+  createPressRelease: (pressData: any) => api.post('/api/v1/content/press', pressData),
+  updatePressRelease: (id: string, pressData: any) => api.put(`/api/v1/content/press/${id}`, pressData),
+  deletePressRelease: (id: string) => api.delete(`/api/v1/content/press/${id}`),
+  
+  // Careers
+  getJobListings: (query?: any) => api.get('/api/v1/content/careers/jobs', { params: query }),
+  getJobListing: (id: string) => api.get(`/api/v1/content/careers/jobs/${id}`),
+  createJobListing: (jobData: any) => api.post('/api/v1/content/careers/jobs', jobData),
+  updateJobListing: (id: string, jobData: any) => api.put(`/api/v1/content/careers/jobs/${id}`, jobData),
+  deleteJobListing: (id: string) => api.delete(`/api/v1/content/careers/jobs/${id}`),
+  applyForJob: (jobId: string, applicationData: any) => api.post(`/api/v1/content/careers/jobs/${jobId}/apply`, applicationData),
+  getJobApplications: (query?: any) => api.get('/api/v1/content/careers/applications', { params: query }),
 };
 
 export default api;

@@ -8,6 +8,12 @@ import { CatalogModule } from './catalog/catalog.module';
 import { PaymentModule } from './payment/payment.module';
 import { UserModule } from './user/user.module';
 import { AdminModule } from './admin/admin.module';
+import { VendorModule } from './vendor/vendor.module';
+import { ContentModule } from './content/content.module';
+import { SystemModule } from './system/system.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
+import { CartModule } from './cart/cart.module';
+import { CheckoutModule } from './checkout/checkout.module';
 import { HealthModule } from './health/health.module';
 import { LoggingModule } from './common/logging/logging.module';
 import { SwaggerModule } from './swagger/swagger.module';
@@ -61,6 +67,12 @@ import configuration from './config/configuration';
     PaymentModule,
     UserModule,
     AdminModule,
+    VendorModule,
+    ContentModule,
+    SystemModule,
+    MarketplaceModule,
+    CartModule,
+    CheckoutModule,
   ],
   providers: [
     // Global guards

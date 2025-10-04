@@ -28,7 +28,7 @@ import {
   SortDesc
 } from 'lucide-react'
 import styles from './Marketplace.module.scss'
-import { productApi } from '@/lib/api/client'
+import { marketplaceApi } from '@/lib/api/client'
 
 const defaultCategories = [
   { id: 'all', name: 'All Products', count: 5840, icon: Grid },
@@ -205,8 +205,8 @@ export default function MarketplacePage() {
       try {
         setLoading(true)
         const [productsData, categoriesData] = await Promise.all([
-          productApi.getProducts({ limit: 50 }),
-          productApi.getCategories()
+          marketplaceApi.getProducts({ limit: 50 }),
+          marketplaceApi.getCategories()
         ])
         setProducts(productsData.products || productsData)
         setCategories(categoriesData)
@@ -226,7 +226,8 @@ export default function MarketplacePage() {
     const searchProducts = async () => {
       if (searchQuery.trim()) {
         try {
-          const searchResults = await productApi.searchProducts(searchQuery, {
+          const searchResults = await marketplaceApi.searchProducts({
+            query: searchQuery,
             category: activeCategory !== 'all' ? activeCategory : undefined
           })
           setProducts(searchResults.products || searchResults)

@@ -13,7 +13,6 @@ export class RedisService {
       port: this.configService.get('redis.port', 6379),
       password: this.configService.get('redis.password'),
       db: this.configService.get('redis.db', 0),
-      retryDelayOnFailover: 100,
       maxRetriesPerRequest: 3,
     });
 
@@ -187,7 +186,8 @@ export class RedisService {
 
   async zScore(key: string, member: string): Promise<number | null> {
     try {
-      return await this.redis.zscore(key, member);
+      const result = await this.redis.zscore(key, member);
+      return result ? Number(result) : null;
     } catch (error) {
       this.logger.error(`Failed to zscore key ${key}:`, error);
       return null;

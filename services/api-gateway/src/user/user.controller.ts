@@ -15,7 +15,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get user profile' })
   @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
   async getProfile(@GetUser() user: any) {
-    return this.userService.getProfile({ userId: user.id });
+    return this.userService.getProfile(user.id);
   }
 
   @Put('profile')
@@ -24,7 +24,7 @@ export class UserController {
   @ApiOperation({ summary: 'Update user profile' })
   @ApiResponse({ status: 200, description: 'Profile updated successfully' })
   async updateProfile(@Body() data: any, @GetUser() user: any) {
-    return this.userService.updateProfile({ userId: user.id, ...data });
+    return this.userService.updateProfile(user.id, data);
   }
 
   @Get('orders')
@@ -33,7 +33,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get user orders' })
   @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
   async getOrders(@Query() query: any, @GetUser() user: any) {
-    return this.userService.getOrders({ userId: user.id, ...query });
+    return this.userService.getOrders(user.id, query);
   }
 
   @Get('downloads')
@@ -42,7 +42,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get user downloads' })
   @ApiResponse({ status: 200, description: 'Downloads retrieved successfully' })
   async getDownloads(@GetUser() user: any) {
-    return this.userService.getDownloads({ userId: user.id });
+    return this.userService.getAnalytics(user.id);
   }
 
   @Get('wishlist')
@@ -51,7 +51,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get user wishlist' })
   @ApiResponse({ status: 200, description: 'Wishlist retrieved successfully' })
   async getWishlist(@GetUser() user: any) {
-    return this.userService.getWishlist({ userId: user.id });
+    return this.userService.getWishlist(user.id);
   }
 
   @Post('wishlist/:productId')
@@ -60,7 +60,7 @@ export class UserController {
   @ApiOperation({ summary: 'Add to wishlist' })
   @ApiResponse({ status: 200, description: 'Added to wishlist successfully' })
   async addToWishlist(@Param('productId') productId: string, @GetUser() user: any) {
-    return this.userService.addToWishlist({ userId: user.id, productId });
+    return this.userService.addToWishlist(user.id, productId);
   }
 
   @Delete('wishlist/:productId')
@@ -69,6 +69,6 @@ export class UserController {
   @ApiOperation({ summary: 'Remove from wishlist' })
   @ApiResponse({ status: 200, description: 'Removed from wishlist successfully' })
   async removeFromWishlist(@Param('productId') productId: string, @GetUser() user: any) {
-    return this.userService.removeFromWishlist({ userId: user.id, productId });
+    return this.userService.removeFromWishlist(user.id, productId);
   }
 }

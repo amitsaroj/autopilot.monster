@@ -41,7 +41,7 @@ async function bootstrap() {
       keepalive: {
         keepaliveTimeMs: 120000,
         keepaliveTimeoutMs: 5000,
-        keepalivePermitWithoutCalls: true,
+        keepalivePermitWithoutCalls: 1,
         http2MaxPingsWithoutData: 0,
         http2MinTimeBetweenPingsMs: 10000,
       },

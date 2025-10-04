@@ -17,7 +17,9 @@ import {
   CheckCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
+import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import styles from './Signup.module.scss'
 
 interface SignupForm {
@@ -46,9 +48,10 @@ export default function SignupPage() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [currentStep, setCurrentStep] = useState(1)
+  const { register, isLoading } = useAuth()
+  const router = useRouter()
 
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {}
@@ -99,13 +102,23 @@ export default function SignupPage() {
   }
 
   const handleSignup = async () => {
-    setIsLoading(true)
+    const userData = {
+      firstName: signupForm.firstName,
+      lastName: signupForm.lastName,
+      email: signupForm.email,
+      company: signupForm.company,
+      phone: signupForm.phone,
+      password: signupForm.password,
+      subscribeNewsletter: signupForm.subscribeNewsletter
+    }
     
-    // Simulate signup process
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    const result = await register(userData)
     
-    // Redirect to dashboard on success
-    window.location.href = '/dashboard'
+    if (result.success) {
+      router.push('/dashboard')
+    } else {
+      setErrors({ general: result.error || 'Registration failed' })
+    }
   }
 
   const handleSocialSignup = (provider: 'google' | 'github') => {
@@ -174,6 +187,13 @@ export default function SignupPage() {
             </div>
 
             <form onSubmit={(e) => { e.preventDefault(); handleNextStep(); }} className={styles.signupForm}>
+              {errors.general && (
+                <div className={styles.errorMessage}>
+                  <AlertCircle size={14} />
+                  {errors.general}
+                </div>
+              )}
+              
               {currentStep === 1 && (
                 <motion.div
                   key="step1"

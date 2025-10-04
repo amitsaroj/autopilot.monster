@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import styles from './Status.module.scss'
+import { systemApi } from '@/lib/api/client'
 
 // Metadata for this page - should be handled by layout or metadata API
 // export const metadata = {
@@ -172,19 +173,37 @@ export default function StatusPage() {
   
   const [uptimeData, setUptimeData] = useState<{date: string, status: string, uptime: number}[]>([])
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [systemStatus, setSystemStatus] = useState(null)
+  const [systemHealth, setSystemHealth] = useState(null)
 
   useEffect(() => {
+    const loadSystemData = async () => {
+      try {
+        const [statusData, healthData] = await Promise.all([
+          systemApi.getStatus(),
+          systemApi.getHealth()
+        ])
+        setSystemStatus(statusData)
+        setSystemHealth(healthData)
+      } catch (error) {
+        console.error('Failed to load system data:', error)
+      }
+    }
+
+    loadSystemData()
     setUptimeData(generateUptimeData())
     
     // Update timestamp every 30 seconds
     const interval = setInterval(() => {
       setLastUpdated(new Date())
+      loadSystemData() // Refresh system data
     }, 30000)
     
     return () => clearInterval(interval)
   }, [])
 
-  const overallStatus = services.some(s => s.status === 'outage') ? 'outage' :
+  const overallStatus = systemStatus?.status || 
+                       services.some(s => s.status === 'outage') ? 'outage' :
                        services.some(s => s.status === 'degraded') ? 'degraded' : 'operational'
 
   const formatTime = (dateString: string) => {
@@ -257,7 +276,13 @@ export default function StatusPage() {
           </motion.div>
 
           <div className={styles.servicesList}>
-            {services.map((service, index) => (
+            {(systemStatus?.services ? Object.entries(systemStatus.services).map(([name, status]) => ({
+              name: name.charAt(0).toUpperCase() + name.slice(1),
+              status: status,
+              uptime: '99.9%',
+              responseTime: '45ms',
+              description: `${name} service status`
+            })) : services).map((service, index) => (
               <motion.div
                 key={service.name}
                 className={styles.serviceCard}

@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Menu, X, Zap, ShoppingCart, Search } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { Menu, X, Zap, ShoppingCart, Search, User, LogOut, Settings, Package } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
+import { useAuth } from '@/contexts/AuthContext'
 import styles from './Navigation.module.scss'
 
 const navItems = [
@@ -20,7 +21,10 @@ const navItems = [
 export const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, isAuthenticated, logout } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +34,26 @@ export const Navigation: React.FC = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showUserMenu) {
+        const target = event.target as Element
+        if (!target.closest(`.${styles.userMenu}`)) {
+          setShowUserMenu(false)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showUserMenu])
+
+  const handleLogout = () => {
+    logout()
+    setShowUserMenu(false)
+    router.push('/')
+  }
 
   return (
     <motion.nav
@@ -100,12 +124,76 @@ export const Navigation: React.FC = () => {
           </motion.button>
 
           <div className={styles.authButtons}>
-            <Button variant="ghost" size="sm">
-              Login
-            </Button>
-            <Button variant="holographic" size="sm">
-              Get Started
-            </Button>
+            {isAuthenticated ? (
+              <div className={styles.userMenu}>
+                <motion.button
+                  className={styles.userButton}
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className={styles.userAvatar}>
+                    {user?.avatar ? (
+                      <img src={user.avatar} alt={user.name} />
+                    ) : (
+                      <User size={16} />
+                    )}
+                  </div>
+                  <span className={styles.userName}>{user?.name || 'User'}</span>
+                </motion.button>
+
+                <AnimatePresence>
+                  {showUserMenu && (
+                    <motion.div
+                      className={styles.userDropdown}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className={styles.userInfo}>
+                        <div className={styles.userDetails}>
+                          <div className={styles.userName}>{user?.name}</div>
+                          <div className={styles.userEmail}>{user?.email}</div>
+                        </div>
+                      </div>
+                      
+                      <div className={styles.userMenuItems}>
+                        <Link href="/dashboard" className={styles.menuItem}>
+                          <User size={16} />
+                          Dashboard
+                        </Link>
+                        <Link href="/vendor" className={styles.menuItem}>
+                          <Package size={16} />
+                          Vendor Portal
+                        </Link>
+                        <Link href="/settings" className={styles.menuItem}>
+                          <Settings size={16} />
+                          Settings
+                        </Link>
+                        <button onClick={handleLogout} className={styles.menuItem}>
+                          <LogOut size={16} />
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button variant="holographic" size="sm">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}

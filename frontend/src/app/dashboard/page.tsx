@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   User, 
@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/Button/Button'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './Dashboard.module.scss'
+import { userApi, paymentApi } from '@/lib/api/client'
 
 interface Purchase {
   id: string
@@ -103,6 +104,33 @@ const usageStats = [
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'purchases' | 'subscriptions' | 'profile'>('overview')
   const [searchTerm, setSearchTerm] = useState('')
+  const [userProfileData, setUserProfileData] = useState(userProfile)
+  const [purchases, setPurchases] = useState(recentPurchases)
+  const [subscriptions, setSubscriptions] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Load user data from API
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        setLoading(true)
+        const [profileData, ordersData, subscriptionsData] = await Promise.all([
+          userApi.getProfile(),
+          userApi.getOrders(),
+          paymentApi.getSubscriptions()
+        ])
+        setUserProfileData(profileData)
+        setPurchases(ordersData.orders || ordersData)
+        setSubscriptions(subscriptionsData.subscriptions || subscriptionsData)
+      } catch (error) {
+        console.error('Failed to load user data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadUserData()
+  }, [])
 
   const handleDownload = (purchase: Purchase) => {
     console.log(`Downloading: ${purchase.name}`)
@@ -137,8 +165,8 @@ export default function DashboardPage() {
             <div className={styles.userInfo}>
               <div className={styles.avatar}>
                 <Image
-                  src={userProfile.avatar}
-                  alt={userProfile.name}
+                  src={userProfileData.avatar}
+                  alt={userProfileData.name}
                   width={80}
                   height={80}
                   className={styles.avatarImage}
@@ -149,10 +177,10 @@ export default function DashboardPage() {
               </div>
               <div className={styles.userDetails}>
                 <h1 className={styles.welcomeTitle}>
-                  Welcome back, {userProfile.name}!
+                  Welcome back, {userProfileData.name}!
                 </h1>
                 <p className={styles.welcomeSubtitle}>
-                  Member since {new Date(userProfile.joinDate).toLocaleDateString('en-US', { 
+                  Member since {new Date(userProfileData.joinDate).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long' 
                   })}
@@ -253,7 +281,7 @@ export default function DashboardPage() {
                       Recent Activity
                     </h3>
                     <div className={styles.activityList}>
-                      {recentPurchases.slice(0, 3).map((purchase) => (
+                      {purchases.slice(0, 3).map((purchase) => (
                         <div key={purchase.id} className={styles.activityItem}>
                           <div className={styles.activityIcon}>
                             {purchase.type === 'agent' && <Bot size={16} />}
@@ -286,15 +314,15 @@ export default function DashboardPage() {
                     </h3>
                     <div className={styles.summaryCards}>
                       <div className={styles.summaryCard}>
-                        <div className={styles.summaryValue}>${userProfile.totalSpent}</div>
+                        <div className={styles.summaryValue}>${userProfileData.totalSpent}</div>
                         <div className={styles.summaryLabel}>Total Spent</div>
                       </div>
                       <div className={styles.summaryCard}>
-                        <div className={styles.summaryValue}>{userProfile.totalDownloads}</div>
+                        <div className={styles.summaryValue}>{userProfileData.totalDownloads}</div>
                         <div className={styles.summaryLabel}>Downloads</div>
                       </div>
                       <div className={styles.summaryCard}>
-                        <div className={styles.summaryValue}>{userProfile.activeSubscriptions}</div>
+                        <div className={styles.summaryValue}>{userProfileData.activeSubscriptions}</div>
                         <div className={styles.summaryLabel}>Active Plans</div>
                       </div>
                     </div>
@@ -308,7 +336,7 @@ export default function DashboardPage() {
                 <div className={styles.purchasesHeader}>
                   <h3 className={styles.sectionTitle}>
                     <Download size={20} />
-                    My Purchases ({recentPurchases.length})
+                    My Purchases ({purchases.length})
                   </h3>
                   <div className={styles.searchBox}>
                     <Search size={16} />
@@ -323,7 +351,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className={styles.purchasesList}>
-                  {recentPurchases.map((purchase) => (
+                  {purchases.map((purchase) => (
                     <motion.div
                       key={purchase.id}
                       className={styles.purchaseCard}
@@ -445,11 +473,11 @@ export default function DashboardPage() {
                     <div className={styles.formGrid}>
                       <div className={styles.formGroup}>
                         <label>Full Name</label>
-                        <input type="text" defaultValue={userProfile.name} className={styles.input} />
+                        <input type="text" defaultValue={userProfileData.name} className={styles.input} />
                       </div>
                       <div className={styles.formGroup}>
                         <label>Email Address</label>
-                        <input type="email" defaultValue={userProfile.email} className={styles.input} />
+                        <input type="email" defaultValue={userProfileData.email} className={styles.input} />
                       </div>
                       <div className={styles.formGroup}>
                         <label>Phone Number</label>

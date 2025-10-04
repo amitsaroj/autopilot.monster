@@ -319,25 +319,25 @@ export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
         body: searchBody
       });
 
-      const products = response.body.hits.hits.map((hit: any) => ({
+      const products = response.hits.hits.map((hit: any) => ({
         ...hit._source,
         score: hit._score,
         highlights: hit.highlight
       }));
 
       // Get aggregations for faceted search
-      const aggregations = response.body.aggregations || {};
+      const aggregations = response.aggregations || {};
 
       return {
         products,
-        total: response.body.hits.total.value,
+        total: typeof response.hits.total === 'number' ? response.hits.total : response.hits.total.value,
         page,
         limit,
         facets: {
-          categories: aggregations.categories?.buckets || [],
-          types: aggregations.types?.buckets || [],
-          tags: aggregations.tags?.buckets || [],
-          priceRanges: aggregations.priceRanges?.buckets || []
+          categories: (aggregations.categories as any)?.buckets || [],
+          types: (aggregations.types as any)?.buckets || [],
+          tags: (aggregations.tags as any)?.buckets || [],
+          priceRanges: (aggregations.priceRanges as any)?.buckets || []
         }
       };
     } catch (error) {
@@ -383,7 +383,7 @@ export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
         body: searchBody
       });
 
-      return response.body.hits.hits.map((hit: any) => hit._source);
+      return response.hits.hits.map((hit: any) => hit._source);
     } catch (error) {
       this.logger.error('Search categories failed:', error);
       throw error;
@@ -407,7 +407,7 @@ export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
         }
       });
 
-      return response.body.suggest.name_suggest[0].options.map((option: any) => ({
+      return (response.suggest.name_suggest[0].options as any[]).map((option: any) => ({
         text: option.text,
         score: option._score
       }));
