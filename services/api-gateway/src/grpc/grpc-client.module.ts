@@ -13,7 +13,7 @@ import { join } from 'path';
           transport: Transport.GRPC,
           options: {
             package: 'autopilot.auth',
-            protoPath: join(__dirname, '../../../shared/proto/auth.proto'),
+            protoPath: join(__dirname, '../../../../shared/proto/auth.proto'),
             url: configService.get<string>('services.auth.url'),
             ...configService.get('grpc.options'),
           },
@@ -27,7 +27,7 @@ import { join } from 'path';
           transport: Transport.GRPC,
           options: {
             package: 'autopilot.catalog',
-            protoPath: join(__dirname, '../../../shared/proto/catalog.proto'),
+            protoPath: join(__dirname, '../../../../shared/proto/catalog.proto'),
             url: configService.get<string>('services.catalog.url'),
             ...configService.get('grpc.options'),
           },
@@ -41,7 +41,7 @@ import { join } from 'path';
           transport: Transport.GRPC,
           options: {
             package: 'autopilot.payment',
-            protoPath: join(__dirname, '../../../shared/proto/payment.proto'),
+            protoPath: join(__dirname, '../../../../shared/proto/payment.proto'),
             url: configService.get<string>('services.payment.url'),
             ...configService.get('grpc.options'),
           },
@@ -55,7 +55,7 @@ import { join } from 'path';
           transport: Transport.GRPC,
           options: {
             package: 'autopilot.license',
-            protoPath: join(__dirname, '../../../shared/proto/license.proto'),
+            protoPath: join(__dirname, '../../../../shared/proto/license.proto'),
             url: configService.get<string>('services.license.url'),
             ...configService.get('grpc.options'),
           },
@@ -69,7 +69,7 @@ import { join } from 'path';
           transport: Transport.GRPC,
           options: {
             package: 'autopilot.notification',
-            protoPath: join(__dirname, '../../../shared/proto/notification.proto'),
+            protoPath: join(__dirname, '../../../../shared/proto/notification.proto'),
             url: configService.get<string>('services.notification.url'),
             ...configService.get('grpc.options'),
           },

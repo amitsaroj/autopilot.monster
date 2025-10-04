@@ -1,318 +1,356 @@
-# 🚀 Autopilot Monster - AI Agents & Automation Marketplace
+# Autopilot.Monster - AI Agent Marketplace
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
-[![Docker](https://img.shields.io/badge/docker-%3E%3D20.0.0-blue)](https://www.docker.com/)
+A comprehensive multi-service marketplace platform for AI agents, n8n workflows, and automation templates.
 
-A comprehensive AI Agents & Automation Marketplace platform built with modern microservices architecture, featuring a complete e-commerce solution for AI tools, automation workflows, and digital products.
+## 🚀 Quick Start
 
-## 🎯 **Quick Start**
+### Prerequisites
 
-### **Option 1: Docker (Recommended)**
-```bash
-# Clone and start everything
-git clone <repository-url>
-cd autopilot.monster
-docker compose up -d
+- Node.js 18+ and npm
+- MongoDB (optional - services will work without it in development mode)
+- Redis (optional - services will work without it in development mode)
 
-# Access the platform
-open http://localhost:3000
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd autopilot.monster
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start all services**
+   ```bash
+   ./start-all-services.sh
+   ```
+
+4. **Stop all services**
+   ```bash
+   ./stop-all-services.sh
+   ```
+
+## 📦 Architecture
+
+### Services
+
+| Service | Port | Description | API Docs |
+|---------|------|-------------|----------|
+| **API Gateway** | 4000 | Main entry point, routes to microservices | http://localhost:4000/api-docs |
+| **Auth Service** | 3001 | Authentication & Authorization | http://localhost:3001/api-docs |
+| **Catalog Service** | 3002 | Product catalog management | http://localhost:3002/api-docs |
+| **Payment Service** | 3003 | Payment processing & orders | http://localhost:3003/api-docs |
+| **User Service** | 3004 | User profile management | http://localhost:3004/api-docs |
+| **Vendor Service** | 3005 | Vendor dashboard & analytics | http://localhost:3005/api-docs |
+| **Frontend** | 3000 | Next.js web application | http://localhost:3000 |
+
+## 🔗 API Endpoints
+
+### API Gateway (Port 4000)
+
+All requests should go through the API Gateway at `http://localhost:4000/api/v1/`
+
+#### Authentication
+
+- `POST /api/v1/auth/register` - Register a new user
+- `POST /api/v1/auth/login` - Login
+- `POST /api/v1/auth/logout` - Logout
+- `POST /api/v1/auth/refresh` - Refresh access token
+- `GET /api/v1/auth/profile` - Get user profile
+- `PUT /api/v1/auth/profile` - Update user profile
+- `POST /api/v1/auth/forgot-password` - Request password reset
+- `POST /api/v1/auth/reset-password` - Reset password
+- `POST /api/v1/auth/change-password` - Change password
+
+#### OAuth
+
+- `GET /api/v1/auth/google` - Google OAuth login
+- `GET /api/v1/auth/google/callback` - Google OAuth callback
+- `GET /api/v1/auth/github` - GitHub OAuth login
+- `GET /api/v1/auth/github/callback` - GitHub OAuth callback
+
+#### Products/Catalog
+
+- `GET /api/v1/catalog/products` - List all products
+- `GET /api/v1/catalog/products/:id` - Get product details
+- `POST /api/v1/catalog/products` - Create product (vendor only)
+- `PUT /api/v1/catalog/products/:id` - Update product (vendor only)
+- `DELETE /api/v1/catalog/products/:id` - Delete product (vendor only)
+- `POST /api/v1/catalog/search` - Search products
+- `GET /api/v1/catalog/featured` - Get featured products
+- `GET /api/v1/catalog/trending` - Get trending products
+- `GET /api/v1/catalog/categories` - List categories
+
+#### Shopping Cart
+
+- `GET /api/v1/cart` - Get user's cart
+- `POST /api/v1/cart/items` - Add item to cart
+- `PUT /api/v1/cart/items/:itemId` - Update cart item
+- `DELETE /api/v1/cart/items/:itemId` - Remove item from cart
+- `DELETE /api/v1/cart` - Clear cart
+- `POST /api/v1/cart/coupon` - Apply coupon
+
+#### Checkout & Orders
+
+- `POST /api/v1/checkout/initiate` - Initiate checkout
+- `POST /api/v1/checkout/payment-intent` - Create payment intent
+- `POST /api/v1/checkout/payment/confirm` - Confirm payment
+- `POST /api/v1/checkout/complete` - Complete order
+- `GET /api/v1/payment/orders` - List user orders
+- `GET /api/v1/payment/orders/:id` - Get order details
+- `POST /api/v1/payment/orders/:id/cancel` - Cancel order
+
+#### User Management
+
+- `GET /api/v1/user/profile` - Get user profile
+- `PUT /api/v1/user/profile` - Update user profile
+- `GET /api/v1/user/orders` - Get user orders
+- `GET /api/v1/user/downloads` - Get user downloads
+- `GET /api/v1/user/wishlist` - Get wishlist
+- `POST /api/v1/user/wishlist/:productId` - Add to wishlist
+- `DELETE /api/v1/user/wishlist/:productId` - Remove from wishlist
+
+#### Vendor Dashboard
+
+- `GET /api/v1/vendor/profile` - Get vendor profile
+- `PUT /api/v1/vendor/profile` - Update vendor profile
+- `GET /api/v1/vendor/products` - List vendor products
+- `POST /api/v1/vendor/products` - Create new product
+- `PUT /api/v1/vendor/products/:id` - Update product
+- `DELETE /api/v1/vendor/products/:id` - Delete product
+- `GET /api/v1/vendor/orders` - List vendor orders
+- `GET /api/v1/vendor/analytics` - Get vendor analytics
+- `GET /api/v1/vendor/payouts` - Get payout history
+- `POST /api/v1/vendor/kyc/submit` - Submit KYC documents
+
+#### Admin Dashboard
+
+- `GET /api/v1/admin/dashboard` - Get admin dashboard data
+- `GET /api/v1/admin/users` - List all users
+- `GET /api/v1/admin/vendors` - List all vendors
+- `GET /api/v1/admin/products` - List all products
+- `GET /api/v1/admin/orders` - List all orders
+- `GET /api/v1/admin/analytics` - Get platform analytics
+
+#### Content Management
+
+- `GET /api/v1/content/blog/posts` - List blog posts
+- `GET /api/v1/content/blog/posts/:slug` - Get blog post
+- `GET /api/v1/content/help/articles` - List help articles
+- `GET /api/v1/content/tutorials` - List tutorials
+- `GET /api/v1/content/careers/jobs` - List job openings
+
+## 🛠️ Development
+
+### Project Structure
+
+```
+autopilot.monster/
+├── services/
+│   ├── api-gateway/       # API Gateway (Port 4000)
+│   ├── auth-service/      # Auth Service (Port 3001)
+│   ├── catalog-service/   # Catalog Service (Port 3002)
+│   ├── payment-service/   # Payment Service (Port 3003)
+│   ├── user-service/      # User Service (Port 3004)
+│   └── vendor-service/    # Vendor Service (Port 3005)
+├── frontend/              # Next.js Frontend (Port 3000)
+├── shared/                # Shared proto files and types
+├── logs/                  # Service logs (generated)
+└── scripts/               # Utility scripts
 ```
 
-### **Option 2: Development Mode**
-```bash
-# Start all services
-npm start
+### Running Individual Services
 
-# Or manually
-./start-dev.sh
-```
-
-## 📊 **Service Architecture**
-
-| Service | Port | Description | Status |
-|---------|------|-------------|--------|
-| **Frontend** | `3000` | Next.js application | ✅ Ready |
-| **API Gateway** | `4000` | Main API endpoint | ✅ Ready |
-| **Auth Service** | `3002` | Authentication & authorization | ✅ Ready |
-| **Catalog Service** | `3003` | Product catalog & search | ✅ Ready |
-| **Payment Service** | `3004` | Payment processing | ✅ Ready |
-| **User Service** | `3005` | User management | ✅ Ready |
-| **Vendor Service** | `3006` | Vendor management | ✅ Ready |
-| **Admin Service** | `3007` | Admin panel | ✅ Ready |
-| **Content Service** | `3008` | Content management | ✅ Ready |
-
-## 🛠️ **Technology Stack**
-
-### **Backend**
-- **Framework**: NestJS (Node.js)
-- **Database**: MongoDB with Redis caching
-- **Message Queue**: Apache Kafka
-- **Search**: Elasticsearch
-- **Authentication**: JWT with OAuth support
-- **API Documentation**: Swagger/OpenAPI
-
-### **Frontend**
-- **Framework**: Next.js 15 with TypeScript
-- **Styling**: SCSS with CSS Modules
-- **Animations**: Framer Motion
-- **State Management**: React Context + React Query
-- **UI Components**: Custom component library
-
-### **Infrastructure**
-- **Containerization**: Docker & Docker Compose
-- **Load Balancer**: Nginx
-- **Monitoring**: Prometheus + Grafana
-- **CI/CD**: GitHub Actions ready
-
-## 🚀 **Available Commands**
-
-### **Development**
-```bash
-npm start          # Start all services in development mode
-npm stop           # Stop all services
-npm run dev        # Alias for npm start
-```
-
-### **Individual Services**
-```bash
-npm run dev:gateway    # API Gateway (Port 4000)
-npm run dev:auth       # Auth Service (Port 3002)
-npm run dev:catalog    # Catalog Service (Port 3003)
-npm run dev:payment    # Payment Service (Port 3004)
-npm run dev:user       # User Service (Port 3005)
-npm run dev:vendor     # Vendor Service (Port 3006)
-npm run dev:admin      # Admin Service (Port 3007)
-npm run dev:content    # Content Service (Port 3008)
-npm run dev:frontend   # Frontend (Port 3000)
-```
-
-### **Building & Testing**
-```bash
-npm run build          # Build all services
-npm run build:services # Build backend services only
-npm run build:frontend # Build frontend only
-npm run test           # Run all tests
-npm run lint           # Lint all code
-npm run clean          # Clean build artifacts
-```
-
-### **Docker Commands**
-```bash
-npm run docker:up      # Start Docker services
-npm run docker:down    # Stop Docker services
-npm run docker:logs    # View Docker logs
-npm run docker:build   # Build Docker images
-npm run docker:restart # Restart Docker services
-```
-
-### **Utilities**
-```bash
-npm run install:all    # Install dependencies for all services
-npm run logs           # View service logs
-npm run health         # Check service health
-npm run docs           # Show API documentation URL
-```
-
-## 🌐 **Access Points**
-
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Frontend** | http://localhost:3000 | Main application |
-| **API Gateway** | http://localhost:4000 | API endpoint |
-| **API Documentation** | http://localhost:4000/api-docs | Swagger UI |
-| **Grafana Dashboard** | http://localhost:3001 | Monitoring (admin/admin123) |
-| **Prometheus** | http://localhost:9090 | Metrics |
-
-## 📚 **API Documentation**
-
-### **Authentication Endpoints**
-```bash
-POST /api/v1/auth/register     # User registration
-POST /api/v1/auth/login        # User login
-POST /api/v1/auth/refresh      # Refresh token
-POST /api/v1/auth/logout       # User logout
-```
-
-### **Marketplace Endpoints**
-```bash
-GET    /api/v1/marketplace/products           # Get all products
-GET    /api/v1/marketplace/products/:id       # Get product by ID
-POST   /api/v1/marketplace/search             # Search products
-GET    /api/v1/marketplace/categories         # Get categories
-```
-
-### **User Management**
-```bash
-GET    /api/v1/user/profile                   # Get user profile
-PUT    /api/v1/user/profile                   # Update user profile
-GET    /api/v1/user/orders                    # Get user orders
-GET    /api/v1/user/wishlist                  # Get user wishlist
-```
-
-### **Vendor Management**
-```bash
-GET    /api/v1/vendor/profile                 # Get vendor profile
-PUT    /api/v1/vendor/profile                 # Update vendor profile
-GET    /api/v1/vendor/products                # Get vendor products
-POST   /api/v1/vendor/products                # Create product
-```
-
-## 🎨 **Frontend Features**
-
-### **Pages & Components**
-- ✅ **Homepage** - Hero section with featured products
-- ✅ **Marketplace** - Product browsing and search
-- ✅ **Product Details** - Detailed product information
-- ✅ **Shopping Cart** - Cart management
-- ✅ **Checkout** - Payment processing
-- ✅ **User Dashboard** - Profile and order management
-- ✅ **Vendor Portal** - Vendor dashboard and analytics
-- ✅ **Admin Panel** - Administrative functions
-- ✅ **Authentication** - Login/Register with dynamic navigation
-- ✅ **Blog & Content** - Content management system
-
-### **Authentication System**
-- ✅ **Dynamic Navigation** - Login/logout with user menu
-- ✅ **JWT Integration** - Secure token-based authentication
-- ✅ **User Context** - Global authentication state
-- ✅ **Protected Routes** - Route protection based on auth status
-- ✅ **Social Login** - Google and GitHub OAuth support
-
-## 🔧 **Configuration**
-
-### **Environment Variables**
-Create `.env` files for each service:
+Each service can be run independently:
 
 ```bash
 # API Gateway
-NODE_ENV=development
-PORT=4000
-MONGODB_URI=mongodb://localhost:27017/autopilot_gateway
-REDIS_HOST=localhost
-REDIS_PORT=6379
-JWT_SECRET=your-super-secret-jwt-key
+cd services/api-gateway && npm run start:dev
+
+# Auth Service
+cd services/auth-service && npm run start:dev
+
+# Catalog Service
+cd services/catalog-service && npm run start:dev
+
+# Frontend
+cd frontend && npm run dev
 ```
 
-### **Database Setup**
+### Logs
+
+Service logs are stored in the `logs/` directory:
+
+- `logs/api-gateway.log`
+- `logs/auth-service.log`
+- `logs/catalog-service.log`
+- `logs/payment-service.log`
+- `logs/user-service.log`
+- `logs/vendor-service.log`
+- `logs/frontend.log`
+
+View logs in real-time:
+
 ```bash
-# Start MongoDB and Redis
-docker compose up -d mongodb redis
-
-# Or use local installations
-mongod --dbpath /path/to/data
-redis-server
-```
-
-## 🐛 **Troubleshooting**
-
-### **Common Issues**
-
-#### **Port Conflicts**
-```bash
-# Check port usage
-lsof -i :3000
-lsof -i :4000
-
-# Kill processes
-kill -9 $(lsof -t -i:3000)
-```
-
-#### **Service Not Starting**
-```bash
-# Check logs
-npm run logs
 tail -f logs/api-gateway.log
-
-# Restart services
-npm stop && npm start
+tail -f logs/auth-service.log
 ```
 
-#### **Database Connection Issues**
+### Testing API Endpoints
+
+You can test the API using:
+
+1. **Swagger UI**: Visit http://localhost:4000/api-docs
+2. **cURL**:
+   ```bash
+   # Health check
+   curl http://localhost:4000/api/v1/health
+   
+   # Register
+   curl -X POST http://localhost:4000/api/v1/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"email":"test@example.com","password":"password123","firstName":"John","lastName":"Doe"}'
+   
+   # Login
+   curl -X POST http://localhost:4000/api/v1/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"test@example.com","password":"password123"}'
+   ```
+
+3. **Postman**: Import the OpenAPI spec from http://localhost:4000/api-docs/json
+
+## 🔐 Authentication
+
+The platform uses JWT-based authentication:
+
+1. Register or login to get an access token
+2. Include the token in the `Authorization` header:
+   ```
+   Authorization: Bearer <your-access-token>
+   ```
+
+Example:
 ```bash
-# Check MongoDB
-docker compose ps mongodb
-docker compose logs mongodb
-
-# Restart database
-docker compose restart mongodb
+curl http://localhost:4000/api/v1/user/profile \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
-#### **Build Errors**
+## 🌐 Frontend
+
+The frontend is built with:
+
+- **Next.js 14** (App Router)
+- **React 18**
+- **TypeScript**
+- **Tailwind CSS**
+
+### Features
+
+- Server-side rendering (SSR)
+- Static site generation (SSG)
+- API Routes
+- Dynamic routing
+- Authentication & Authorization
+- Responsive design
+
+## 📊 Features
+
+### For Customers
+
+- Browse AI agents, workflows, and templates
+- Advanced search and filtering
+- Add items to cart and wishlist
+- Secure checkout with multiple payment options
+- Download purchased products
+- Review and rate products
+- Order history and tracking
+
+### For Vendors
+
+- Create and manage products
+- Upload files and screenshots
+- Set pricing (free, one-time, subscription, tiered)
+- View analytics and sales reports
+- Manage orders and refunds
+- Receive payouts
+- KYC verification
+
+### For Admins
+
+- Dashboard with platform-wide analytics
+- User management
+- Vendor approval and management
+- Product moderation
+- Order management
+- Content management
+- System settings
+
+## 🔧 Configuration
+
+Each service can be configured via environment variables. Default values are provided for development.
+
+### Common Environment Variables
+
 ```bash
-# Clean and rebuild
-npm run clean
-npm run build
+# Database
+DATABASE_URL=mongodb://localhost:27017/autopilot-monster
 
-# Check TypeScript errors
-npm run lint
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=24h
+
+# OAuth
+OAUTH_GOOGLE_CLIENT_ID=your-client-id
+OAUTH_GOOGLE_CLIENT_SECRET=your-client-secret
+OAUTH_GITHUB_CLIENT_ID=your-client-id
+OAUTH_GITHUB_CLIENT_SECRET=your-client-secret
 ```
 
-### **Health Checks**
-```bash
-# Check API Gateway
-curl http://localhost:4000/health
+## 🚨 Troubleshooting
 
-# Check individual services
-curl http://localhost:3002/health  # Auth
-curl http://localhost:3003/health  # Catalog
-curl http://localhost:3004/health  # Payment
-```
+### Services won't start
 
-## 📊 **Monitoring**
+1. Check if ports are already in use:
+   ```bash
+   lsof -i :3000,3001,3002,3003,3004,3005,4000
+   ```
 
-### **Service Health**
-- **API Gateway**: http://localhost:4000/health
-- **System Status**: http://localhost:4000/api/v1/system/status
-- **Grafana Dashboard**: http://localhost:3001 (admin/admin123)
+2. Kill existing processes:
+   ```bash
+   ./stop-all-services.sh
+   ```
 
-### **Logs**
-```bash
-# View all logs
-npm run logs
+3. Check logs:
+   ```bash
+   tail -f logs/*.log
+   ```
 
-# View specific service logs
-tail -f logs/api-gateway.log
-tail -f logs/frontend.log
-```
+### Database connection errors
 
-## 🚀 **Production Deployment**
+Services will work without MongoDB/Redis in development mode. External services are optional.
 
-### **Docker Production**
-```bash
-# Build and start production services
-docker compose -f docker-compose.prod.yml up -d
+### Port conflicts
 
-# Check status
-docker compose ps
-```
+Change ports in `start-all-services.sh` or set `PORT` environment variable for each service.
 
-### **Environment Setup**
-1. Set production environment variables
-2. Configure SSL certificates
-3. Set up monitoring and logging
-4. Configure backup strategies
+## 📝 License
 
-## 🤝 **Contributing**
+[Add your license here]
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+## 🤝 Contributing
 
-## 📄 **License**
+[Add contribution guidelines here]
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 📧 Contact
 
-## 🆘 **Support**
-
-- **Documentation**: [COMPLETE_DOCUMENTATION.md](COMPLETE_DOCUMENTATION.md)
-- **Issues**: Create an issue on GitHub
-- **Discussions**: Use GitHub Discussions for questions
+[Add contact information here]
 
 ---
 
-**🎉 Happy Coding with Autopilot Monster!**
-
-Built with ❤️ using modern web technologies and best practices.
+Made with ❤️ by Autopilot.Monster Team

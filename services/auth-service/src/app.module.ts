@@ -23,9 +23,7 @@ import configuration from './config/configuration';
     // Database
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('database.mongodb.uri'),
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+        uri: configService.get<string>('database.url'),
       }),
       inject: [ConfigService],
     }),

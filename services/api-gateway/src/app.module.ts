@@ -56,7 +56,7 @@ import configuration from './config/configuration';
     // Core modules
     HttpModule,
     LoggingModule,
-    GrpcClientModule,
+    // GrpcClientModule, // Temporarily disabled
     KafkaModule,
     HealthModule,
     SwaggerModule,

@@ -1,150 +1,100 @@
 export default () => ({
-  // Server configuration
-  port: parseInt(process.env.PORT, 10) || 3001,
-  nodeEnv: process.env.NODE_ENV || 'development',
-  
-  // Database configuration
+  port: parseInt(process.env.PORT, 10) || 3000,
   database: {
-    mongodb: {
-      uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/autopilot',
-    },
-    redis: {
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
-    },
+    url: process.env.DATABASE_URL || 'mongodb://localhost:27017/autopilot-monster',
   },
-
-  // JWT configuration
+  redis: {
+    url: process.env.REDIS_URL || 'redis://localhost:6379',
+  },
   jwt: {
     secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production',
-    expiresIn: process.env.JWT_EXPIRATION || '24h',
-    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRATION || '7d',
+    expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+    refreshSecret: process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-key-change-in-production',
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
-
-  // OAuth configuration
   oauth: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/auth/google/callback',
+      clientId: process.env.OAUTH_GOOGLE_CLIENT_ID || 'dummy-client-id',
+      clientSecret: process.env.OAUTH_GOOGLE_CLIENT_SECRET || 'dummy-client-secret',
+      redirectUri: process.env.OAUTH_GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
     },
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      redirectUri: process.env.GITHUB_REDIRECT_URI || 'http://localhost:3001/auth/github/callback',
+      clientId: process.env.OAUTH_GITHUB_CLIENT_ID || 'dummy-client-id',
+      clientSecret: process.env.OAUTH_GITHUB_CLIENT_SECRET || 'dummy-client-secret',
+      redirectUri: process.env.OAUTH_GITHUB_REDIRECT_URI || 'http://localhost:3000/auth/github/callback',
     },
   },
-
-  // External payment services
-  payment: {
-    stripe: {
-      secretKey: process.env.STRIPE_SECRET_KEY,
-      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
-      webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+  services: {
+    auth: {
+      url: process.env.SERVICES_AUTH_URL || 'localhost:3001',
     },
-    razorpay: {
-      keyId: process.env.RAZORPAY_KEY_ID,
-      keySecret: process.env.RAZORPAY_KEY_SECRET,
-      webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
+    catalog: {
+      url: process.env.SERVICES_CATALOG_URL || 'localhost:3002',
+    },
+    payment: {
+      url: process.env.SERVICES_PAYMENT_URL || 'localhost:3003',
+    },
+    user: {
+      url: process.env.SERVICES_USER_URL || 'localhost:3004',
+    },
+    vendor: {
+      url: process.env.SERVICES_VENDOR_URL || 'localhost:3005',
+    },
+    admin: {
+      url: process.env.SERVICES_ADMIN_URL || 'localhost:3006',
+    },
+    content: {
+      url: process.env.SERVICES_CONTENT_URL || 'localhost:3007',
+    },
+    license: {
+      url: process.env.SERVICES_LICENSE_URL || 'localhost:3008',
+    },
+    notification: {
+      url: process.env.SERVICES_NOTIFICATION_URL || 'localhost:3009',
     },
   },
-
-  // File storage
-  storage: {
-    aws: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      region: process.env.AWS_REGION || 'us-east-1',
-      s3Bucket: process.env.AWS_S3_BUCKET || 'autopilot-assets',
-    },
+  kafka: {
+    brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
+    clientId: process.env.KAFKA_CLIENT_ID || 'api-gateway',
   },
-
-  // Email configuration
+  elasticsearch: {
+    url: process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
+  },
   email: {
     smtp: {
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT, 10) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
-      user: process.env.SMTP_USER,
-      password: process.env.SMTP_PASS,
-    },
-    from: process.env.EMAIL_FROM || 'noreply@autopilot.monster',
-  },
-
-  // Microservices configuration
-  services: {
-    auth: {
-      url: process.env.AUTH_SERVICE_URL || 'localhost:3002',
-    },
-    catalog: {
-      url: process.env.CATALOG_SERVICE_URL || 'localhost:3003',
-    },
-    payment: {
-      url: process.env.PAYMENT_SERVICE_URL || 'localhost:3004',
-    },
-    license: {
-      url: process.env.LICENSE_SERVICE_URL || 'localhost:3005',
-    },
-    notification: {
-      url: process.env.NOTIFICATION_SERVICE_URL || 'localhost:3006',
+      user: process.env.SMTP_USER || 'your-email@gmail.com',
+      pass: process.env.SMTP_PASS || 'your-app-password',
     },
   },
-
-  // Message queue configuration
-  kafka: {
-    brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
-    clientId: 'api-gateway',
-    groupId: 'api-gateway-group',
+  upload: {
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 10485760, // 10MB
+    allowedFileTypes: process.env.ALLOWED_FILE_TYPES?.split(',') || [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'text/plain',
+    ],
   },
-
-  // gRPC configuration
+  throttle: {
+    ttl: parseInt(process.env.THROTTLE_TTL, 10) || 60,
+    limit: parseInt(process.env.THROTTLE_LIMIT, 10) || 100,
+  },
+  cors: {
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    credentials: process.env.CORS_CREDENTIALS === 'true' || true,
+  },
   grpc: {
     options: {
-      'grpc.keepalive_time_ms': 120000,
-      'grpc.keepalive_timeout_ms': 5000,
-      'grpc.keepalive_permit_without_calls': true,
-      'grpc.http2.max_pings_without_data': 0,
-      'grpc.http2.min_time_between_pings_ms': 10000,
+      keepalive: {
+        keepaliveTimeMs: 30000,
+        keepaliveTimeoutMs: 5000,
+        keepalivePermitWithoutCalls: true,
+        http2MaxPingsWithoutData: 0,
+        http2MinTimeBetweenPingsMs: 10000,
+      },
     },
-  },
-
-  // NATS configuration  
-  nats: {
-    url: process.env.NATS_URL || 'nats://localhost:4222',
-  },
-
-  // Search configuration
-  elasticsearch: {
-    url: process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
-  },
-
-  // Rate limiting
-  rateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // limit each IP to 1000 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.',
-  },
-
-  // Security
-  security: {
-    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS, 10) || 12,
-    sessionSecret: process.env.SESSION_SECRET || 'your-session-secret-change-in-production',
-  },
-
-  // Monitoring
-  monitoring: {
-    sentry: {
-      dsn: process.env.SENTRY_DSN,
-    },
-    openTelemetry: {
-      endpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
-      serviceName: 'api-gateway',
-    },
-  },
-
-  // Feature flags
-  features: {
-    enableSwagger: process.env.ENABLE_SWAGGER !== 'false',
-    enableMetrics: process.env.ENABLE_METRICS !== 'false',
-    enableTracing: process.env.ENABLE_TRACING !== 'false',
   },
 });
