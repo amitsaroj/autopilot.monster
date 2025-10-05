@@ -1,0 +1,462 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # Infrastructure Services
+  # ============================================
+  
+  # MongoDB - Primary Database
+  mongodb:
+    image: mongo:7.0
+    container_name: autopilot-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis - Caching & Rate Limiting
+  redis:
+    image: redis:7.2-alpine
+    container_name: autopilot-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass password123
+    volumes:
+      - redis_data:/data
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Zookeeper - For Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: autopilot-zookeeper
+    restart: unless-stopped
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Kafka - Message Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: autopilot-kafka
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # Elasticsearch - Search Engine (Optional)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: autopilot-elasticsearch
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Microservices (Node.js/Fastify)
+  # ============================================
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./services/auth-service-node
+      dockerfile: Dockerfile
+    container_name: autopilot-auth-service
+    restart: unless-stopped
+    ports:
+      - "4002:4002"
+    environment:
+      NODE_ENV: production
+      AUTH_SERVICE_PORT: 4002
+      AUTH_DB_URL: mongodb://admin:password123@mongodb:27017/auth_db?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password123
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-in-production-min-32-chars
+      JWT_EXPIRES_IN: 1h
+      JWT_REFRESH_EXPIRES_IN: 7d
+      CORS_ORIGINS: http://localhost:3000,http://localhost:4000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # User Service
+  user-service:
+    build:
+      context: ./services/user-service-node
+      dockerfile: Dockerfile
+    container_name: autopilot-user-service
+    restart: unless-stopped
+    ports:
+      - "4005:4005"
+    environment:
+      NODE_ENV: production
+      USER_SERVICE_PORT: 4005
+      USER_DB_URL: mongodb://admin:password123@mongodb:27017/user_db?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password123
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4005/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Marketplace Service
+  marketplace-service:
+    build:
+      context: ./services/marketplace-service-node
+      dockerfile: Dockerfile
+    container_name: autopilot-marketplace-service
+    restart: unless-stopped
+    ports:
+      - "4003:4003"
+    environment:
+      NODE_ENV: production
+      MARKETPLACE_SERVICE_PORT: 4003
+      MARKETPLACE_DB_URL: mongodb://admin:password123@mongodb:27017/marketplace_db?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password123
+      KAFKA_BROKERS: kafka:29092
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Cart Service
+  cart-service:
+    build:
+      context: ./services/cart-service-node
+      dockerfile: Dockerfile
+    container_name: autopilot-cart-service
+    restart: unless-stopped
+    ports:
+      - "4009:4009"
+    environment:
+      NODE_ENV: production
+      CART_SERVICE_PORT: 4009
+      CART_DB_URL: mongodb://admin:password123@mongodb:27017/cart_db?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password123
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4009/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Order Service
+  order-service:
+    build:
+      context: ./services/order-service-node
+      dockerfile: Dockerfile
+    container_name: autopilot-order-service
+    restart: unless-stopped
+    ports:
+      - "4004:4004"
+    environment:
+      NODE_ENV: production
+      ORDER_SERVICE_PORT: 4004
+      ORDER_DB_URL: mongodb://admin:password123@mongodb:27017/order_db?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password123
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+      STRIPE_SECRET_KEY: sk_test_your-stripe-secret-key
+      RAZORPAY_KEY_ID: your-razorpay-key-id
+      RAZORPAY_KEY_SECRET: your-razorpay-key-secret
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Vendor Service
+  vendor-service:
+    build:
+      context: ./services/vendor-service-node
+      dockerfile: Dockerfile
+    container_name: autopilot-vendor-service
+    restart: unless-stopped
+    ports:
+      - "4006:4006"
+    environment:
+      NODE_ENV: production
+      VENDOR_SERVICE_PORT: 4006
+      VENDOR_DB_URL: mongodb://admin:password123@mongodb:27017/vendor_db?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password123
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4006/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Content Service
+  content-service:
+    build:
+      context: ./services/content-service-node
+      dockerfile: Dockerfile
+    container_name: autopilot-content-service
+    restart: unless-stopped
+    ports:
+      - "4008:4008"
+    environment:
+      NODE_ENV: production
+      CONTENT_SERVICE_PORT: 4008
+      CONTENT_DB_URL: mongodb://admin:password123@mongodb:27017/content_db?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password123
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4008/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Admin Service
+  admin-service:
+    build:
+      context: ./services/admin-service-node
+      dockerfile: Dockerfile
+    container_name: autopilot-admin-service
+    restart: unless-stopped
+    ports:
+      - "4007:4007"
+    environment:
+      NODE_ENV: production
+      ADMIN_SERVICE_PORT: 4007
+      ADMIN_DB_URL: mongodb://admin:password123@mongodb:27017/admin_db?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password123
+      KAFKA_BROKERS: kafka:29092
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4007/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway-node
+      dockerfile: Dockerfile
+    container_name: autopilot-api-gateway
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      API_GATEWAY_PORT: 4000
+      AUTH_SERVICE_URL: http://auth-service:4002
+      USER_SERVICE_URL: http://user-service:4005
+      MARKETPLACE_SERVICE_URL: http://marketplace-service:4003
+      CART_SERVICE_URL: http://cart-service:4009
+      ORDER_SERVICE_URL: http://order-service:4004
+      VENDOR_SERVICE_URL: http://vendor-service:4006
+      CONTENT_SERVICE_URL: http://content-service:4008
+      ADMIN_SERVICE_URL: http://admin-service:4007
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-min-32-chars
+      CORS_ORIGINS: http://localhost:3000
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      marketplace-service:
+        condition: service_healthy
+      cart-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      vendor-service:
+        condition: service_healthy
+      content-service:
+        condition: service_healthy
+      admin-service:
+        condition: service_healthy
+    networks:
+      - autopilot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+  kafka_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  autopilot-network:
+    driver: bridge
+
