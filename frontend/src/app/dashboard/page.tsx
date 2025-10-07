@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/Button/Button'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './Dashboard.module.scss'
-import { userApi, paymentApi } from '@/lib/api/client'
+import { userApi } from '@/lib/api'
 
 interface Purchase {
   id: string

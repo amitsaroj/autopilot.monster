@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { contentApi } from '@/lib/api/client';
+import { contentApi } from '@/lib/api';
 import Link from 'next/link';
 
 interface JobListing {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { adminApi } from '@/lib/api/client';
+import { adminApi } from '@/lib/api';
 
 interface DashboardStats {
   overview: {

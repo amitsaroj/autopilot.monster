@@ -28,7 +28,7 @@ import {
   SortDesc
 } from 'lucide-react'
 import styles from './Marketplace.module.scss'
-import { marketplaceApi } from '@/lib/api/client'
+import { marketplaceApi } from '@/lib/api'
 
 const defaultCategories = [
   { id: 'all', name: 'All Products', count: 5840, icon: Grid },
