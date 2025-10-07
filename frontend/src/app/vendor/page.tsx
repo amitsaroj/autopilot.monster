@@ -28,7 +28,7 @@ import { Button } from '@/components/ui/Button/Button'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './Vendor.module.scss'
-import { vendorApi } from '@/lib/api/client'
+import  vendorApi  from '@/lib/api/vendor.api'
 
 interface Product {
   id: string
@@ -134,14 +134,23 @@ export default function VendorPage() {
     const loadVendorData = async () => {
       try {
         setLoading(true)
-        const [profileData, productsData, analyticsData] = await Promise.all([
+        const [profileResponse, productsResponse, analyticsResponse] = await Promise.all([
           vendorApi.getProfile(),
           vendorApi.getProducts(),
           vendorApi.getAnalytics()
         ])
-        setVendorProfileData(profileData)
-        setProducts(productsData.products || productsData)
-        setAnalyticsData(analyticsData)
+        
+        if (profileResponse.success && profileResponse.data) {
+          setVendorProfileData(profileResponse.data)
+        }
+        
+        if (productsResponse.success && productsResponse.products) {
+          setProducts(productsResponse.products)
+        }
+        
+        if (analyticsResponse.success && analyticsResponse.data) {
+          setAnalyticsData(analyticsResponse.data)
+        }
       } catch (error) {
         console.error('Failed to load vendor data:', error)
       } finally {

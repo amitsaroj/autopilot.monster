@@ -1,61 +1,35 @@
 #!/bin/bash
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-echo -e "${BLUE}======================================${NC}"
-echo -e "${BLUE}  Stopping All Services${NC}"
-echo -e "${BLUE}======================================${NC}"
+echo "🛑 Stopping All Microservices..."
 echo ""
 
-# Function to stop a service
-stop_service() {
-    local service_name=$1
-    local pid_file="logs/${service_name}.pid"
-    
-    if [ -f "$pid_file" ]; then
-        local pid=$(cat "$pid_file")
-        if ps -p $pid > /dev/null 2>&1; then
-            echo -e "${YELLOW}Stopping ${service_name} (PID: $pid)...${NC}"
-            kill $pid 2>/dev/null
-            sleep 1
-            if ps -p $pid > /dev/null 2>&1; then
-                echo -e "${RED}Force killing ${service_name}...${NC}"
-                kill -9 $pid 2>/dev/null
+# Kill by PID files
+if [ -d "logs" ]; then
+    for pid_file in logs/*.pid; do
+        if [ -f "$pid_file" ]; then
+            service=$(basename "$pid_file" .pid)
+            pid=$(cat "$pid_file")
+            if ps -p "$pid" > /dev/null 2>&1; then
+                echo "🛑 Stopping $service (PID: $pid)..."
+                kill "$pid" 2>/dev/null || true
+                sleep 1
+                if ps -p "$pid" > /dev/null 2>&1; then
+                    kill -9 "$pid" 2>/dev/null || true
+                fi
             fi
-            echo -e "${GREEN}✓ ${service_name} stopped${NC}"
-        else
-            echo -e "${YELLOW}${service_name} is not running${NC}"
+            rm -f "$pid_file"
         fi
-        rm -f "$pid_file"
-    else
-        echo -e "${YELLOW}No PID file for ${service_name}${NC}"
-    fi
-}
+    done
+fi
 
-# Stop all services
-stop_service "API Gateway"
-stop_service "Auth Service"
-stop_service "Catalog Service"
-stop_service "Payment Service"
-stop_service "User Service"
-stop_service "Vendor Service"
-stop_service "Frontend"
-
-# Kill any remaining npm processes
-echo ""
-echo -e "${YELLOW}Cleaning up any remaining processes...${NC}"
-pkill -f "npm run start:dev" 2>/dev/null
-pkill -f "npm run dev" 2>/dev/null
-pkill -f "next dev" 2>/dev/null
+# Kill remaining processes
+echo "🧹 Cleaning up..."
+pkill -f "ts-node-dev" 2>/dev/null || true
+pkill -f "node dist/index.js" 2>/dev/null || true
 
 sleep 2
 
 echo ""
-echo -e "${GREEN}All services stopped!${NC}"
+echo "✅ All services stopped!"
+echo "📝 Logs preserved in logs/"
 echo ""
-

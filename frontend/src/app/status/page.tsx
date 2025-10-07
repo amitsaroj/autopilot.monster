@@ -21,7 +21,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button/Button'
 import styles from './Status.module.scss'
-import { systemApi } from '@/lib/api/client'
+import { systemApi } from '@/lib/api'
 
 // Metadata for this page - should be handled by layout or metadata API
 // export const metadata = {

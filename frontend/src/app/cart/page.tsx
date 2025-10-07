@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button/Button'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './Cart.module.scss'
-import { cartApi, checkoutApi } from '@/lib/api/client'
+import { cartApi, checkoutApi } from '@/lib/api'
 
 interface CartItem {
   id: string
