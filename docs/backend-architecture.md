@@ -1,620 +1,790 @@
-# Backend Architecture - Autopilot.monster
+# Backend Architecture - Autopilot Monster
 
-## Overview
+## 📋 Overview
 
-This document outlines the comprehensive NestJS microservices architecture for the Autopilot.monster marketplace platform.
+This document provides comprehensive details about the Node.js/Fastify microservices architecture powering the Autopilot Monster marketplace platform.
 
-## Architecture Pattern
+## 🏗️ Architecture Pattern
 
 ### Microservices Structure
 
 ```
-backend/
+autopilot.monster/
 ├── services/
-│   ├── auth-service/           # Authentication & Authorization
-│   ├── user-service/           # User Management
-│   ├── catalog-service/        # Product Catalog
-│   ├── payment-service/        # Payment Processing
-│   ├── order-service/          # Order Management
-│   ├── download-service/       # Digital Downloads
-│   ├── license-service/        # License Management
-│   ├── vendor-service/         # Vendor Management
-│   ├── admin-service/          # Admin Operations
-│   ├── analytics-service/      # Analytics & Reporting
-│   ├── notification-service/   # Email/SMS Notifications
-│   └── file-service/           # File Upload/Storage
+│   ├── api-gateway-node/          # API Gateway (Port 4000)
+│   ├── auth-service-node/         # Authentication (Port 4002)
+│   ├── user-service-node/         # User Management (Port 4005)
+│   ├── marketplace-service-node/  # Product Catalog (Port 4003)
+│   ├── cart-service-node/         # Shopping Cart (Port 4009)
+│   ├── order-service-node/        # Order Management (Port 4004)
+│   ├── vendor-service-node/       # Vendor Management (Port 4006)
+│   ├── content-service-node/      # Content Management (Port 4008)
+│   └── admin-service-node/        # Admin Operations (Port 4007)
 ├── shared/
-│   ├── common/                 # Shared DTOs, Types
-│   ├── database/               # Database Schemas
-│   ├── utils/                  # Utility Functions
-│   └── config/                 # Configuration
-├── gateway/
-│   └── api-gateway/            # API Gateway (NestJS)
-└── infrastructure/
-    ├── docker/                 # Docker Configurations
-    ├── kubernetes/             # K8s Manifests
-    └── terraform/              # Infrastructure as Code
+│   ├── config/                    # Shared Configuration
+│   │   ├── db.ts                 # MongoDB connection manager
+│   │   ├── env.ts                # Environment variables
+│   │   ├── kafka.ts              # Kafka producer/consumer
+│   │   ├── logger.ts             # Winston logging
+│   │   └── redis.ts              # Redis client
+│   ├── middleware/                # Shared Middleware
+│   │   ├── auth.middleware.ts
+│   │   ├── error.middleware.ts
+│   │   ├── rateLimit.middleware.ts
+│   │   └── validation.middleware.ts
+│   ├── proto/                     # Protocol Buffers
+│   ├── types/                     # Shared TypeScript types
+│   └── utils/                     # Utility functions
+├── frontend/                      # Next.js Frontend
+└── docker-compose.prod.yml        # Production deployment
 ```
 
-## Service Details
+## 🎯 Service Details
 
-### 1. Auth Service
-**Responsibility**: Authentication, JWT tokens, password management
+### 1. API Gateway (Port 4000)
 
+**Technology**: Fastify with HTTP Proxy
+
+**Responsibilities**:
+- Request routing to microservices
+- Load balancing
+- Rate limiting
+- Unified Swagger documentation aggregation
+- Health check aggregation
+- CORS handling
+- Security headers
+
+**Key Features**:
 ```typescript
-// auth-service/src/auth.controller.ts
-@Controller('auth')
-export class AuthController {
-  @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    // JWT authentication logic
-  }
-
-  @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
-    // User registration logic
-  }
-
-  @Post('forgot-password')
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    // Password reset logic
-  }
-
-  @Post('refresh')
-  async refreshToken(@Body() refreshDto: RefreshTokenDto) {
-    // Token refresh logic
-  }
-}
+// API Gateway Structure
+services/api-gateway-node/
+├── src/
+│   └── index.ts              # Main gateway file
+├── Dockerfile
+├── package.json
+└── tsconfig.json
 ```
 
-**Database**: MongoDB (users, tokens, sessions)
-**Message Queue**: NATS for auth events
-**Cache**: Redis for session storage
-
-### 2. User Service
-**Responsibility**: User profiles, preferences, account management
-
+**Implementation**:
 ```typescript
-// user-service/src/user.controller.ts
-@Controller('users')
-export class UserController {
-  @Get('profile')
-  @UseGuards(JwtAuthGuard)
-  async getProfile(@Req() req) {
-    // Get user profile
-  }
+import Fastify from 'fastify';
+import proxy from '@fastify/http-proxy';
+import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
+import rateLimit from '@fastify/rate-limit';
 
-  @Put('profile')
-  @UseGuards(JwtAuthGuard)
-  async updateProfile(@Req() req, @Body() updateDto: UpdateProfileDto) {
-    // Update user profile
-  }
+const app = Fastify({ logger: false });
 
-  @Get('purchases')
-  @UseGuards(JwtAuthGuard)
-  async getPurchases(@Req() req) {
-    // Get user purchase history
-  }
-}
+// Proxy routes
+await app.register(proxy, {
+  upstream: 'http://auth-service:4002',
+  prefix: '/api/auth',
+  rewritePrefix: '/api/auth',
+});
+
+// Health check aggregates all services
+app.get('/health', async () => {
+  const serviceHealth = await checkAllServices();
+  return { status: 'ok', services: serviceHealth };
+});
 ```
 
-### 3. Catalog Service
-**Responsibility**: Product management, search, categories
-
-```typescript
-// catalog-service/src/catalog.controller.ts
-@Controller('catalog')
-export class CatalogController {
-  @Get('products')
-  async getProducts(@Query() query: ProductSearchDto) {
-    // Search and filter products
-  }
-
-  @Get('products/:id')
-  async getProduct(@Param('id') id: string) {
-    // Get single product details
-  }
-
-  @Post('products')
-  @UseGuards(JwtAuthGuard, VendorGuard)
-  async createProduct(@Body() productDto: CreateProductDto) {
-    // Create new product (vendor only)
-  }
-
-  @Get('categories')
-  async getCategories() {
-    // Get product categories
-  }
-}
+**Environment Variables**:
+```env
+API_GATEWAY_PORT=4000
+AUTH_SERVICE_URL=http://localhost:4002
+USER_SERVICE_URL=http://localhost:4005
+MARKETPLACE_SERVICE_URL=http://localhost:4003
+JWT_SECRET=your-secret-key
+CORS_ORIGINS=http://localhost:3000
 ```
 
-### 4. Payment Service
-**Responsibility**: Stripe/Razorpay integration, payment processing
-
-```typescript
-// payment-service/src/payment.controller.ts
-@Controller('payments')
-export class PaymentController {
-  @Post('create-intent')
-  @UseGuards(JwtAuthGuard)
-  async createPaymentIntent(@Body() paymentDto: CreatePaymentDto) {
-    // Create Stripe payment intent
-  }
-
-  @Post('confirm')
-  @UseGuards(JwtAuthGuard)
-  async confirmPayment(@Body() confirmDto: ConfirmPaymentDto) {
-    // Confirm payment
-  }
-
-  @Post('webhook/stripe')
-  async stripeWebhook(@Body() payload: any, @Headers() headers: any) {
-    // Handle Stripe webhooks
-  }
-
-  @Post('webhook/razorpay')
-  async razorpayWebhook(@Body() payload: any, @Headers() headers: any) {
-    // Handle Razorpay webhooks
-  }
-}
-```
-
-### 5. Order Service
-**Responsibility**: Order management, cart operations
-
-```typescript
-// order-service/src/order.controller.ts
-@Controller('orders')
-export class OrderController {
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  async createOrder(@Body() orderDto: CreateOrderDto) {
-    // Create new order
-  }
-
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  async getOrders(@Req() req, @Query() query: OrderQueryDto) {
-    // Get user orders
-  }
-
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  async getOrder(@Param('id') id: string) {
-    // Get single order
-  }
-
-  @Put(':id/status')
-  @UseGuards(JwtAuthGuard, AdminGuard)
-  async updateOrderStatus(@Param('id') id: string, @Body() statusDto: UpdateStatusDto) {
-    // Update order status (admin)
-  }
-}
-```
-
-### 6. Download Service
-**Responsibility**: Digital asset delivery, license verification
-
-```typescript
-// download-service/src/download.controller.ts
-@Controller('downloads')
-export class DownloadController {
-  @Get(':productId/download')
-  @UseGuards(JwtAuthGuard, PurchaseGuard)
-  async downloadProduct(@Param('productId') productId: string, @Req() req) {
-    // Generate secure download link
-  }
-
-  @Get(':productId/license')
-  @UseGuards(JwtAuthGuard, PurchaseGuard)
-  async getLicenseKey(@Param('productId') productId: string, @Req() req) {
-    // Get license key for purchased product
-  }
-
-  @Post(':productId/track')
-  async trackDownload(@Param('productId') productId: string, @Body() trackDto: TrackDownloadDto) {
-    // Track download analytics
-  }
-}
-```
-
-## Database Schema
-
-### MongoDB Collections
-
-```typescript
-// User Schema
-interface User {
-  _id: ObjectId
-  email: string
-  password: string // hashed
-  profile: {
-    firstName: string
-    lastName: string
-    avatar?: string
-    company?: string
-    phone?: string
-  }
-  role: 'user' | 'vendor' | 'admin'
-  status: 'active' | 'suspended' | 'pending'
-  preferences: {
-    newsletter: boolean
-    notifications: boolean
-  }
-  createdAt: Date
-  updatedAt: Date
-}
-
-// Product Schema
-interface Product {
-  _id: ObjectId
-  name: string
-  description: string
-  type: 'agent' | 'workflow' | 'tool'
-  category: string
-  tags: string[]
-  price: number
-  vendor: ObjectId // User ID
-  status: 'active' | 'pending' | 'rejected' | 'draft'
-  files: {
-    thumbnail: string
-    screenshots: string[]
-    downloadUrl: string
-    size: number
-  }
-  metadata: {
-    version: string
-    requirements: string[]
-    compatibility: string[]
-  }
-  analytics: {
-    downloads: number
-    views: number
-    rating: number
-    reviews: number
-  }
-  createdAt: Date
-  updatedAt: Date
-}
-
-// Order Schema
-interface Order {
-  _id: ObjectId
-  orderNumber: string
-  user: ObjectId // User ID
-  items: Array<{
-    product: ObjectId // Product ID
-    price: number
-    quantity: number
-    license: string
-  }>
-  billing: {
-    firstName: string
-    lastName: string
-    email: string
-    address: object
-  }
-  payment: {
-    provider: 'stripe' | 'razorpay'
-    paymentId: string
-    status: 'pending' | 'completed' | 'failed' | 'refunded'
-    amount: number
-    currency: string
-  }
-  status: 'pending' | 'processing' | 'completed' | 'cancelled'
-  licenses: Array<{
-    product: ObjectId
-    licenseKey: string
-    activatedAt?: Date
-    expiresAt?: Date
-  }>
-  createdAt: Date
-  updatedAt: Date
-}
-```
-
-## Message Queue (NATS)
-
-### Event-Driven Architecture
-
-```typescript
-// Events Published
-interface Events {
-  'user.registered': { userId: string, email: string }
-  'user.verified': { userId: string }
-  'product.uploaded': { productId: string, vendorId: string }
-  'product.approved': { productId: string, vendorId: string }
-  'order.created': { orderId: string, userId: string }
-  'payment.completed': { orderId: string, paymentId: string }
-  'download.started': { productId: string, userId: string }
-}
-
-// Event Handlers
-@Injectable()
-export class UserEventHandler {
-  @EventPattern('user.registered')
-  async handleUserRegistered(data: { userId: string, email: string }) {
-    // Send welcome email
-    // Create user analytics profile
-  }
-
-  @EventPattern('payment.completed')
-  async handlePaymentCompleted(data: { orderId: string, paymentId: string }) {
-    // Generate license keys
-    // Send purchase confirmation email
-    // Update analytics
-  }
-}
-```
-
-## API Gateway
-
-### Route Configuration
-
-```typescript
-// api-gateway/src/app.module.ts
-@Module({
-  imports: [
-    ProxyModule.register([
-      {
-        name: 'auth',
-        upstream: 'http://auth-service:3001',
-        paths: ['/api/auth/*']
-      },
-      {
-        name: 'users',
-        upstream: 'http://user-service:3002',
-        paths: ['/api/users/*']
-      },
-      {
-        name: 'catalog',
-        upstream: 'http://catalog-service:3003',
-        paths: ['/api/catalog/*', '/api/products/*']
-      },
-      {
-        name: 'payments',
-        upstream: 'http://payment-service:3004',
-        paths: ['/api/payments/*']
-      },
-      {
-        name: 'orders',
-        upstream: 'http://order-service:3005',
-        paths: ['/api/orders/*']
-      }
-    ])
-  ]
-})
-export class AppModule {}
-```
-
-## Deployment
-
-### Docker Compose
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  # Databases
-  mongodb:
-    image: mongo:7
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-
-  # Message Queue
-  nats:
-    image: nats:2.10-alpine
-    ports:
-      - "4222:4222"
-      - "8222:8222"
-
-  # API Gateway
-  api-gateway:
-    build: ./gateway/api-gateway
-    ports:
-      - "3000:3000"
-    depends_on:
-      - auth-service
-      - user-service
-      - catalog-service
-
-  # Microservices
-  auth-service:
-    build: ./services/auth-service
-    ports:
-      - "3001:3001"
-    depends_on:
-      - mongodb
-      - redis
-      - nats
-
-  user-service:
-    build: ./services/user-service
-    ports:
-      - "3002:3002"
-    depends_on:
-      - mongodb
-      - nats
-
-  catalog-service:
-    build: ./services/catalog-service
-    ports:
-      - "3003:3003"
-    depends_on:
-      - mongodb
-      - nats
-```
-
-### Kubernetes Deployment
-
-```yaml
-# k8s/auth-service-deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: auth-service
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: auth-service
-  template:
-    metadata:
-      labels:
-        app: auth-service
-    spec:
-      containers:
-      - name: auth-service
-        image: autopilot/auth-service:latest
-        ports:
-        - containerPort: 3001
-        env:
-        - name: MONGODB_URI
-          valueFrom:
-            secretKeyRef:
-              name: database-secrets
-              key: mongodb-uri
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: auth-secrets
-              key: jwt-secret
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: auth-service
-spec:
-  selector:
-    app: auth-service
-  ports:
-    - protocol: TCP
-      port: 3001
-      targetPort: 3001
+
+### 2. Auth Service (Port 4002)
+
+**Technology**: Fastify + MongoDB + Redis + Kafka
+
+**Database**: `auth_db` (MongoDB)
+
+**Responsibilities**:
+- User registration
+- Login with JWT tokens
+- Refresh token mechanism
+- Password reset
+- Account activation
+- Token blacklisting
+- OAuth integration (ready)
+
+**Structure**:
+```typescript
+services/auth-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── auth.controller.ts    # Route handlers
+│   ├── models/
+│   │   └── user.model.ts         # Mongoose schemas
+│   ├── routes/
+│   │   └── auth.routes.ts        # API routes
+│   ├── services/
+│   │   └── auth.service.ts       # Business logic
+│   ├── app.ts                     # Fastify app setup
+│   └── index.ts                   # Service entry point
+├── Dockerfile
+├── package.json
+└── tsconfig.json
 ```
 
-## Security
-
-### Authentication & Authorization
-
-- JWT tokens with refresh token rotation
-- Role-based access control (RBAC)
-- API rate limiting
-- Request validation
-- CORS protection
-- Helmet.js security headers
-
-### Data Protection
-
-- MongoDB encryption at rest
-- Redis encryption in transit
-- File encryption for sensitive data
-- PII data anonymization
-- GDPR compliance measures
-
-## Monitoring & Logging
-
-### Application Monitoring
-
+**API Endpoints**:
 ```typescript
-// Prometheus metrics
-@Injectable()
-export class MetricsService {
-  private readonly requestCounter = new Counter({
-    name: 'http_requests_total',
-    help: 'Total HTTP requests',
-    labelNames: ['method', 'route', 'status']
-  })
+POST /api/auth/register          # Register new user
+POST /api/auth/login             # User login
+POST /api/auth/logout            # Logout (invalidate token)
+POST /api/auth/refresh           # Refresh access token
+POST /api/auth/forgot-password   # Request password reset
+POST /api/auth/reset-password    # Reset password with token
+GET  /api/auth/verify/:token     # Verify email
+```
 
-  private readonly responseTime = new Histogram({
-    name: 'http_request_duration_seconds',
-    help: 'HTTP request duration',
-    labelNames: ['method', 'route']
-  })
-
-  recordRequest(method: string, route: string, status: number) {
-    this.requestCounter.inc({ method, route, status })
-  }
-
-  recordResponseTime(method: string, route: string, duration: number) {
-    this.responseTime.observe({ method, route }, duration)
+**Key Implementation**:
+```typescript
+// auth.service.ts
+export class AuthService {
+  async register(data: RegisterDto) {
+    // Hash password
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    
+    // Create user
+    const user = await User.create({
+      ...data,
+      password: hashedPassword
+    });
+    
+    // Generate tokens
+    const accessToken = this.generateAccessToken(user);
+    const refreshToken = this.generateRefreshToken(user);
+    
+    // Publish event to Kafka
+    await kafkaManager.publish('user.registered', {
+      userId: user._id,
+      email: user.email
+    });
+    
+    return { user, accessToken, refreshToken };
   }
 }
 ```
 
-### Logging Strategy
-
-- Structured logging with Winston
-- Centralized log aggregation (ELK Stack)
-- Request/response logging
-- Error tracking with Sentry
-- Performance monitoring with APM
-
-## Development Setup
-
-### Prerequisites
-
-```bash
-# Install dependencies
-npm install -g @nestjs/cli
-npm install -g typescript
-
-# Start infrastructure
-docker-compose up -d mongodb redis nats
-
-# Install service dependencies
-cd services/auth-service && npm install
-cd services/user-service && npm install
-# ... repeat for all services
+**Database Schema**:
+```typescript
+// user.model.ts
+interface IUser {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  isEmailVerified: boolean;
+  isActive: boolean;
+  role: 'user' | 'vendor' | 'admin';
+  createdAt: Date;
+  updatedAt: Date;
+}
 ```
 
-### Running Services
+---
 
-```bash
-# Start all services in development
-npm run start:dev:all
+### 3. User Service (Port 4005)
 
-# Or start individual services
-npm run start:dev auth-service
-npm run start:dev user-service
+**Technology**: Fastify + MongoDB + Kafka
+
+**Database**: `user_db` (MongoDB)
+
+**Responsibilities**:
+- User profile management
+- Wishlist functionality
+- Subscription management
+- User preferences
+- Dashboard data
+- Account settings
+
+**Structure**:
+```typescript
+services/user-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── user.controller.ts
+│   ├── models/
+│   │   ├── profile.model.ts      # User profiles
+│   │   ├── wishlist.model.ts     # Wishlist items
+│   │   └── subscription.model.ts # Subscriptions
+│   ├── routes/
+│   │   └── user.routes.ts
+│   ├── services/
+│   │   └── user.service.ts
+│   ├── app.ts
+│   └── index.ts
+├── Dockerfile
+└── package.json
 ```
 
-## Testing Strategy
+**API Endpoints**:
+```typescript
+GET    /api/users/profile          # Get user profile
+PUT    /api/users/profile          # Update profile
+GET    /api/users/dashboard        # Dashboard data
+GET    /api/users/wishlist         # Get wishlist
+POST   /api/users/wishlist         # Add to wishlist
+DELETE /api/users/wishlist/:id     # Remove from wishlist
+GET    /api/users/subscriptions    # Get subscriptions
+POST   /api/users/subscriptions    # Create subscription
+```
 
-### Unit Tests
-- Jest for unit testing
-- 80%+ code coverage requirement
-- Mocked dependencies
+**Kafka Events Consumed**:
+```typescript
+// Listens to user.registered from Auth Service
+kafkaManager.consume('user.registered', async (event) => {
+  await UserProfile.create({
+    userId: event.userId,
+    email: event.email,
+    // Initialize default profile
+  });
+});
+```
 
-### Integration Tests
-- Supertest for API testing
-- Test database isolation
-- Service-to-service communication tests
+---
 
-### E2E Tests
-- Cypress for frontend E2E
-- API E2E with real database
-- Load testing with Artillery
+### 4. Marketplace Service (Port 4003)
 
-## Performance Optimization
+**Technology**: Fastify + MongoDB + Elasticsearch + Kafka
 
-### Caching Strategy
-- Redis for session storage
-- MongoDB query result caching
-- CDN for static assets
-- GraphQL query caching
+**Database**: `marketplace_db` (MongoDB)
 
-### Database Optimization
-- MongoDB indexing strategy
-- Connection pooling
-- Read replicas for analytics
-- Aggregation pipeline optimization
+**Responsibilities**:
+- Product catalog management
+- Product search and filtering
+- Categories management
+- Product reviews and ratings
+- Featured/popular products
+- Vendor product listings
 
-This backend architecture provides a scalable, maintainable, and secure foundation for the Autopilot.monster marketplace platform.
+**Structure**:
+```typescript
+services/marketplace-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── marketplace.controller.ts
+│   ├── models/
+│   │   ├── product.model.ts      # Products
+│   │   ├── category.model.ts     # Categories
+│   │   └── review.model.ts       # Reviews
+│   ├── routes/
+│   │   └── marketplace.routes.ts
+│   ├── services/
+│   │   └── marketplace.service.ts
+│   ├── app.ts
+│   └── index.ts
+```
+
+**API Endpoints**:
+```typescript
+GET    /api/marketplace/products          # List products (paginated)
+GET    /api/marketplace/products/:id      # Get product details
+POST   /api/marketplace/products          # Create product (vendor)
+PUT    /api/marketplace/products/:id      # Update product (vendor)
+DELETE /api/marketplace/products/:id      # Delete product (vendor)
+GET    /api/marketplace/categories        # List categories
+GET    /api/marketplace/products/:id/reviews  # Product reviews
+POST   /api/marketplace/products/:id/reviews  # Add review
+```
+
+**Product Schema**:
+```typescript
+interface IProduct {
+  vendorId: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  category: string;
+  tags: string[];
+  images: string[];
+  thumbnail?: string;
+  rating: number;
+  reviewCount: number;
+  downloadCount: number;
+  isFeatured: boolean;
+  isPopular: boolean;
+  status: 'active' | 'pending' | 'rejected' | 'draft';
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+---
+
+### 5. Cart Service (Port 4009)
+
+**Technology**: Fastify + MongoDB + Redis
+
+**Database**: `cart_db` (MongoDB)
+
+**Responsibilities**:
+- Shopping cart CRUD operations
+- Cart item management
+- Price calculations
+- Cart persistence
+- Session-based and user-based carts
+
+**Structure**:
+```typescript
+services/cart-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── cart.controller.ts
+│   ├── models/
+│   │   └── cart.model.ts
+│   ├── routes/
+│   │   └── cart.routes.ts
+│   ├── services/
+│   │   └── cart.service.ts
+│   ├── app.ts
+│   └── index.ts
+```
+
+**API Endpoints**:
+```typescript
+GET    /api/cart              # Get cart
+POST   /api/cart/items        # Add item to cart
+PUT    /api/cart/items/:id    # Update item quantity
+DELETE /api/cart/items/:id    # Remove item
+DELETE /api/cart              # Clear cart
+```
+
+**Cart Schema**:
+```typescript
+interface ICart {
+  userId: string;
+  items: Array<{
+    productId: string;
+    productName: string;
+    price: number;
+    quantity: number;
+    thumbnail?: string;
+  }>;
+  subtotal: number;
+  tax: number;
+  total: number;
+  currency: string;
+  updatedAt: Date;
+  expiresAt: Date;
+}
+```
+
+---
+
+### 6. Order Service (Port 4004)
+
+**Technology**: Fastify + MongoDB + Stripe/Razorpay + Kafka
+
+**Database**: `order_db` (MongoDB)
+
+**Responsibilities**:
+- Order creation and management
+- Payment processing (Stripe/Razorpay)
+- Order status tracking
+- Order history
+- Transaction logs
+- Payment webhook handling
+
+**Structure**:
+```typescript
+services/order-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── order.controller.ts
+│   ├── models/
+│   │   ├── order.model.ts
+│   │   └── payment.model.ts
+│   ├── routes/
+│   │   └── order.routes.ts
+│   ├── services/
+│   │   └── order.service.ts
+│   ├── app.ts
+│   └── index.ts
+```
+
+**API Endpoints**:
+```typescript
+POST   /api/orders                    # Create order
+GET    /api/orders                    # List orders
+GET    /api/orders/:id                # Get order details
+POST   /api/orders/:id/payment        # Process payment
+POST   /api/orders/:id/cancel         # Cancel order
+GET    /api/orders/payment-methods    # Get payment methods
+POST   /api/orders/webhooks/stripe    # Stripe webhook
+POST   /api/orders/webhooks/razorpay  # Razorpay webhook
+```
+
+**Order Schema**:
+```typescript
+interface IOrder {
+  orderId: string;
+  userId: string;
+  items: Array<{
+    productId: string;
+    productName: string;
+    price: number;
+    quantity: number;
+  }>;
+  subtotal: number;
+  tax: number;
+  total: number;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentMethod: 'stripe' | 'razorpay';
+  paymentIntent?: string;
+  billingAddress: object;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+**Payment Integration**:
+```typescript
+// Stripe payment
+import Stripe from 'stripe';
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+async createPayment(order) {
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: order.total * 100,
+    currency: 'usd',
+    metadata: { orderId: order.orderId }
+  });
+  
+  return paymentIntent;
+}
+```
+
+---
+
+### 7. Vendor Service (Port 4006)
+
+**Technology**: Fastify + MongoDB + Kafka
+
+**Database**: `vendor_db` (MongoDB)
+
+**Responsibilities**:
+- Vendor registration and onboarding
+- Product management for vendors
+- Analytics dashboard
+- Earnings tracking
+- Payout requests
+- Vendor profile management
+
+**Structure**:
+```typescript
+services/vendor-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── vendor.controller.ts
+│   ├── models/
+│   │   ├── vendor.model.ts
+│   │   └── payout.model.ts
+│   ├── routes/
+│   │   └── vendor.routes.ts
+│   ├── services/
+│   │   └── vendor.service.ts
+│   ├── app.ts
+│   └── index.ts
+```
+
+**API Endpoints**:
+```typescript
+GET    /api/vendors/profile          # Get vendor profile
+PUT    /api/vendors/profile          # Update profile
+GET    /api/vendors/products         # List vendor products
+POST   /api/vendors/products         # Create product
+PUT    /api/vendors/products/:id     # Update product
+DELETE /api/vendors/products/:id     # Delete product
+GET    /api/vendors/analytics        # Get analytics
+GET    /api/vendors/earnings         # Get earnings
+POST   /api/vendors/payouts          # Request payout
+```
+
+**Vendor Schema**:
+```typescript
+interface IVendor {
+  vendorId: string;
+  userId: string;
+  name: string;
+  description: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  avatar?: string;
+  verified: boolean;
+  status: 'active' | 'pending' | 'suspended';
+  productsCount: number;
+  totalRevenue: number;
+  averageRating: number;
+  joinDate: Date;
+}
+```
+
+---
+
+### 8. Content Service (Port 4008)
+
+**Technology**: Fastify + MongoDB
+
+**Database**: `content_db` (MongoDB)
+
+**Responsibilities**:
+- Blog post management
+- Tutorial system
+- Help article management
+- Job listings
+- Content categories
+- SEO optimization
+
+**Structure**:
+```typescript
+services/content-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── content.controller.ts
+│   ├── models/
+│   │   ├── blog.model.ts
+│   │   └── tutorial.model.ts
+│   ├── routes/
+│   │   └── content.routes.ts
+│   ├── services/
+│   │   └── content.service.ts
+│   ├── app.ts
+│   └── index.ts
+```
+
+**API Endpoints**:
+```typescript
+GET    /api/content/blog             # List blog posts
+GET    /api/content/blog/:slug       # Get blog post
+POST   /api/content/blog             # Create post (admin)
+PUT    /api/content/blog/:id         # Update post (admin)
+DELETE /api/content/blog/:id         # Delete post (admin)
+GET    /api/content/help             # List help articles
+GET    /api/content/help/:slug       # Get help article
+GET    /api/content/jobs             # List job openings
+POST   /api/content/jobs/:id/apply   # Apply for job
+```
+
+---
+
+### 9. Admin Service (Port 4007)
+
+**Technology**: Fastify + MongoDB + Kafka
+
+**Database**: `admin_db` (MongoDB)
+
+**Responsibilities**:
+- User management (view, update, delete)
+- Vendor approval system
+- Product moderation
+- Platform analytics
+- System settings
+- Approval workflows
+
+**Structure**:
+```typescript
+services/admin-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── admin.controller.ts
+│   ├── models/
+│   │   ├── admin.model.ts
+│   │   └── approval.model.ts
+│   ├── routes/
+│   │   └── admin.routes.ts
+│   ├── services/
+│   │   └── admin.service.ts
+│   ├── app.ts
+│   └── index.ts
+```
+
+**API Endpoints**:
+```typescript
+GET    /api/admin/dashboard          # Dashboard stats
+GET    /api/admin/users              # List users
+GET    /api/admin/users/:id          # Get user details
+PUT    /api/admin/users/:id          # Update user
+DELETE /api/admin/users/:id          # Delete user
+GET    /api/admin/vendors            # List vendors
+POST   /api/admin/vendors/:id/approve    # Approve vendor
+POST   /api/admin/vendors/:id/reject     # Reject vendor
+GET    /api/admin/products           # List products
+POST   /api/admin/products/:id/approve   # Approve product
+POST   /api/admin/products/:id/reject    # Reject product
+```
+
+---
+
+## 🔗 Shared Infrastructure
+
+### Shared Configuration Module
+
+**Location**: `shared/config/`
+
+**Purpose**: Centralized configuration for all services
+
+**Files**:
+
+1. **db.ts** - MongoDB Connection Manager
+```typescript
+export class DatabaseManager {
+  async connect(serviceName: string, uri: string) {
+    const connection = await mongoose.createConnection(uri).asPromise();
+    this.connections.set(serviceName, connection);
+    return connection;
+  }
+}
+```
+
+2. **redis.ts** - Redis Client Manager
+```typescript
+export class RedisManager {
+  private client: Redis;
+  
+  async getClient() {
+    if (!this.client) {
+      this.client = new Redis({
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+        password: process.env.REDIS_PASSWORD
+      });
+    }
+    return this.client;
+  }
+}
+```
+
+3. **kafka.ts** - Kafka Producer/Consumer
+```typescript
+export class KafkaManager {
+  async publish(topic: string, message: any) {
+    await this.producer.send({
+      topic,
+      messages: [{ value: JSON.stringify(message) }]
+    });
+  }
+  
+  async consume(topic: string, handler: Function) {
+    await this.consumer.subscribe({ topic });
+    await this.consumer.run({
+      eachMessage: async ({ message }) => {
+        const data = JSON.parse(message.value.toString());
+        await handler(data);
+      }
+    });
+  }
+}
+```
+
+4. **logger.ts** - Winston Logger
+```typescript
+export const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/combined.log' })
+  ]
+});
+```
+
+5. **env.ts** - Environment Variables Manager
+```typescript
+export class EnvConfig {
+  get(key: string, defaultValue?: string): string {
+    return process.env[key] || defaultValue || '';
+  }
+}
+```
+
+### Shared Middleware
+
+**Location**: `shared/middleware/`
+
+1. **auth.middleware.ts** - JWT Authentication
+2. **error.middleware.ts** - Error Handling
+3. **rateLimit.middleware.ts** - Rate Limiting
+4. **validation.middleware.ts** - Input Validation
+
+---
+
+## 🔄 Inter-Service Communication
+
+### 1. Synchronous (HTTP)
+
+Via API Gateway:
+```
+Client → API Gateway → Service A
+```
+
+### 2. Asynchronous (Kafka Events)
+
+```
+Service A publishes event → Kafka → Service B consumes
+```
+
+**Event Examples**:
+- `user.registered` - New user signup
+- `order.created` - New order placed
+- `payment.success` - Payment completed
+- `product.created` - New product added
+- `vendor.approved` - Vendor activated
+
+---
+
+## 📊 Performance Metrics
+
+### Fastify vs NestJS
+
+| Metric | NestJS | Fastify | Improvement |
+|--------|--------|---------|-------------|
+| Requests/sec | 30,000 | 70,000 | +133% |
+| Startup Time | 3-5s | 1-2s | -60% |
+| Memory Usage | 200MB | 80MB | -60% |
+| Response Time | 50ms | 20ms | -60% |
+
+---
+
+## 🔐 Security Measures
+
+1. **Authentication**: JWT with refresh tokens
+2. **Password Security**: bcrypt with 10 rounds
+3. **Rate Limiting**: Redis-backed, per-IP
+4. **Input Validation**: All endpoints validated
+5. **CORS**: Configured for allowed origins
+6. **Helmet**: Security headers enabled
+7. **SQL Injection**: MongoDB prevents it
+8. **XSS**: React escapes by default
+
+---
+
+## 📚 Related Documentation
+
+- [Technical Architecture](./technical-architecture.md)
+- [Backend Services](./backend-services.md)
+- [API Reference](./API_REFERENCE.md)
+- [Setup Guide](./SETUP.md)
+- [Deployment Guide](./deployment-guide.md)
+
+---
+
+<div align="center">
+
+**[⬆ Back to Top](#backend-architecture---autopilot-monster)**
+
+Made with ❤️ by the Autopilot Monster Team
+
+</div>

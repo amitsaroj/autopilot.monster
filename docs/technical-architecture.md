@@ -1,644 +1,566 @@
-# Technical Architecture - Autopilot.monster
+# Technical Architecture - Autopilot Monster
 
 ## 🏗️ System Overview
 
-Autopilot.monster is a production-ready, scalable marketplace platform built with modern microservices architecture. The system enables vendors to sell AI agents, n8n workflows, and automation assets with enterprise-grade security, performance, and user experience.
+Autopilot Monster is a production-ready, scalable marketplace platform built with modern microservices architecture using Node.js and Fastify. The system enables vendors to sell AI agents, n8n workflows, and automation tools with enterprise-grade security, performance, and user experience.
 
 ## 🎯 Core Requirements
 
 ### Business Requirements
+
 - **Multi-vendor marketplace** for AI agents and automation tools
 - **Free and paid downloads** with secure licensing
-- **n8n workflow integration** with preview capabilities
+- **N8N workflow integration** with preview capabilities
 - **Real-time analytics** and vendor dashboards
 - **Subscription and one-time payment** models
 - **Enterprise-grade security** and compliance
 
 ### Technical Requirements
+
 - **99.9% uptime** with horizontal scalability
 - **Sub-200ms API response times** for core operations
-- **Global CDN** for asset delivery
+- **70,000+ requests/second** capability with Fastify
+- **Event-driven architecture** with Apache Kafka
 - **Real-time notifications** and updates
 - **Comprehensive monitoring** and observability
-- **Automated testing** and CI/CD pipeline
+- **Automated testing** and CI/CD pipeline support
 
 ## 🏛️ High-Level Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Edge Layer (Cloudflare)                  │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
-│  │     CDN     │ │     WAF     │ │   Global Load Balancer  │ │
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                                │
-┌─────────────────────────────────────────────────────────────┐
-│                 API Gateway (NestJS)                        │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
-│  │   Routing   │ │    Auth     │ │    Rate Limiting        │ │
-│  │   & Load    │ │ Validation  │ │    & Throttling         │ │
-│  │  Balancing  │ │             │ │                         │ │
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                                │
-┌─────────────────────────────────────────────────────────────┐
-│                Microservices Layer                          │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
-│  │    Auth     │ │   Catalog   │ │       Assets            │ │
-│  │   Service   │ │   Service   │ │      Service            │ │
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘ │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
-│  │  Payments   │ │ Licensing   │ │      Downloads          │ │
-│  │   Service   │ │   Service   │ │      Service            │ │
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘ │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
-│  │   Search    │ │  Reviews    │ │    Notifications        │ │
-│  │   Service   │ │   Service   │ │      Service            │ │
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘ │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
-│  │   n8n       │ │   Vendor    │ │        Admin            │ │
-│  │  Parser     │ │ Marketplace │ │      Service            │ │
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                                │
-┌─────────────────────────────────────────────────────────────┐
-│                 Data & Storage Layer                        │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
-│  │  MongoDB    │ │    Redis    │ │      S3/R2 Storage      │ │
-│  │ (Per Service│ │   Cache &   │ │    (Binary Assets)      │ │
-│  │  Database)  │ │   Queues    │ │                         │ │
-│  └─────────────┘ └─────────────┘ └─────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                     Client Layer                                 │
+│                ┌────────────────────┐                            │
+│                │   Next.js 15       │                            │
+│                │   Frontend App     │                            │
+│                │   (Port 3000)      │                            │
+│                └──────────┬─────────┘                            │
+└───────────────────────────┼──────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  API Gateway Layer                               │
+│           ┌─────────────────────────────┐                        │
+│           │   Fastify API Gateway       │                        │
+│           │   (Port 4000)               │                        │
+│           │   • Request Routing         │                        │
+│           │   • Load Balancing          │                        │
+│           │   • Rate Limiting           │                        │
+│           │   • Unified Swagger Docs    │                        │
+│           │   • Health Aggregation      │                        │
+│           └──────────┬──────────────────┘                        │
+└──────────────────────┼───────────────────────────────────────────┘
+                       │
+        ┌──────────────┼──────────────┐
+        │              │               │
+        ▼              ▼               ▼
+┌─────────────────────────────────────────────────────────────────┐
+│               Microservices Layer (Node.js/Fastify)              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ Auth Service │  │ User Service │  │ Marketplace  │          │
+│  │  (Port 4002) │  │ (Port 4005)  │  │   Service    │          │
+│  │              │  │              │  │ (Port 4003)  │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ Cart Service │  │Order Service │  │Vendor Service│          │
+│  │ (Port 4009)  │  │ (Port 4004)  │  │ (Port 4006)  │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                   │
+│  ┌──────────────┐  ┌──────────────┐                             │
+│  │Content Svc   │  │Admin Service │                             │
+│  │ (Port 4008)  │  │ (Port 4007)  │                             │
+│  └──────────────┘  └──────────────┘                             │
+└──────────────────────┬──────────────────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Event Streaming Layer                               │
+│                ┌────────────────────┐                            │
+│                │  Apache Kafka      │                            │
+│                │  (Port 9092)       │                            │
+│                │  • Event Bus       │                            │
+│                │  • Async Messaging │                            │
+│                │  • Service Decouple│                            │
+│                └──────────┬─────────┘                            │
+└───────────────────────────┼──────────────────────────────────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        │                   │                   │
+        ▼                   ▼                   ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                Data & Cache Layer                                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │  MongoDB 7.0 │  │  Redis 7.2   │  │Elasticsearch │          │
+│  │(Port 27017)  │  │ (Port 6379)  │  │ (Port 9200)  │          │
+│  │              │  │              │  │              │          │
+│  │• auth_db     │  │• Caching     │  │• Search      │          │
+│  │• user_db     │  │• Sessions    │  │• Analytics   │          │
+│  │• marketplace │  │• Rate Limit  │  │• Indexing    │          │
+│  │• cart_db     │  │• Pub/Sub     │  │              │          │
+│  │• order_db    │  └──────────────┘  └──────────────┘          │
+│  │• vendor_db   │                                                │
+│  │• content_db  │                                                │
+│  │• admin_db    │                                                │
+│  └──────────────┘                                                │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## 🔧 Technology Stack
 
 ### Frontend Stack
-- **Framework**: Next.js 14+ with App Router
-- **Styling**: SCSS (ITCSS + BEM + CSS Modules)
-- **Animations**: Framer Motion + Lottie
-- **State Management**: React Query + Zustand
-- **Forms**: React Hook Form + Zod
-- **Testing**: Jest + React Testing Library + Playwright
-- **Component Library**: Storybook + Chromatic
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Next.js** | 15.5+ | React framework with App Router |
+| **React** | 19.1+ | UI library |
+| **TypeScript** | 5+ | Type safety |
+| **SCSS/Sass** | 1.92+ | Styling with CSS modules |
+| **Framer Motion** | 12+ | Animations and transitions |
+| **React Hook Form** | 7.62+ | Form handling |
+| **Zod** | 4.1+ | Schema validation |
+| **Axios** | 1.12+ | HTTP client |
+| **Recharts** | 3.1+ | Data visualization |
+| **Lucide React** | 0.542+ | Icon library |
 
 ### Backend Stack
-- **API Framework**: NestJS with TypeScript
-- **Database**: MongoDB with Mongoose ODM
-- **Cache**: Redis for caching and session storage
-- **Message Queue**: NATS for event-driven architecture
-- **File Storage**: AWS S3 / Cloudflare R2
-- **Search**: Elasticsearch for advanced search capabilities
-- **Monitoring**: OpenTelemetry + Jaeger + Prometheus
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Node.js** | 18+ | JavaScript runtime |
+| **Fastify** | 4.26+ | Web framework (70k req/s) |
+| **TypeScript** | 5.3+ | Type-safe development |
+| **MongoDB** | 7.0+ | NoSQL database |
+| **Mongoose** | 8.1+ | MongoDB ODM |
+| **Redis** | 7.2+ | Caching & sessions |
+| **Apache Kafka** | 7.4+ | Event streaming |
+| **KafkaJS** | 2.2+ | Kafka client |
+| **IORedis** | 5.3+ | Redis client |
+| **Winston** | 3.11+ | Logging |
+| **bcryptjs** | 2.4+ | Password hashing |
+| **jsonwebtoken** | 9.0+ | JWT authentication |
 
 ### Infrastructure Stack
-- **Containerization**: Docker + Docker Compose
-- **Orchestration**: Kubernetes (EKS/GKE/DO)
-- **Infrastructure as Code**: Terraform
-- **CI/CD**: GitHub Actions + ArgoCD
-- **Monitoring**: Grafana + Prometheus + AlertManager
-- **Logging**: ELK Stack (Elasticsearch + Logstash + Kibana)
-- **Security**: Vault for secrets management
 
-## 🏢 Microservices Architecture
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Docker** | Latest | Containerization |
+| **Docker Compose** | 3.8+ | Multi-container orchestration |
+| **Nginx** | Alpine | Reverse proxy & load balancer |
+| **Elasticsearch** | 8.11+ | Search engine |
+| **Zookeeper** | 7.4+ | Kafka coordination |
+| **Prometheus** | Latest | Metrics collection |
+| **Grafana** | Latest | Monitoring dashboards |
 
-### 1. API Gateway Service
-**Purpose**: Single entry point for all client requests
-**Responsibilities**:
-- Request routing and load balancing
-- Authentication and authorization
-- Rate limiting and throttling
-- Request/response transformation
-- Circuit breaker pattern implementation
+## 📊 System Architecture Patterns
 
-**Key Components**:
-```typescript
-// API Gateway Structure
-src/
-├── controllers/           # Route handlers
-├── middleware/           # Auth, rate limiting, logging
-├── guards/              # Authorization guards
-├── interceptors/        # Request/response transformation
-├── filters/             # Error handling
-└── config/              # Environment configuration
+### 1. Microservices Architecture
+
+Each service is:
+- **Independent**: Own database, deployment, scaling
+- **Focused**: Single responsibility principle
+- **Resilient**: Isolated failures
+- **Scalable**: Horizontal scaling per service
+
+### 2. Database per Service Pattern
+
+```
+Auth Service     → auth_db (MongoDB)
+User Service     → user_db (MongoDB)
+Marketplace Svc  → marketplace_db (MongoDB)
+Cart Service     → cart_db (MongoDB)
+Order Service    → order_db (MongoDB)
+Vendor Service   → vendor_db (MongoDB)
+Content Service  → content_db (MongoDB)
+Admin Service    → admin_db (MongoDB)
 ```
 
-### 2. Authentication Service
-**Purpose**: User authentication and session management
-**Responsibilities**:
-- User registration and login
-- JWT token generation and validation
-- OAuth integration (Google, GitHub, etc.)
-- Password reset and email verification
-- Role-based access control (RBAC)
+**Benefits**:
+- Data isolation and independence
+- Technology flexibility per service
+- Easier scaling and maintenance
+- Clear boundaries and ownership
 
-**Database Schema**:
-```typescript
-interface User {
-  _id: ObjectId;
-  email: string;
-  passwordHash: string;
-  profile: {
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    bio?: string;
-  };
-  roles: UserRole[];
-  isEmailVerified: boolean;
-  lastLoginAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
+### 3. Event-Driven Architecture
 
-interface UserRole {
-  name: 'customer' | 'vendor' | 'admin';
-  permissions: Permission[];
-  grantedAt: Date;
-  grantedBy: ObjectId;
-}
+**Kafka Topics**:
+```
+user.registered     → User signup events
+user.logged-in      → Login tracking
+order.created       → New orders
+payment.success     → Payment confirmations
+payment.failed      → Payment failures
+product.created     → New products
+vendor.approved     → Vendor activations
+vendor.payout       → Payout requests
 ```
 
-### 3. Catalog Service
-**Purpose**: Product catalog management and search
-**Responsibilities**:
-- Product CRUD operations
-- Category and tag management
-- Search and filtering
-- Product recommendations
-- Inventory tracking
-
-**Database Schema**:
-```typescript
-interface Product {
-  _id: ObjectId;
-  vendorId: ObjectId;
-  title: string;
-  description: string;
-  shortDescription: string;
-  category: ProductCategory;
-  tags: string[];
-  pricing: {
-    type: 'free' | 'one-time' | 'subscription';
-    amount?: number;
-    currency: string;
-    subscriptionInterval?: 'monthly' | 'yearly';
-  };
-  media: {
-    thumbnail: string;
-    screenshots: string[];
-    demoVideo?: string;
-  };
-  metadata: {
-    type: 'ai-agent' | 'n8n-workflow' | 'automation-asset';
-    complexity: 'beginner' | 'intermediate' | 'advanced';
-    estimatedSetupTime: number; // minutes
-    requirements: string[];
-  };
-  status: 'draft' | 'pending' | 'approved' | 'rejected' | 'suspended';
-  stats: {
-    downloads: number;
-    rating: number;
-    reviewCount: number;
-  };
-  createdAt: Date;
-  updatedAt: Date;
-}
+**Event Flow Example**:
+```
+1. Order Service creates order
+2. Publishes "order.created" to Kafka
+3. Multiple consumers process:
+   - Vendor Service → Notifies vendor
+   - Email Service → Sends confirmation
+   - Analytics Service → Updates metrics
+   - License Service → Generates license
 ```
 
-### 4. Assets Service
-**Purpose**: File storage and asset management
-**Responsibilities**:
-- File upload and validation
-- Virus scanning (ClamAV)
-- Asset versioning
-- Presigned URL generation
-- CDN integration
+### 4. API Gateway Pattern
 
-**Key Features**:
-- **Virus Scanning**: All uploaded files scanned with ClamAV
-- **Secret Redaction**: n8n workflows scanned for API keys/secrets
-- **Versioning**: Asset version management with rollback capability
-- **Watermarking**: Optional watermarking for preview assets
+The API Gateway provides:
+- **Unified Entry Point**: Single endpoint for all services
+- **Request Routing**: Routes to appropriate microservice
+- **Load Balancing**: Distributes traffic
+- **Rate Limiting**: Protects services
+- **Authentication**: JWT validation
+- **API Documentation**: Aggregated Swagger
 
-### 5. Payments Service
-**Purpose**: Payment processing and subscription management
-**Responsibilities**:
-- Payment gateway integration (Stripe, Razorpay)
-- Subscription lifecycle management
-- Invoice generation
-- Refund processing
-- Webhook handling
-
-**Payment Flow**:
-```typescript
-interface PaymentIntent {
-  _id: ObjectId;
-  userId: ObjectId;
-  productId: ObjectId;
-  amount: number;
-  currency: string;
-  status: 'pending' | 'succeeded' | 'failed' | 'canceled';
-  paymentMethodId: string;
-  metadata: Record<string, any>;
-  createdAt: Date;
-  completedAt?: Date;
-}
+**Routing**:
+```
+/api/auth/*         → Auth Service (4002)
+/api/users/*        → User Service (4005)
+/api/marketplace/*  → Marketplace Service (4003)
+/api/cart/*         → Cart Service (4009)
+/api/orders/*       → Order Service (4004)
+/api/vendors/*      → Vendor Service (4006)
+/api/content/*      → Content Service (4008)
+/api/admin/*        → Admin Service (4007)
 ```
 
-### 6. Licensing Service
-**Purpose**: Digital rights management and licensing
-**Responsibilities**:
-- License generation and validation
-- Usage tracking and limits
-- License expiration management
-- Entitlement verification
+### 5. CQRS (Command Query Responsibility Segregation)
 
-**License Model**:
+**Commands** (Write Operations):
+- Create, Update, Delete operations
+- Validated and processed synchronously
+- Publish events to Kafka
+
+**Queries** (Read Operations):
+- Read from optimized read models
+- Cached with Redis
+- Fast response times
+
+### 6. Circuit Breaker Pattern
+
+Prevents cascading failures:
 ```typescript
-interface License {
-  _id: ObjectId;
-  userId: ObjectId;
-  productId: ObjectId;
-  type: 'perpetual' | 'subscription' | 'trial';
-  status: 'active' | 'expired' | 'suspended' | 'revoked';
-  permissions: {
-    download: boolean;
-    commercialUse: boolean;
-    redistribution: boolean;
-    modification: boolean;
-  };
-  limits: {
-    maxDownloads?: number;
-    maxDevices?: number;
-    expirationDate?: Date;
-  };
-  issuedAt: Date;
-  expiresAt?: Date;
+// Example: Service call with circuit breaker
+if (circuitBreaker.isOpen()) {
+  return fallbackResponse;
+}
+
+try {
+  const response = await serviceCall();
+  circuitBreaker.recordSuccess();
+  return response;
+} catch (error) {
+  circuitBreaker.recordFailure();
+  throw error;
 }
 ```
-
-### 7. Downloads Service
-**Purpose**: Secure file delivery and download tracking
-**Responsibilities**:
-- Presigned URL generation
-- Download tracking and analytics
-- Bandwidth management
-- Download limits enforcement
-
-### 8. n8n Parser Service
-**Purpose**: n8n workflow analysis and preview generation
-**Responsibilities**:
-- n8n JSON validation and parsing
-- Workflow visualization generation
-- Node dependency analysis
-- Preview image generation
-
-### 9. Search Service
-**Purpose**: Advanced search and recommendation engine
-**Responsibilities**:
-- Full-text search with Elasticsearch
-- Faceted search and filtering
-- Search analytics
-- Recommendation algorithms
-
-### 10. Reviews Service
-**Purpose**: Product reviews and ratings management
-**Responsibilities**:
-- Review submission and moderation
-- Rating calculation
-- Review analytics
-- Spam detection
-
-### 11. Notifications Service
-**Purpose**: Real-time notifications and communication
-**Responsibilities**:
-- Email notifications
-- In-app notifications
-- Push notifications
-- Notification preferences
-
-### 12. Vendor Marketplace Service
-**Purpose**: Vendor onboarding and management
-**Responsibilities**:
-- Vendor registration and verification
-- Vendor dashboard and analytics
-- Commission calculation
-- Vendor support tools
-
-### 13. Admin Service
-**Purpose**: Administrative functions and system management
-**Responsibilities**:
-- User management
-- Product moderation
-- System configuration
-- Analytics and reporting
-
-## 🔄 Event-Driven Architecture
-
-### Event Bus (NATS)
-The system uses NATS for asynchronous communication between services:
-
-```typescript
-// Event Types
-interface Events {
-  'user.registered': UserRegisteredEvent;
-  'user.verified': UserVerifiedEvent;
-  'product.created': ProductCreatedEvent;
-  'product.approved': ProductApprovedEvent;
-  'payment.completed': PaymentCompletedEvent;
-  'license.issued': LicenseIssuedEvent;
-  'download.initiated': DownloadInitiatedEvent;
-  'review.submitted': ReviewSubmittedEvent;
-}
-
-// Example Event Handler
-@EventHandler('payment.completed')
-export class PaymentCompletedHandler {
-  async handle(event: PaymentCompletedEvent) {
-    // Issue license
-    await this.licensingService.issueLicense(event.userId, event.productId);
-    
-    // Send confirmation email
-    await this.notificationsService.sendPaymentConfirmation(event.userId);
-    
-    // Update product stats
-    await this.catalogService.incrementDownloads(event.productId);
-  }
-}
-```
-
-## 🗄️ Database Architecture
-
-### MongoDB Collections per Service
-
-#### Authentication Service
-- `users` - User accounts and profiles
-- `sessions` - Active user sessions
-- `password_resets` - Password reset tokens
-
-#### Catalog Service
-- `products` - Product catalog
-- `categories` - Product categories
-- `tags` - Product tags
-
-#### Assets Service
-- `assets` - File metadata
-- `asset_versions` - Version history
-- `scan_results` - Virus scan results
-
-#### Payments Service
-- `payment_intents` - Payment transactions
-- `subscriptions` - Active subscriptions
-- `invoices` - Generated invoices
-
-#### Licensing Service
-- `licenses` - User licenses
-- `entitlements` - Access permissions
-- `usage_logs` - License usage tracking
-
-#### Downloads Service
-- `downloads` - Download history
-- `download_links` - Presigned URLs
-
-#### Reviews Service
-- `reviews` - Product reviews
-- `ratings` - Product ratings
 
 ## 🔐 Security Architecture
 
 ### Authentication & Authorization
-- **JWT Tokens**: Stateless authentication with refresh tokens
-- **OAuth 2.0**: Integration with Google, GitHub, Microsoft
-- **RBAC**: Role-based access control with fine-grained permissions
-- **API Keys**: For vendor integrations
 
-### Data Security
-- **Encryption at Rest**: MongoDB encryption with AWS KMS
-- **Encryption in Transit**: TLS 1.3 for all communications
-- **Secret Management**: HashiCorp Vault for secrets
-- **Input Validation**: Comprehensive input sanitization
+**JWT-Based Authentication**:
+- **Access Token**: Short-lived (1 hour)
+- **Refresh Token**: Long-lived (7 days)
+- **Token Storage**: Redis for blacklisting
+- **Password Security**: bcrypt with 10 rounds
 
-### Infrastructure Security
-- **WAF**: Web Application Firewall with Cloudflare
-- **DDoS Protection**: Cloudflare DDoS mitigation
-- **Network Security**: VPC with private subnets
-- **Container Security**: Image scanning and runtime protection
-
-## 📊 Monitoring & Observability
-
-### Application Monitoring
-- **APM**: OpenTelemetry with Jaeger for distributed tracing
-- **Metrics**: Prometheus for metrics collection
-- **Logging**: Structured logging with ELK stack
-- **Error Tracking**: Sentry for error monitoring
-
-### Infrastructure Monitoring
-- **System Metrics**: Node Exporter for system metrics
-- **Database Monitoring**: MongoDB monitoring with Percona
-- **Cache Monitoring**: Redis monitoring
-- **Network Monitoring**: Network latency and throughput
-
-### Alerting
-- **Critical Alerts**: PagerDuty integration
-- **Warning Alerts**: Slack notifications
-- **Escalation**: Automated escalation procedures
-
-## 🚀 Performance Optimization
-
-### Frontend Performance
-- **Code Splitting**: Route-based and component-based splitting
-- **Image Optimization**: Next.js Image component with WebP
-- **Caching**: Service Worker for offline functionality
-- **CDN**: Global CDN for static assets
-
-### Backend Performance
-- **Database Indexing**: Optimized MongoDB indexes
-- **Caching Strategy**: Redis for frequently accessed data
-- **Connection Pooling**: Database connection optimization
-- **Load Balancing**: Horizontal scaling with load balancers
-
-### Infrastructure Performance
-- **Auto Scaling**: Kubernetes HPA for automatic scaling
-- **Resource Optimization**: Right-sized containers
-- **Network Optimization**: CDN and edge caching
-- **Database Optimization**: Read replicas and sharding
-
-## 🔄 CI/CD Pipeline
-
-### Development Workflow
-1. **Feature Branch**: Create feature branch from main
-2. **Development**: Local development with Docker Compose
-3. **Testing**: Automated tests (unit, integration, e2e)
-4. **Code Review**: Pull request with automated checks
-5. **Staging**: Deploy to staging environment
-6. **Production**: Deploy to production with blue-green deployment
-
-### Pipeline Stages
-```yaml
-# GitHub Actions Pipeline
-name: CI/CD Pipeline
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-      - name: Setup Node.js
-      - name: Install dependencies
-      - name: Run linting
-      - name: Run unit tests
-      - name: Run integration tests
-      - name: Run e2e tests
-      - name: Build applications
-      - name: Security scan
-      - name: Upload coverage
-
-  deploy-staging:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
-    steps:
-      - name: Deploy to staging
-      - name: Run smoke tests
-      - name: Notify team
-
-  deploy-production:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Deploy to production
-      - name: Run health checks
-      - name: Notify stakeholders
+**Authorization Levels**:
+```
+1. Public endpoints (no auth)
+2. Authenticated users
+3. Vendor-only endpoints
+4. Admin-only endpoints
 ```
 
-## 📈 Scalability Considerations
+### Security Layers
+
+```
+┌─────────────────────────────────────┐
+│    Edge Security (Future)           │
+│    • Cloudflare WAF                 │
+│    • DDoS Protection                │
+│    • SSL/TLS Termination            │
+└─────────────────────────────────────┘
+           │
+┌─────────────────────────────────────┐
+│    Application Security             │
+│    • JWT Authentication             │
+│    • Rate Limiting (Redis)          │
+│    • CORS Configuration             │
+│    • Helmet Security Headers        │
+│    • Input Validation               │
+└─────────────────────────────────────┘
+           │
+┌─────────────────────────────────────┐
+│    Data Security                    │
+│    • MongoDB Authentication         │
+│    • Encrypted Connections          │
+│    • Database Per Service           │
+│    • Backup & Recovery              │
+└─────────────────────────────────────┘
+```
+
+## 📈 Performance Optimization
+
+### Caching Strategy
+
+**Redis Cache Layers**:
+
+1. **API Response Caching**
+   - Product listings: 5 minutes
+   - Categories: 1 hour
+   - Static content: 24 hours
+
+2. **Session Storage**
+   - User sessions
+   - JWT blacklist
+   - Rate limit counters
+
+3. **Database Query Caching**
+   - Frequently accessed data
+   - Computed results
+   - Aggregation results
+
+### Database Optimization
+
+**MongoDB Indexes**:
+```javascript
+// Products collection
+db.products.createIndex({ vendorId: 1, status: 1 });
+db.products.createIndex({ category: 1, price: 1 });
+db.products.createIndex({ name: "text", description: "text" });
+
+// Orders collection
+db.orders.createIndex({ userId: 1, createdAt: -1 });
+db.orders.createIndex({ status: 1, paymentStatus: 1 });
+
+// Users collection
+db.users.createIndex({ email: 1 }, { unique: true });
+```
+
+**Connection Pooling**:
+```typescript
+mongoose.connect(uri, {
+  maxPoolSize: 10,
+  minPoolSize: 2,
+  socketTimeoutMS: 45000
+});
+```
+
+### Load Balancing
+
+**Nginx Configuration**:
+```nginx
+upstream api_gateway {
+  server api-gateway-1:4000;
+  server api-gateway-2:4000;
+  server api-gateway-3:4000;
+}
+
+server {
+  listen 80;
+  location /api {
+    proxy_pass http://api_gateway;
+  }
+}
+```
+
+## 🔄 Data Flow Patterns
+
+### 1. User Registration Flow
+
+```
+Client → API Gateway → Auth Service
+                          ↓
+                     Create User
+                          ↓
+                    Publish Event → Kafka (user.registered)
+                          ↓
+              ┌───────────┴───────────┐
+              ▼                       ▼
+        User Service            Email Service
+     (Create Profile)         (Send Welcome)
+```
+
+### 2. Product Purchase Flow
+
+```
+Client → API Gateway → Order Service
+                          ↓
+                    Create Order
+                          ↓
+                  Payment Service
+                          ↓
+                    Stripe/Razorpay
+                          ↓
+                    Update Order
+                          ↓
+                Publish Events → Kafka
+                          ↓
+        ┌─────────────────┼─────────────────┐
+        ▼                 ▼                  ▼
+   Vendor Svc      Email Service      License Svc
+   (Notify)        (Confirmation)      (Generate)
+```
+
+### 3. Search Flow with Elasticsearch
+
+```
+Client → API Gateway → Marketplace Service
+                          ↓
+                    Check Redis Cache
+                          ↓
+                    Cache Miss?
+                          ↓
+                   Query Elasticsearch
+                          ↓
+                    Store in Redis
+                          ↓
+                    Return Results
+```
+
+## 🔍 Monitoring & Observability
+
+### Health Checks
+
+**Endpoint**: `/health` on each service
+
+**Response**:
+```json
+{
+  "status": "healthy",
+  "service": "auth-service",
+  "version": "1.0.0",
+  "uptime": 12345,
+  "database": "connected",
+  "redis": "connected",
+  "kafka": "connected"
+}
+```
+
+### Logging Strategy
+
+**Winston Configuration**:
+```typescript
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ 
+      filename: 'logs/error.log', 
+      level: 'error' 
+    }),
+    new winston.transports.File({ 
+      filename: 'logs/combined.log' 
+    })
+  ]
+});
+```
+
+**Log Levels**:
+- **error**: Critical failures
+- **warn**: Warning conditions
+- **info**: General information
+- **debug**: Detailed debug information
+
+### Metrics Collection
+
+**Prometheus Metrics**:
+- Request rate
+- Response time
+- Error rate
+- Database connections
+- Cache hit rate
+- Queue depth
+
+## 🚀 Scalability Strategy
 
 ### Horizontal Scaling
-- **Stateless Services**: All services designed to be stateless
-- **Load Balancing**: Multiple instances behind load balancers
-- **Database Sharding**: MongoDB sharding for large datasets
-- **CDN**: Global content delivery network
 
-### Vertical Scaling
-- **Resource Monitoring**: Continuous monitoring of resource usage
-- **Auto Scaling**: Automatic scaling based on metrics
-- **Performance Tuning**: Regular performance optimization
-- **Capacity Planning**: Proactive capacity planning
-
-## 🔧 Development Environment
-
-### Local Development Setup
+Each service can scale independently:
 ```bash
-# Clone repository
-git clone https://github.com/your-org/autopilot.monster.git
-cd autopilot.monster
+# Scale auth service to 3 instances
+docker-compose up -d --scale auth-service=3
 
-# Install dependencies
-npm install
-
-# Start development environment
-docker-compose up -d
-
-# Run services
-npm run dev:all
-
-# Run tests
-npm run test:all
+# Scale marketplace service to 5 instances
+docker-compose up -d --scale marketplace-service=5
 ```
 
-### Docker Compose Configuration
-```yaml
-version: '3.8'
-services:
-  mongodb:
-    image: mongo:7.0
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
+### Database Scaling
 
-  redis:
-    image: redis:7.0-alpine
-    ports:
-      - "6379:6379"
-
-  nats:
-    image: nats:2.9-alpine
-    ports:
-      - "4222:4222"
-
-  # Frontend applications
-  customer-portal:
-    build: ./apps/customer-portal
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-
-  # Backend services
-  api-gateway:
-    build: ./services/api-gateway
-    ports:
-      - "3001:3001"
-    depends_on:
-      - mongodb
-      - redis
-      - nats
+**Read Replicas**:
+```javascript
+mongoose.connect(primaryUri);
+mongoose.connection.useReadPrefs('secondary');
 ```
 
-## 📋 API Design Standards
+**Sharding** (Future):
+- Shard by user ID
+- Shard by geographic region
+- Shard by product category
 
-### RESTful API Design
-- **Resource-based URLs**: `/api/v1/products`, `/api/v1/users`
-- **HTTP Methods**: GET, POST, PUT, PATCH, DELETE
-- **Status Codes**: Proper HTTP status codes
-- **Pagination**: Cursor-based pagination for large datasets
-- **Filtering**: Query parameters for filtering and sorting
+### Caching Scaling
 
-### GraphQL Integration
-- **Hybrid Approach**: REST for CRUD, GraphQL for complex queries
-- **Schema Design**: Well-defined schema with proper types
-- **Caching**: GraphQL query result caching
-- **Real-time**: GraphQL subscriptions for real-time updates
+**Redis Cluster**:
+- Multiple Redis nodes
+- Data replication
+- Automatic failover
+- High availability
 
-### API Documentation
-- **OpenAPI/Swagger**: Comprehensive API documentation
-- **Interactive Docs**: Swagger UI for testing
-- **SDK Generation**: Auto-generated client SDKs
-- **Versioning**: API versioning strategy
+## 🏗️ Future Enhancements
 
-## 🎯 Success Metrics
+### Planned Improvements
 
-### Technical Metrics
-- **Uptime**: 99.9% availability
-- **Response Time**: <200ms for 95th percentile
-- **Error Rate**: <0.1% error rate
-- **Throughput**: 10,000+ requests per second
+1. **Kubernetes Deployment**
+   - Auto-scaling pods
+   - Service mesh (Istio)
+   - Rolling updates
+   - Blue-green deployments
 
-### Business Metrics
-- **User Engagement**: Daily/Monthly active users
-- **Conversion Rate**: Free to paid conversion
-- **Revenue**: Monthly recurring revenue (MRR)
-- **Customer Satisfaction**: Net Promoter Score (NPS)
+2. **Advanced Monitoring**
+   - Distributed tracing (Jaeger)
+   - APM tools (New Relic/DataDog)
+   - Custom dashboards
+   - Alert management
 
-## 🔮 Future Considerations
+3. **Enhanced Security**
+   - OAuth 2.0 integration
+   - Two-factor authentication
+   - API key management
+   - Security audits
 
-### Technology Evolution
-- **Edge Computing**: Move compute closer to users
-- **AI/ML Integration**: Enhanced recommendation engine
-- **Blockchain**: Potential for decentralized marketplace
-- **Web3**: Integration with Web3 technologies
+4. **Performance Optimization**
+   - GraphQL gateway
+   - CDN integration
+   - Edge computing
+   - Database sharding
 
-### Scalability Roadmap
-- **Multi-region**: Global deployment strategy
-- **Microservices Evolution**: Further service decomposition
-- **Event Sourcing**: Event-driven architecture evolution
-- **CQRS**: Command Query Responsibility Segregation
+5. **Additional Features**
+   - WebSocket real-time updates
+   - AI-powered recommendations
+   - Advanced analytics
+   - Mobile applications
+
+## 📚 Related Documentation
+
+- [Backend Architecture](./backend-architecture.md) - Detailed backend service structure
+- [Backend Services](./backend-services.md) - Individual service documentation
+- [API Architecture](./api-architecture.md) - API design and patterns
+- [Deployment Guide](./deployment-guide.md) - Production deployment instructions
+- [Setup Guide](./SETUP.md) - Development environment setup
+- [API Reference](./API_REFERENCE.md) - Complete API documentation
 
 ---
 
-This technical architecture provides a solid foundation for building a production-ready, scalable marketplace platform. The modular design allows for independent development and deployment of services while maintaining system coherence and performance.
+<div align="center">
+
+**[⬆ Back to Top](#technical-architecture---autopilot-monster)**
+
+Made with ❤️ by the Autopilot Monster Team
+
+</div>

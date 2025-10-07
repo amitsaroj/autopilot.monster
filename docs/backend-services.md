@@ -1,1037 +1,795 @@
-# Backend Services - NestJS Microservices Architecture
+# Backend Services - Autopilot Monster
 
 ## 🏗️ Microservices Overview
 
-The Autopilot.monster backend is built using NestJS microservices architecture, providing scalable, maintainable, and production-ready services. Each service is independently deployable and follows domain-driven design principles.
+The Autopilot Monster backend consists of 9 independent Node.js microservices built with Fastify, providing scalable, maintainable, and production-ready services. Each service follows domain-driven design principles and communicates via REST APIs and Apache Kafka events.
 
 ## 🔧 Core Technologies
 
-- **Framework**: NestJS with TypeScript
-- **Database**: MongoDB with Mongoose ODM
-- **Message Queue**: NATS for inter-service communication
-- **Cache**: Redis for session storage and caching
-- **Validation**: Class-validator and class-transformer
-- **Documentation**: Swagger/OpenAPI
-- **Testing**: Jest with supertest
-- **Monitoring**: OpenTelemetry integration
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Node.js** | 18+ | JavaScript runtime |
+| **Fastify** | 4.26+ | High-performance web framework (70k req/s) |
+| **TypeScript** | 5.3+ | Type-safe development |
+| **MongoDB** | 7.0+ | NoSQL database (per service) |
+| **Mongoose** | 8.1+ | MongoDB ODM |
+| **Redis** | 7.2+ | Caching & session storage |
+| **Apache Kafka** | 7.4+ | Event streaming platform |
+| **KafkaJS** | 2.2+ | Kafka client for Node.js |
+| **IORedis** | 5.3+ | Redis client |
+| **Winston** | 3.11+ | Logging framework |
+| **bcryptjs** | 2.4+ | Password hashing |
+| **jsonwebtoken** | 9.0+ | JWT authentication |
+| **@fastify/swagger** | 8.14+ | API documentation |
+| **@fastify/cors** | 9.0+ | CORS handling |
+| **@fastify/helmet** | 11.1+ | Security headers |
 
 ## 🏢 Service Catalog
 
 ### 1. API Gateway Service
-**Port**: 3001
+
+**Port**: 4000  
 **Purpose**: Single entry point for all client requests
+**Technology**: Fastify + HTTP Proxy
 
 #### Key Features
-- Request routing and load balancing
-- Authentication middleware
-- Rate limiting and throttling
-- Request/response transformation
-- Circuit breaker pattern
+- ✅ Request routing to microservices
+- ✅ Load balancing
+- ✅ Rate limiting (Redis-backed)
+- ✅ CORS configuration
+- ✅ Security headers (Helmet)
+- ✅ Unified Swagger documentation
+- ✅ Health check aggregation
 
-#### Core Structure
-```typescript
-// src/main.ts
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  
-  // Global validation pipe
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
-  
-  // Swagger documentation
-  const config = new DocumentBuilder()
-    .setTitle('Autopilot.monster API')
-    .setDescription('AI Agents & Automation Marketplace API')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
-  
-  await app.listen(3001);
-}
-bootstrap();
+#### Project Structure
+```
+services/api-gateway-node/
+├── src/
+│   └── index.ts              # Main gateway file
+├── Dockerfile
+├── package.json
+└── tsconfig.json
 ```
 
-#### Authentication Guard
+#### Core Implementation
 ```typescript
-// src/guards/jwt-auth.guard.ts
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Reflector } from '@nestjs/core';
+// src/index.ts
+import Fastify from 'fastify';
+import proxy from '@fastify/http-proxy';
+import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
+import rateLimit from '@fastify/rate-limit';
 
-@Injectable()
-export class JwtAuthGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService,
-    private reflector: Reflector,
-  ) {}
+const app = Fastify({ logger: false });
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+// Security middleware
+await app.register(helmet);
+await app.register(cors, {
+  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000']
+});
 
-    if (isPublic) return true;
+// Rate limiting
+await app.register(rateLimit, {
+  max: 100,
+  timeWindow: '15 minutes',
+  redis: redisClient
+});
 
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+// Proxy routes
+await app.register(proxy, {
+  upstream: 'http://auth-service:4002',
+  prefix: '/api/auth',
+  rewritePrefix: '/api/auth',
+  http2: false,
+});
 
-    if (!token) {
-      throw new UnauthorizedException('Token not found');
-    }
+await app.register(proxy, {
+  upstream: 'http://marketplace-service:4003',
+  prefix: '/api/marketplace',
+  rewritePrefix: '/api/marketplace',
+  http2: false,
+});
 
-    try {
-      const payload = await this.jwtService.verifyAsync(token);
-      request.user = payload;
-    } catch {
-      throw new UnauthorizedException('Invalid token');
-    }
+// Health endpoint
+app.get('/health', async () => {
+  const services = await checkAllServices();
+  return { status: 'ok', services };
+});
 
-    return true;
-  }
-
-  private extractTokenFromHeader(request: any): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
-  }
-}
+// Start server
+await app.listen({ port: 4000, host: '0.0.0.0' });
 ```
 
-### 2. Authentication Service
-**Port**: 3002
-**Purpose**: User authentication and authorization
+#### Environment Variables
+```env
+API_GATEWAY_PORT=4000
+JWT_SECRET=your-secret-key
+CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
 
-#### Database Schema
+---
+
+### 2. Auth Service
+
+**Port**: 4002  
+**Database**: `auth_db` (MongoDB)  
+**Purpose**: Authentication & Authorization
+
+#### Key Features
+- ✅ User registration with email verification
+- ✅ Login with JWT tokens (access + refresh)
+- ✅ Password reset functionality
+- ✅ Token refresh mechanism
+- ✅ Token blacklisting (Redis)
+- ✅ OAuth 2.0 ready
+- ✅ Role-based access control
+
+#### Project Structure
+```
+services/auth-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── auth.controller.ts    # Route handlers
+│   ├── models/
+│   │   └── user.model.ts         # Mongoose schemas
+│   ├── routes/
+│   │   └── auth.routes.ts        # API routes
+│   ├── services/
+│   │   └── auth.service.ts       # Business logic
+│   ├── app.ts                     # Fastify app setup
+│   └── index.ts                   # Service entry point
+├── Dockerfile
+├── package.json
+└── tsconfig.json
+```
+
+#### User Model
 ```typescript
-// src/schemas/user.schema.ts
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+// src/models/user.model.ts
+import mongoose from 'mongoose';
 
-@Schema({ timestamps: true })
-export class User extends Document {
-  @Prop({ required: true, unique: true })
+interface IUser {
   email: string;
-
-  @Prop({ required: true })
-  passwordHash: string;
-
-  @Prop({
-    type: {
-      firstName: String,
-      lastName: String,
-      avatar: String,
-      bio: String,
-    },
-  })
-  profile: {
+  password: string;
     firstName: string;
     lastName: string;
-    avatar?: string;
-    bio?: string;
-  };
-
-  @Prop([{
-    name: { type: String, enum: ['customer', 'vendor', 'admin'] },
-    permissions: [String],
-    grantedAt: Date,
-    grantedBy: String,
-  }])
-  roles: Array<{
-    name: 'customer' | 'vendor' | 'admin';
-    permissions: string[];
-    grantedAt: Date;
-    grantedBy: string;
-  }>;
-
-  @Prop({ default: false })
+  role: 'user' | 'vendor' | 'admin';
   isEmailVerified: boolean;
-
-  @Prop()
-  lastLoginAt: Date;
-
-  @Prop()
-  refreshTokens: string[];
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
-```
-
-#### Authentication Controller
-```typescript
-// src/controllers/auth.controller.ts
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { AuthService } from '../services/auth.service';
-import { LoginDto, RegisterDto, RefreshTokenDto } from '../dto';
-
-@ApiTags('Authentication')
-@Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
-
-  @Post('register')
-  @ApiOperation({ summary: 'Register new user' })
-  @ApiResponse({ status: 201, description: 'User registered successfully' })
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
-  }
-
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'User login' })
-  @ApiResponse({ status: 200, description: 'Login successful' })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
-  }
-
-  @Post('refresh')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Refresh access token' })
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshToken(refreshTokenDto.refreshToken);
-  }
-}
-```
-
-### 3. Catalog Service
-**Port**: 3003
-**Purpose**: Product catalog management
-
-#### Product Schema
-```typescript
-// src/schemas/product.schema.ts
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
-
-@Schema({ timestamps: true })
-export class Product extends Document {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  vendorId: Types.ObjectId;
-
-  @Prop({ required: true })
-  title: string;
-
-  @Prop({ required: true })
-  description: string;
-
-  @Prop({ required: true })
-  shortDescription: string;
-
-  @Prop({
+const userSchema = new mongoose.Schema<IUser>({
+  email: { 
     type: String,
-    enum: ['ai-agent', 'n8n-workflow', 'automation-asset'],
     required: true,
-  })
-  type: 'ai-agent' | 'n8n-workflow' | 'automation-asset';
-
-  @Prop([String])
-  categories: string[];
-
-  @Prop([String])
-  tags: string[];
-
-  @Prop({
-    type: {
-      type: { type: String, enum: ['free', 'one-time', 'subscription'] },
-      amount: Number,
-      currency: { type: String, default: 'USD' },
-      subscriptionInterval: {
-        type: String,
-        enum: ['monthly', 'yearly'],
-      },
-    },
+    unique: true, 
+    lowercase: true 
+  },
+  password: { 
+    type: String, 
     required: true,
-  })
-  pricing: {
-    type: 'free' | 'one-time' | 'subscription';
-    amount?: number;
-    currency: string;
-    subscriptionInterval?: 'monthly' | 'yearly';
-  };
-
-  @Prop({
-    type: {
-      thumbnail: String,
-      screenshots: [String],
-      demoVideo: String,
-    },
-  })
-  media: {
-    thumbnail: string;
-    screenshots: string[];
-    demoVideo?: string;
-  };
-
-  @Prop({
+    select: false 
+  },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  role: { 
     type: String,
-    enum: ['draft', 'pending', 'approved', 'rejected', 'suspended'],
-    default: 'draft',
-  })
-  status: 'draft' | 'pending' | 'approved' | 'rejected' | 'suspended';
+    enum: ['user', 'vendor', 'admin'], 
+    default: 'user' 
+  },
+  isEmailVerified: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true }
+}, { 
+  timestamps: true 
+});
 
-  @Prop({
-    type: {
-      downloads: { type: Number, default: 0 },
-      rating: { type: Number, default: 0 },
-      reviewCount: { type: Number, default: 0 },
-    },
-  })
-  stats: {
-    downloads: number;
-    rating: number;
-    reviewCount: number;
-  };
-}
-
-export const ProductSchema = SchemaFactory.createForClass(Product);
+export const User = mongoose.model<IUser>('User', userSchema);
 ```
 
-#### Catalog Service Implementation
+#### Auth Service Implementation
 ```typescript
-// src/services/catalog.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Product } from '../schemas/product.schema';
-import { CreateProductDto, UpdateProductDto, SearchProductsDto } from '../dto';
+// src/services/auth.service.ts
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { User } from '../models/user.model';
+import { kafkaManager } from '../../../shared/config/kafka';
 
-@Injectable()
-export class CatalogService {
-  constructor(
-    @InjectModel(Product.name) private productModel: Model<Product>,
-  ) {}
-
-  async create(createProductDto: CreateProductDto): Promise<Product> {
-    const product = new this.productModel(createProductDto);
-    return product.save();
-  }
-
-  async findAll(searchDto: SearchProductsDto): Promise<{
-    products: Product[];
-    total: number;
-    page: number;
-    limit: number;
-  }> {
-    const {
-      page = 1,
-      limit = 20,
-      category,
-      type,
-      priceMin,
-      priceMax,
-      search,
-      sortBy = 'createdAt',
-      sortOrder = 'desc',
-    } = searchDto;
-
-    const query: any = { status: 'approved' };
-
-    // Build search query
-    if (search) {
-      query.$text = { $search: search };
-    }
-
-    if (category) {
-      query.categories = { $in: [category] };
-    }
-
-    if (type) {
-      query.type = type;
-    }
-
-    if (priceMin !== undefined || priceMax !== undefined) {
-      query['pricing.amount'] = {};
-      if (priceMin !== undefined) query['pricing.amount'].$gte = priceMin;
-      if (priceMax !== undefined) query['pricing.amount'].$lte = priceMax;
-    }
-
-    const sort: any = {};
-    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
-
-    const [products, total] = await Promise.all([
-      this.productModel
-        .find(query)
-        .sort(sort)
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .populate('vendorId', 'profile.firstName profile.lastName')
-        .exec(),
-      this.productModel.countDocuments(query),
-    ]);
-
-    return {
-      products,
-      total,
-      page,
-      limit,
+export class AuthService {
+  async register(data: RegisterDto) {
+    // Hash password
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    
+    // Create user
+    const user = await User.create({
+      ...data,
+      password: hashedPassword
+    });
+    
+    // Generate tokens
+    const accessToken = this.generateAccessToken(user);
+    const refreshToken = this.generateRefreshToken(user);
+    
+    // Publish event to Kafka
+    await kafkaManager.publish('user.registered', {
+      userId: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      timestamp: new Date().toISOString()
+    });
+    
+    return { 
+      user: this.sanitizeUser(user), 
+      accessToken, 
+      refreshToken 
     };
   }
-
-  async findById(id: string): Promise<Product> {
-    const product = await this.productModel
-      .findById(id)
-      .populate('vendorId', 'profile.firstName profile.lastName')
-      .exec();
-
-    if (!product) {
-      throw new NotFoundException('Product not found');
+  
+  async login(email: string, password: string) {
+    // Find user
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      throw new Error('Invalid credentials');
     }
+    
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      throw new Error('Invalid credentials');
+    }
+    
+    // Generate tokens
+    const accessToken = this.generateAccessToken(user);
+    const refreshToken = this.generateRefreshToken(user);
+    
+    // Publish event
+    await kafkaManager.publish('user.logged-in', {
+      userId: user._id.toString(),
+      email: user.email,
+      timestamp: new Date().toISOString()
+    });
 
-    return product;
+    return {
+      user: this.sanitizeUser(user), 
+      accessToken, 
+      refreshToken 
+    };
   }
-
-  async incrementDownloads(id: string): Promise<void> {
-    await this.productModel.findByIdAndUpdate(
-      id,
-      { $inc: { 'stats.downloads': 1 } },
+  
+  generateAccessToken(user: any) {
+    return jwt.sign(
+      { 
+        userId: user._id.toString(), 
+        email: user.email, 
+        role: user.role 
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: '1h' }
     );
   }
-}
-```
-
-### 4. Assets Service
-**Port**: 3004
-**Purpose**: File storage and asset management
-
-#### Asset Schema
-```typescript
-// src/schemas/asset.schema.ts
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
-
-@Schema({ timestamps: true })
-export class Asset extends Document {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'Product' })
-  productId: Types.ObjectId;
-
-  @Prop({ required: true })
-  fileName: string;
-
-  @Prop({ required: true })
-  originalName: string;
-
-  @Prop({ required: true })
-  mimeType: string;
-
-  @Prop({ required: true })
-  size: number;
-
-  @Prop({ required: true })
-  path: string;
-
-  @Prop({ required: true })
-  version: string;
-
-  @Prop({
-    type: {
-      status: { type: String, enum: ['pending', 'clean', 'infected'] },
-      scannedAt: Date,
-      engine: String,
-    },
-  })
-  scanResult: {
-    status: 'pending' | 'clean' | 'infected';
-    scannedAt: Date;
-    engine: string;
-  };
-
-  @Prop({ default: false })
-  isPreview: boolean;
-
-  @Prop()
-  metadata: Record<string, any>;
-}
-
-export const AssetSchema = SchemaFactory.createForClass(Asset);
-```
-
-#### File Upload Service
-```typescript
-// src/services/asset.service.ts
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { S3 } from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
-import { Asset } from '../schemas/asset.schema';
-import { VirusScanService } from './virus-scan.service';
-
-@Injectable()
-export class AssetService {
-  private s3: S3;
-
-  constructor(
-    @InjectModel(Asset.name) private assetModel: Model<Asset>,
-    private virusScanService: VirusScanService,
-  ) {
-    this.s3 = new S3({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      region: process.env.AWS_REGION,
-    });
+  
+  generateRefreshToken(user: any) {
+    return jwt.sign(
+      { userId: user._id.toString() },
+      process.env.JWT_REFRESH_SECRET!,
+      { expiresIn: '7d' }
+    );
   }
-
-  async uploadAsset(
-    file: Express.Multer.File,
-    productId: string,
-    isPreview = false,
-  ): Promise<Asset> {
-    // Validate file
-    this.validateFile(file);
-
-    // Generate unique filename
-    const fileName = `${uuidv4()}-${file.originalname}`;
-    const path = `assets/${productId}/${fileName}`;
-
-    try {
-      // Upload to S3
-      await this.s3.upload({
-        Bucket: process.env.S3_BUCKET,
-        Key: path,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      }).promise();
-
-      // Create asset record
-      const asset = new this.assetModel({
-        productId,
-        fileName,
-        originalName: file.originalname,
-        mimeType: file.mimetype,
-        size: file.size,
-        path,
-        version: '1.0.0',
-        isPreview,
-        scanResult: {
-          status: 'pending',
-          scannedAt: new Date(),
-          engine: 'ClamAV',
-        },
-      });
-
-      const savedAsset = await asset.save();
-
-      // Trigger virus scan
-      this.virusScanService.scanAsset(savedAsset._id.toString());
-
-      return savedAsset;
-    } catch (error) {
-      throw new BadRequestException('Failed to upload asset');
-    }
-  }
-
-  async generatePresignedUrl(assetId: string, expiresIn = 3600): Promise<string> {
-    const asset = await this.assetModel.findById(assetId);
-    
-    if (!asset) {
-      throw new BadRequestException('Asset not found');
-    }
-
-    if (asset.scanResult.status !== 'clean') {
-      throw new BadRequestException('Asset not available for download');
-    }
-
-    return this.s3.getSignedUrl('getObject', {
-      Bucket: process.env.S3_BUCKET,
-      Key: asset.path,
-      Expires: expiresIn,
-    });
-  }
-
-  private validateFile(file: Express.Multer.File): void {
-    const maxSize = 100 * 1024 * 1024; // 100MB
-    const allowedTypes = [
-      'application/json',
-      'application/zip',
-      'text/plain',
-      'application/pdf',
-    ];
-
-    if (file.size > maxSize) {
-      throw new BadRequestException('File size exceeds 100MB limit');
-    }
-
-    if (!allowedTypes.includes(file.mimetype)) {
-      throw new BadRequestException('File type not supported');
-    }
+  
+  sanitizeUser(user: any) {
+    const { password, ...sanitized } = user.toObject();
+    return sanitized;
   }
 }
 ```
 
-### 5. Payments Service
-**Port**: 3005
-**Purpose**: Payment processing and subscription management
+#### API Endpoints
+```
+POST /api/auth/register          # Register new user
+POST /api/auth/login             # User login
+POST /api/auth/logout            # Logout user
+POST /api/auth/refresh           # Refresh access token
+POST /api/auth/forgot-password   # Request password reset
+POST /api/auth/reset-password    # Reset password
+GET  /api/auth/verify/:token     # Verify email
+GET  /api/auth/profile           # Get current user profile
+```
 
-#### Payment Intent Schema
+#### Kafka Events Published
+- `user.registered` - When new user signs up
+- `user.logged-in` - When user logs in
+
+---
+
+### 3. Marketplace Service
+
+**Port**: 4003  
+**Database**: `marketplace_db` (MongoDB)  
+**Purpose**: Product catalog management
+
+#### Key Features
+- ✅ Product CRUD operations
+- ✅ Category management
+- ✅ Product reviews & ratings
+- ✅ Search & filtering
+- ✅ Featured/popular products
+- ✅ Vendor product listings
+- ✅ Elasticsearch integration (optional)
+
+#### Project Structure
+```
+services/marketplace-service-node/
+├── src/
+│   ├── controllers/
+│   │   └── marketplace.controller.ts
+│   ├── models/
+│   │   ├── product.model.ts
+│   │   ├── category.model.ts
+│   │   └── review.model.ts
+│   ├── routes/
+│   │   └── marketplace.routes.ts
+│   ├── services/
+│   │   └── marketplace.service.ts
+│   ├── app.ts
+│   └── index.ts
+```
+
+#### Product Model
 ```typescript
-// src/schemas/payment-intent.schema.ts
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+// src/models/product.model.ts
+interface IProduct {
+  vendorId: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  category: string;
+  tags: string[];
+  images: string[];
+  thumbnail?: string;
+  rating: number;
+  reviewCount: number;
+  downloadCount: number;
+  isFeatured: boolean;
+  isPopular: boolean;
+  status: 'active' | 'pending' | 'rejected' | 'draft';
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-@Schema({ timestamps: true })
-export class PaymentIntent extends Document {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  userId: Types.ObjectId;
+const productSchema = new mongoose.Schema<IProduct>({
+  vendorId: { type: String, required: true, index: true },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  price: { type: Number, required: true, min: 0 },
+  originalPrice: { type: Number },
+  category: { type: String, required: true, index: true },
+  tags: [{ type: String }],
+  images: [{ type: String }],
+  thumbnail: { type: String },
+  rating: { type: Number, default: 0, min: 0, max: 5 },
+  reviewCount: { type: Number, default: 0 },
+  downloadCount: { type: Number, default: 0 },
+  isFeatured: { type: Boolean, default: false },
+  isPopular: { type: Boolean, default: false },
+  status: { 
+    type: String, 
+    enum: ['active', 'pending', 'rejected', 'draft'], 
+    default: 'pending' 
+  }
+}, { timestamps: true });
 
-  @Prop({ required: true, type: Types.ObjectId, ref: 'Product' })
-  productId: Types.ObjectId;
+// Indexes for performance
+productSchema.index({ vendorId: 1, status: 1 });
+productSchema.index({ category: 1, price: 1 });
+productSchema.index({ name: 'text', description: 'text' });
 
-  @Prop({ required: true })
-  amount: number;
+export const Product = mongoose.model<IProduct>('Product', productSchema);
+```
 
-  @Prop({ required: true })
+#### API Endpoints
+```
+GET    /api/marketplace/products          # List products
+GET    /api/marketplace/products/:id      # Get product details
+POST   /api/marketplace/products          # Create product (vendor)
+PUT    /api/marketplace/products/:id      # Update product (vendor)
+DELETE /api/marketplace/products/:id      # Delete product (vendor)
+GET    /api/marketplace/categories        # List categories
+GET    /api/marketplace/products/:id/reviews  # Get reviews
+POST   /api/marketplace/products/:id/reviews  # Add review
+```
+
+#### Kafka Events Published
+- `product.created` - New product added
+- `product.updated` - Product modified
+- `product.deleted` - Product removed
+
+---
+
+### 4. Cart Service
+
+**Port**: 4009  
+**Database**: `cart_db` (MongoDB)  
+**Purpose**: Shopping cart management
+
+#### Key Features
+- ✅ Add/remove items
+- ✅ Update quantities
+- ✅ Cart persistence
+- ✅ Price calculations
+- ✅ Session-based carts
+- ✅ Auto-expiration
+
+#### Cart Model
+```typescript
+interface ICart {
+  userId: string;
+  items: Array<{
+    productId: string;
+    productName: string;
+    price: number;
+    quantity: number;
+    thumbnail?: string;
+  }>;
+  subtotal: number;
+  tax: number;
+  total: number;
   currency: string;
-
-  @Prop({
-    type: String,
-    enum: ['pending', 'succeeded', 'failed', 'canceled'],
-    default: 'pending',
-  })
-  status: 'pending' | 'succeeded' | 'failed' | 'canceled';
-
-  @Prop()
-  stripePaymentIntentId: string;
-
-  @Prop()
-  paymentMethodId: string;
-
-  @Prop({ type: Object })
-  metadata: Record<string, any>;
-
-  @Prop()
-  completedAt: Date;
-}
-
-export const PaymentIntentSchema = SchemaFactory.createForClass(PaymentIntent);
-```
-
-### 6. Licensing Service
-**Port**: 3006
-**Purpose**: Digital rights management
-
-#### License Schema
-```typescript
-// src/schemas/license.schema.ts
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
-
-@Schema({ timestamps: true })
-export class License extends Document {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  userId: Types.ObjectId;
-
-  @Prop({ required: true, type: Types.ObjectId, ref: 'Product' })
-  productId: Types.ObjectId;
-
-  @Prop({ required: true, type: Types.ObjectId, ref: 'PaymentIntent' })
-  paymentIntentId: Types.ObjectId;
-
-  @Prop({
-    type: String,
-    enum: ['perpetual', 'subscription', 'trial'],
-    required: true,
-  })
-  type: 'perpetual' | 'subscription' | 'trial';
-
-  @Prop({
-    type: String,
-    enum: ['active', 'expired', 'suspended', 'revoked'],
-    default: 'active',
-  })
-  status: 'active' | 'expired' | 'suspended' | 'revoked';
-
-  @Prop({
-    type: {
-      download: { type: Boolean, default: true },
-      commercialUse: { type: Boolean, default: false },
-      redistribution: { type: Boolean, default: false },
-      modification: { type: Boolean, default: false },
-    },
-  })
-  permissions: {
-    download: boolean;
-    commercialUse: boolean;
-    redistribution: boolean;
-    modification: boolean;
-  };
-
-  @Prop({
-    type: {
-      maxDownloads: Number,
-      maxDevices: Number,
-      expirationDate: Date,
-    },
-  })
-  limits: {
-    maxDownloads?: number;
-    maxDevices?: number;
-    expirationDate?: Date;
-  };
-
-  @Prop({ required: true })
-  issuedAt: Date;
-
-  @Prop()
+  updatedAt: Date;
   expiresAt: Date;
 }
 
-export const LicenseSchema = SchemaFactory.createForClass(License);
-```
-
-## 🔄 Inter-Service Communication
-
-### NATS Event System
-```typescript
-// src/events/event.service.ts
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { connect, NatsConnection, JSONCodec } from 'nats';
-
-@Injectable()
-export class EventService implements OnModuleInit {
-  private nc: NatsConnection;
-  private jc = JSONCodec();
-
-  async onModuleInit() {
-    this.nc = await connect({
-      servers: process.env.NATS_URL || 'nats://localhost:4222',
-    });
+const cartSchema = new mongoose.Schema<ICart>({
+  userId: { type: String, required: true, unique: true, index: true },
+  items: [{
+    productId: { type: String, required: true },
+    productName: { type: String, required: true },
+    price: { type: Number, required: true },
+    quantity: { type: Number, required: true, min: 1 },
+    thumbnail: { type: String }
+  }],
+  subtotal: { type: Number, default: 0 },
+  tax: { type: Number, default: 0 },
+  total: { type: Number, default: 0 },
+  currency: { type: String, default: 'USD' },
+  expiresAt: { 
+    type: Date, 
+    default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
   }
+}, { timestamps: true });
 
-  async publish(subject: string, data: any): Promise<void> {
-    await this.nc.publish(subject, this.jc.encode(data));
-  }
+// Auto-delete expired carts
+cartSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-  async subscribe(subject: string, handler: (data: any) => void): Promise<void> {
-    const sub = this.nc.subscribe(subject);
-    
-    (async () => {
-      for await (const msg of sub) {
-        try {
-          const data = this.jc.decode(msg.data);
-          await handler(data);
-        } catch (error) {
-          console.error('Error processing message:', error);
-        }
-      }
-    })();
-  }
-}
+export const Cart = mongoose.model<ICart>('Cart', cartSchema);
 ```
 
-### Event Handlers
-```typescript
-// src/events/handlers/payment-completed.handler.ts
-import { Injectable } from '@nestjs/common';
-import { EventHandler } from '../decorators/event-handler.decorator';
-import { LicenseService } from '../services/license.service';
-import { NotificationService } from '../services/notification.service';
-
-@Injectable()
-export class PaymentCompletedHandler {
-  constructor(
-    private licenseService: LicenseService,
-    private notificationService: NotificationService,
-  ) {}
-
-  @EventHandler('payment.completed')
-  async handle(event: {
-    userId: string;
-    productId: string;
-    paymentIntentId: string;
-    amount: number;
-  }): Promise<void> {
-    // Issue license
-    await this.licenseService.issueLicense({
-      userId: event.userId,
-      productId: event.productId,
-      paymentIntentId: event.paymentIntentId,
-      type: 'perpetual',
-    });
-
-    // Send confirmation notification
-    await this.notificationService.sendPaymentConfirmation(
-      event.userId,
-      event.productId,
-    );
-  }
-}
+#### API Endpoints
+```
+GET    /api/cart              # Get cart
+POST   /api/cart/items        # Add item
+PUT    /api/cart/items/:id    # Update item
+DELETE /api/cart/items/:id    # Remove item
+DELETE /api/cart              # Clear cart
 ```
 
-## 🧪 Testing Strategy
-
-### Unit Testing
-```typescript
-// src/services/__tests__/catalog.service.spec.ts
-import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
-import { CatalogService } from '../catalog.service';
-import { Product } from '../../schemas/product.schema';
-
-describe('CatalogService', () => {
-  let service: CatalogService;
-  let mockProductModel: any;
-
-  beforeEach(async () => {
-    mockProductModel = {
-      new: jest.fn().mockResolvedValue({}),
-      constructor: jest.fn().mockResolvedValue({}),
-      find: jest.fn(),
-      findById: jest.fn(),
-      findByIdAndUpdate: jest.fn(),
-      save: jest.fn(),
-      exec: jest.fn(),
-    };
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        CatalogService,
-        {
-          provide: getModelToken(Product.name),
-          useValue: mockProductModel,
-        },
-      ],
-    }).compile();
-
-    service = module.get<CatalogService>(CatalogService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
-  it('should find products with search parameters', async () => {
-    const mockProducts = [{ title: 'Test Product' }];
-    mockProductModel.find.mockReturnValue({
-      sort: jest.fn().mockReturnValue({
-        skip: jest.fn().mockReturnValue({
-          limit: jest.fn().mockReturnValue({
-            populate: jest.fn().mockReturnValue({
-              exec: jest.fn().mockResolvedValue(mockProducts),
-            }),
-          }),
-        }),
-      }),
-    });
-
-    mockProductModel.countDocuments.mockResolvedValue(1);
-
-    const result = await service.findAll({
-      page: 1,
-      limit: 10,
-      search: 'test',
-    });
-
-    expect(result.products).toEqual(mockProducts);
-    expect(result.total).toBe(1);
-  });
-});
-```
-
-### Integration Testing
-```typescript
-// src/__tests__/catalog.integration.spec.ts
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from '../app.module';
-
-describe('Catalog (e2e)', () => {
-  let app: INestApplication;
-
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-  });
-
-  it('/catalog/products (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/catalog/products')
-      .expect(200)
-      .expect((res) => {
-        expect(res.body).toHaveProperty('products');
-        expect(res.body).toHaveProperty('total');
-      });
-  });
-
-  it('/catalog/products/:id (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/catalog/products/507f1f77bcf86cd799439011')
-      .expect(404);
-  });
-});
-```
-
-## 🚀 Deployment Configuration
-
-### Docker Configuration
-```dockerfile
-# Dockerfile
-FROM node:18-alpine AS builder
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-
-FROM node:18-alpine AS runtime
-
-WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY . .
-
-RUN npm run build
-
-EXPOSE 3000
-
-CMD ["npm", "run", "start:prod"]
-```
-
-### Kubernetes Deployment
-```yaml
-# k8s/catalog-service.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: catalog-service
-  labels:
-    app: catalog-service
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: catalog-service
-  template:
-    metadata:
-      labels:
-        app: catalog-service
-    spec:
-      containers:
-      - name: catalog-service
-        image: autopilot/catalog-service:latest
-        ports:
-        - containerPort: 3003
-        env:
-        - name: MONGODB_URI
-          valueFrom:
-            secretKeyRef:
-              name: db-secrets
-              key: mongodb-uri
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: cache-secrets
-              key: redis-url
-        - name: NATS_URL
-          value: "nats://nats-service:4222"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3003
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 3003
-          initialDelaySeconds: 5
-          periodSeconds: 5
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: catalog-service
-spec:
-  selector:
-    app: catalog-service
-  ports:
-  - port: 3003
-    targetPort: 3003
-  type: ClusterIP
+
+### 5. Order Service
+
+**Port**: 4004  
+**Database**: `order_db` (MongoDB)  
+**Purpose**: Order & payment processing
+
+#### Key Features
+- ✅ Order creation & management
+- ✅ Stripe integration
+- ✅ Razorpay integration
+- ✅ Payment webhook handling
+- ✅ Order status tracking
+- ✅ Transaction logs
+
+#### Order Model
+```typescript
+interface IOrder {
+  orderId: string;
+  userId: string;
+  items: Array<{
+    productId: string;
+    productName: string;
+    price: number;
+    quantity: number;
+    vendorId: string;
+  }>;
+  subtotal: number;
+  tax: number;
+  total: number;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentMethod: 'stripe' | 'razorpay';
+  paymentIntent?: string;
+  billingAddress: {
+    name: string;
+    email: string;
+    address: string;
+    city: string;
+    country: string;
+    zip: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const orderSchema = new mongoose.Schema<IOrder>({
+  orderId: { type: String, required: true, unique: true, index: true },
+  userId: { type: String, required: true, index: true },
+  items: [{
+    productId: { type: String, required: true },
+    productName: { type: String, required: true },
+    price: { type: Number, required: true },
+    quantity: { type: Number, required: true },
+    vendorId: { type: String, required: true }
+  }],
+  subtotal: { type: Number, required: true },
+  tax: { type: Number, default: 0 },
+  total: { type: Number, required: true },
+  status: { 
+    type: String,
+    enum: ['pending', 'processing', 'completed', 'cancelled', 'refunded'],
+    default: 'pending'
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'paid', 'failed', 'refunded'],
+    default: 'pending'
+  },
+  paymentMethod: { type: String, required: true },
+  paymentIntent: { type: String },
+  billingAddress: {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    address: { type: String, required: true },
+    city: { type: String, required: true },
+    country: { type: String, required: true },
+    zip: { type: String, required: true }
+  }
+}, { timestamps: true });
+
+orderSchema.index({ userId: 1, createdAt: -1 });
+orderSchema.index({ status: 1, paymentStatus: 1 });
+
+export const Order = mongoose.model<IOrder>('Order', orderSchema);
 ```
 
-## 📊 Monitoring and Observability
-
-### Health Checks
+#### Payment Integration
 ```typescript
-// src/health/health.controller.ts
-import { Controller, Get } from '@nestjs/common';
-import { HealthCheck, HealthCheckService, MongooseHealthIndicator } from '@nestjs/terminus';
+// Stripe
+import Stripe from 'stripe';
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-@Controller('health')
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private db: MongooseHealthIndicator,
-  ) {}
-
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      () => this.db.pingCheck('database'),
-    ]);
-  }
+async createPaymentIntent(order: IOrder) {
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: Math.round(order.total * 100), // cents
+    currency: 'usd',
+    metadata: {
+      orderId: order.orderId,
+      userId: order.userId
+    }
+  });
+  
+  return {
+    clientSecret: paymentIntent.client_secret,
+    paymentIntentId: paymentIntent.id
+  };
 }
 ```
 
-### Metrics Collection
+#### API Endpoints
+```
+POST   /api/orders                    # Create order
+GET    /api/orders                    # List orders
+GET    /api/orders/:id                # Get order
+POST   /api/orders/:id/payment        # Process payment
+POST   /api/orders/:id/cancel         # Cancel order
+POST   /api/orders/webhooks/stripe    # Stripe webhook
+POST   /api/orders/webhooks/razorpay  # Razorpay webhook
+```
+
+#### Kafka Events Published
+- `order.created` - New order created
+- `payment.success` - Payment completed
+- `payment.failed` - Payment failed
+- `order.cancelled` - Order cancelled
+
+---
+
+### 6. User Service
+
+**Port**: 4005  
+**Database**: `user_db` (MongoDB)  
+**Purpose**: User profile & preferences
+
+#### Key Features
+- ✅ User profile management
+- ✅ Wishlist functionality
+- ✅ Subscription management
+- ✅ Dashboard data
+- ✅ Purchase history
+
+#### API Endpoints
+```
+GET    /api/users/profile          # Get profile
+PUT    /api/users/profile          # Update profile
+GET    /api/users/dashboard        # Dashboard data
+GET    /api/users/wishlist         # Get wishlist
+POST   /api/users/wishlist         # Add to wishlist
+DELETE /api/users/wishlist/:id     # Remove from wishlist
+GET    /api/users/subscriptions    # Get subscriptions
+POST   /api/users/subscriptions    # Create subscription
+```
+
+#### Kafka Events Consumed
+- `user.registered` - Create default profile
+- `order.created` - Update purchase history
+
+---
+
+### 7. Vendor Service
+
+**Port**: 4006  
+**Database**: `vendor_db` (MongoDB)  
+**Purpose**: Vendor management
+
+#### Key Features
+- ✅ Vendor registration & onboarding
+- ✅ Product management
+- ✅ Analytics dashboard
+- ✅ Earnings tracking
+- ✅ Payout requests
+
+#### Vendor Model
 ```typescript
-// src/metrics/metrics.service.ts
-import { Injectable } from '@nestjs/common';
-import { register, Counter, Histogram } from 'prom-client';
-
-@Injectable()
-export class MetricsService {
-  private httpRequestsTotal = new Counter({
-    name: 'http_requests_total',
-    help: 'Total number of HTTP requests',
-    labelNames: ['method', 'route', 'status_code'],
-  });
-
-  private httpRequestDuration = new Histogram({
-    name: 'http_request_duration_seconds',
-    help: 'Duration of HTTP requests in seconds',
-    labelNames: ['method', 'route'],
-  });
-
-  constructor() {
-    register.registerMetric(this.httpRequestsTotal);
-    register.registerMetric(this.httpRequestDuration);
-  }
-
-  incrementHttpRequests(method: string, route: string, statusCode: number) {
-    this.httpRequestsTotal.inc({ method, route, status_code: statusCode });
-  }
-
-  observeHttpDuration(method: string, route: string, duration: number) {
-    this.httpRequestDuration.observe({ method, route }, duration);
-  }
-
-  getMetrics() {
-    return register.metrics();
-  }
+interface IVendor {
+  vendorId: string;
+    userId: string;
+  name: string;
+  description: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  avatar?: string;
+  verified: boolean;
+  status: 'active' | 'pending' | 'suspended';
+  productsCount: number;
+  totalRevenue: number;
+  averageRating: number;
+  joinDate: Date;
 }
 ```
 
-This comprehensive backend services documentation provides a complete foundation for building scalable, production-ready microservices using NestJS. Each service is designed to be independently deployable while maintaining system coherence through well-defined APIs and event-driven communication.
+#### API Endpoints
+```
+GET    /api/vendors/profile          # Get vendor profile
+PUT    /api/vendors/profile          # Update profile
+GET    /api/vendors/products         # List vendor products
+POST   /api/vendors/products         # Create product
+PUT    /api/vendors/products/:id     # Update product
+DELETE /api/vendors/products/:id     # Delete product
+GET    /api/vendors/analytics        # Get analytics
+GET    /api/vendors/earnings         # Get earnings
+POST   /api/vendors/payouts          # Request payout
+```
+
+---
+
+### 8. Content Service
+
+**Port**: 4008  
+**Database**: `content_db` (MongoDB)  
+**Purpose**: Content management (Blog, Help, Jobs)
+
+#### Key Features
+- ✅ Blog post management
+- ✅ Help articles
+- ✅ Tutorial system
+- ✅ Job listings
+- ✅ SEO optimization
+
+#### API Endpoints
+```
+GET    /api/content/blog             # List blog posts
+GET    /api/content/blog/:slug       # Get blog post
+POST   /api/content/blog             # Create post (admin)
+PUT    /api/content/blog/:id         # Update post (admin)
+DELETE /api/content/blog/:id         # Delete post (admin)
+GET    /api/content/help             # List help articles
+GET    /api/content/help/:slug       # Get help article
+GET    /api/content/jobs             # List jobs
+POST   /api/content/jobs/:id/apply   # Apply for job
+```
+
+---
+
+### 9. Admin Service
+
+**Port**: 4007  
+**Database**: `admin_db` (MongoDB)  
+**Purpose**: Platform administration
+
+#### Key Features
+- ✅ User management
+- ✅ Vendor approval system
+- ✅ Product moderation
+- ✅ Platform analytics
+- ✅ System settings
+
+#### API Endpoints
+```
+GET    /api/admin/dashboard          # Dashboard stats
+GET    /api/admin/users              # List users
+GET    /api/admin/users/:id          # Get user
+PUT    /api/admin/users/:id          # Update user
+DELETE /api/admin/users/:id          # Delete user
+GET    /api/admin/vendors            # List vendors
+POST   /api/admin/vendors/:id/approve    # Approve vendor
+POST   /api/admin/vendors/:id/reject     # Reject vendor
+GET    /api/admin/products           # List products
+POST   /api/admin/products/:id/approve   # Approve product
+POST   /api/admin/products/:id/reject    # Reject product
+```
+
+---
+
+## 🔗 Shared Infrastructure
+
+### Shared Configuration (`shared/config/`)
+
+1. **db.ts** - MongoDB Connection Manager
+2. **redis.ts** - Redis Client Manager
+3. **kafka.ts** - Kafka Producer/Consumer
+4. **logger.ts** - Winston Logger
+5. **env.ts** - Environment Variables
+
+### Shared Middleware (`shared/middleware/`)
+
+1. **auth.middleware.ts** - JWT Authentication
+2. **error.middleware.ts** - Error Handling
+3. **rateLimit.middleware.ts** - Rate Limiting
+4. **validation.middleware.ts** - Input Validation
+
+---
+
+## 📊 Service Communication
+
+### Synchronous (HTTP via API Gateway)
+```
+Client → API Gateway → Service
+```
+
+### Asynchronous (Kafka Events)
+```
+Service A → Kafka → Service B
+```
+
+---
+
+## 📚 Related Documentation
+
+- [Technical Architecture](./technical-architecture.md)
+- [Backend Architecture](./backend-architecture.md)
+- [API Architecture](./api-architecture.md)
+- [Setup Guide](./SETUP.md)
+- [API Reference](./API_REFERENCE.md)
+
+---
+
+<div align="center">
+
+**[⬆ Back to Top](#backend-services---autopilot-monster)**
+
+Made with ❤️ by the Autopilot Monster Team
+
+</div>
